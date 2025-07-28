@@ -1,9 +1,9 @@
 package com.betfair.video.api.infrastructure.in.controller;
 
 import com.betfair.video.api.infrastructure.in.dto.UserGeolocationDto;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,12 +13,11 @@ public class VideoApiController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VideoApiController.class);
 
+    private static final String UUID_HEADER = "X-UUID";
+
     @RequestMapping("/retrieveUserGeolocation")
-    public UserGeolocationDto retrieveUserGeolocation(@RequestHeader("X-UUID") String uuid,
-                                                      @RequestHeader("X-IP") String ip,
-                                                      @RequestHeader("X-Sportsbook-Region") String sportsbookRegion,
-                                                      @RequestHeader("X-Authentication") String authentication) {
-        LOGGER.info("[{}]: Enter retrieveUserGeolocation", "some-unique-request-id");
+    public UserGeolocationDto retrieveUserGeolocation(HttpServletRequest request) {
+        LOGGER.info("[{}] Enter retrieveUserGeolocation", request.getHeader(UUID_HEADER));
 
         return new UserGeolocationDto("GB", "ENG", 12345);
     }
