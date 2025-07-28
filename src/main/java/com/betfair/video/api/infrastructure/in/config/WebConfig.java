@@ -1,6 +1,6 @@
 package com.betfair.video.api.infrastructure.in.config;
 
-import com.betfair.video.api.infrastructure.in.interceptor.AuthenticationInterceptor;
+import com.betfair.video.api.infrastructure.in.interceptor.AccessControlInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -8,9 +8,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     
-    private final AuthenticationInterceptor authenticationInterceptor;
+    private final AccessControlInterceptor authenticationInterceptor;
     
-    public WebConfig(AuthenticationInterceptor authenticationInterceptor) {
+    public WebConfig(AccessControlInterceptor authenticationInterceptor) {
         this.authenticationInterceptor = authenticationInterceptor;
     }
     
