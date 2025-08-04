@@ -23,4 +23,9 @@ public class VideoAPIException extends RuntimeException {
     public VideoAPIExceptionErrorCodeEnum getErrorCode() {
         return errorCode;
     }
+
+    public String getSportType() {
+        return sportType;
+    }
+
 }

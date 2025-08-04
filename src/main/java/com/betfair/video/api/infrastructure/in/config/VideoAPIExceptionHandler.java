@@ -1,6 +1,8 @@
 package com.betfair.video.api.infrastructure.in.config;
 
-import com.betfair.video.api.infrastructure.in.exception.FaultCode;
+import com.betfair.video.api.infrastructure.in.dto.ErrorResponseDetailDto;
+import com.betfair.video.api.infrastructure.in.dto.VideoApiExceptionDto;
+import com.betfair.video.api.infrastructure.in.exception.ResponseCode;
 import com.betfair.video.api.infrastructure.in.exception.VideoAPIException;
 import com.betfair.video.api.infrastructure.in.exception.VideoAPIExceptionErrorCodeEnum;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,7 +22,7 @@ public class VideoAPIExceptionHandler {
 
         HttpStatus httpStatus = mapErrorCodeToHttpStatus(ex.getErrorCode());
 
-        Map<String, Object> errorResponse = createErrorResponse(ex.getResponseCode().getFaultCode());
+        Map<String, Object> errorResponse = createErrorResponse(ex);
 
         return new ResponseEntity<>(errorResponse, httpStatus);
     }
@@ -28,7 +30,9 @@ public class VideoAPIExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex, HttpServletRequest request) {
 
-        Map<String, Object> errorResponse = createErrorResponse(FaultCode.Server);
+        VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.UNRECOGNIZED_VALUE);
+
+        Map<String, Object> errorResponse = createErrorResponse(exception);
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -67,12 +71,15 @@ public class VideoAPIExceptionHandler {
         };
     }
 
-    private Map<String, Object> createErrorResponse(FaultCode faultCode) {
+    private Map<String, Object> createErrorResponse(VideoAPIException ex) {
+        VideoApiExceptionDto videoApiExceptionDto = new VideoApiExceptionDto(ex.getSportType(), ex.getErrorCode());
+        ErrorResponseDetailDto responseDetailDto = new ErrorResponseDetailDto(videoApiExceptionDto, ex.getClass().getSimpleName());
+
         Map<String, Object> errorResponse = new HashMap<>();
 
-        errorResponse.put("faultcode", faultCode);
+        errorResponse.put("faultcode", ex.getResponseCode().getFaultCode());
         errorResponse.put("faultstring", "DSC-????");
-        errorResponse.put("detail", new HashMap<String, Object>());
+        errorResponse.put("detail", responseDetailDto);
 
         return errorResponse;
     }

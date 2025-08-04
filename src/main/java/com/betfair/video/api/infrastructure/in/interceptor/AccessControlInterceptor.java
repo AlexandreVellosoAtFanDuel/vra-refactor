@@ -43,14 +43,6 @@ public class AccessControlInterceptor implements HandlerInterceptor {
             throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.RESTRICTED_COUNTRY, null);
         }
 
-        if (isStreamingOperation() && isAuthenticationIgnoredEmpty()) {
-            if (!isSessionValid()) {
-                LOGGER.error("[{}]: Valid session is required for operation", uuid);
-
-                throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.NO_SESSION, null);
-            }
-        }
-
         return true;
     }
 
@@ -61,21 +53,6 @@ public class AccessControlInterceptor implements HandlerInterceptor {
     // TODO: Validate user IP address
     private boolean isUserIpAddressValid(String ipAddress) {
         return Strings.isNotEmpty(ipAddress);
-    }
-
-    // TODO: Implement this
-    private boolean isStreamingOperation() {
-        return false;
-    }
-
-    // TODO: Implement this
-    private boolean isAuthenticationIgnoredEmpty() {
-        return false;
-    }
-
-    // TODO: Implement this
-    private boolean isSessionValid() {
-        return true;
     }
 
 } 
