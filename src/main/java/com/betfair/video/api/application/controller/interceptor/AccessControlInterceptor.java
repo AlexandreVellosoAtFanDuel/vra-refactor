@@ -15,7 +15,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class AccessControlInterceptor implements HandlerInterceptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccessControlInterceptor.class);
+    private static final Logger logger = LoggerFactory.getLogger(AccessControlInterceptor.class);
 
     @Value("${videoapi.application.key}")
     private String applicationKey;
@@ -28,17 +28,17 @@ public class AccessControlInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         final String uuid = request.getHeader(X_UUID);
 
-        LOGGER.info("[{}]: Enter AccessControlInterceptor", uuid);
+        logger.info("[{}]: Enter AccessControlInterceptor", uuid);
 
         // Check that the application key is set
         if (!isAppKeyValid(request.getHeader(X_APPLICATION_KEY))) {
-            LOGGER.error("[{}]: Valid application key is required for operation", uuid);
+            logger.error("[{}]: Valid application key is required for operation", uuid);
 
             throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.UNKNOWN_CONSUMER, null);
         }
 
         if (!isUserIpAddressValid(request.getHeader(X_IP))) {
-            LOGGER.error("[{}]: An IP address is required for operation", uuid);
+            logger.error("[{}]: An IP address is required for operation", uuid);
 
             throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.RESTRICTED_COUNTRY, null);
         }

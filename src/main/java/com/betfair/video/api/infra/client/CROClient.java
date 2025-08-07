@@ -1,4 +1,4 @@
-package com.betfair.video.api.infra;
+package com.betfair.video.api.infra.client;
 
 import com.betfair.video.api.application.dto.cro.RequestVerifySession;
 import com.betfair.video.api.application.dto.cro.ResponseVerifySession;
