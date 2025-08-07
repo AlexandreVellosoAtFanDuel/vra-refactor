@@ -1,6 +1,6 @@
-package com.betfair.video.api.infrastructure.in.controller;
+package com.betfair.video.api.application.controller;
 
-import com.betfair.video.api.infrastructure.in.dto.UserGeolocationDto;
+import com.betfair.video.api.application.dto.UserGeolocationDto;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

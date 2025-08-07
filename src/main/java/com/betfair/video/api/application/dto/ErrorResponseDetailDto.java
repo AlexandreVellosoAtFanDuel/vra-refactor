@@ -1,4 +1,4 @@
-package com.betfair.video.api.infrastructure.in.dto;
+package com.betfair.video.api.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

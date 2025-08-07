@@ -1,4 +1,4 @@
-package com.betfair.video.api.infrastructure.in.exception;
+package com.betfair.video.api.application.exception;
 
 public enum ResponseCode {
 

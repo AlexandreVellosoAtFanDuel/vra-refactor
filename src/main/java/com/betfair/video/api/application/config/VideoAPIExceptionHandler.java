@@ -1,10 +1,10 @@
-package com.betfair.video.api.infrastructure.in.config;
+package com.betfair.video.api.application.config;
 
-import com.betfair.video.api.infrastructure.in.dto.ErrorResponseDetailDto;
-import com.betfair.video.api.infrastructure.in.dto.VideoApiExceptionDto;
-import com.betfair.video.api.infrastructure.in.exception.ResponseCode;
-import com.betfair.video.api.infrastructure.in.exception.VideoAPIException;
-import com.betfair.video.api.infrastructure.in.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.application.dto.ErrorResponseDetailDto;
+import com.betfair.video.api.application.dto.VideoApiExceptionDto;
+import com.betfair.video.api.application.exception.ResponseCode;
+import com.betfair.video.api.application.exception.VideoAPIException;
+import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

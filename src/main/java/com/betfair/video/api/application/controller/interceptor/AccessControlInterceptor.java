@@ -1,8 +1,8 @@
-package com.betfair.video.api.infrastructure.in.interceptor;
+package com.betfair.video.api.application.controller.interceptor;
 
-import com.betfair.video.api.infrastructure.in.exception.ResponseCode;
-import com.betfair.video.api.infrastructure.in.exception.VideoAPIException;
-import com.betfair.video.api.infrastructure.in.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.application.exception.ResponseCode;
+import com.betfair.video.api.application.exception.VideoAPIException;
+import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.util.Strings;
@@ -28,7 +28,7 @@ public class AccessControlInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         final String uuid = request.getHeader(X_UUID);
 
-        LOGGER.info("[{}]: Enter accessControlInterceptor", uuid);
+        LOGGER.info("[{}]: Enter AccessControlInterceptor", uuid);
 
         // Check that the application key is set
         if (!isAppKeyValid(request.getHeader(X_APPLICATION_KEY))) {
