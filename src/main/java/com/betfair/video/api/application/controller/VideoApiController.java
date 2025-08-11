@@ -1,10 +1,8 @@
 package com.betfair.video.api.application.controller;
 
 import com.betfair.video.api.application.dto.UserGeolocationDto;
-import com.betfair.video.api.application.util.UserUtil;
+import com.betfair.video.api.application.util.UserContextBuilder;
 import com.betfair.video.api.domain.entity.User;
-import com.betfair.video.api.domain.service.UserGeolocationService;
-import com.betfair.video.api.domain.valueobject.UserGeolocation;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,21 +15,19 @@ public class VideoApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(VideoApiController.class);
 
-    private final UserGeolocationService userGeolocationService;
+    private final UserContextBuilder userContextBuilder;
 
-    public VideoApiController(UserGeolocationService userGeolocationService) {
-        this.userGeolocationService = userGeolocationService;
+    public VideoApiController(UserContextBuilder userContextBuilder) {
+        this.userContextBuilder = userContextBuilder;
     }
 
     @RequestMapping("/retrieveUserGeolocation")
     public UserGeolocationDto retrieveUserGeolocation(HttpServletRequest request) {
-        User user = UserUtil.createUserFromRequest(request);
+        User user = userContextBuilder.createUserFromRequest(request);
 
         logger.info("[{}] Enter retrieveUserGeolocation", user.getUuid());
 
-        UserGeolocation userGeolocation = userGeolocationService.getUserGeolocation(user);
-
-        return new UserGeolocationDto(userGeolocation.countryCode(), userGeolocation.subDivisionCode(), userGeolocation.dmaId());
+        return new UserGeolocationDto(user.getCountryCode(), user.getSubDivisionCode(), user.getDmaId());
     }
 
 }
