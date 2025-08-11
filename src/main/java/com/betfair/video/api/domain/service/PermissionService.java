@@ -17,6 +17,12 @@ public class PermissionService {
     private String userPermissionsServices;
 
     public UserPermissions createUserPermissions() {
+        Set<String> services = getUserServices();
+
+        return new UserPermissions(services);
+    }
+
+    private Set<String> getUserServices() {
         Set<String> services = new HashSet<>();
 
         if ("ALL".equalsIgnoreCase(userPermissionsServices)) {
@@ -31,7 +37,7 @@ public class PermissionService {
                     .collect(Collectors.toSet()));
         }
 
-        return new UserPermissions(services);
+        return services;
     }
 
 }

@@ -52,7 +52,7 @@ public class VideoApiController {
 
         logger.info("[{}]: User country sub-division: {}", context.uuid(), user.geolocation().subDivisionCode());
 
-        List<VideoScheduleItem> items = this.eventService.retrieveScheduleByExternalId(user, externalIdSource, externalId, channelTypeId, mobileDeviceId);
+        List<VideoScheduleItem> items = this.eventService.retrieveScheduleByExternalId(context, user, externalIdSource, externalId, channelTypeId, mobileDeviceId);
 
         return videoScheduleItemDtoMapper.mapToDtoList(items);
     }
