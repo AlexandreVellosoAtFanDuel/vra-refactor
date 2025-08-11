@@ -10,6 +10,7 @@ import com.betfair.video.api.infra.client.CROClient;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,6 +32,11 @@ public class AuthenticationAdapter implements AuthenticationPort {
             this.croClient.verifySession(request);
         } catch (FeignException fe) {
             logger.warn("Error verifying session: {}", fe.getMessage());
+
+            if (HttpStatus.UNAUTHORIZED.value() == fe.status()) {
+                throw new VideoAPIException(ResponseCode.Unauthorised, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS, null);
+            }
+
             throw new VideoAPIException(ResponseCode.Unauthorised, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, null);
         } catch (Exception e) {
             logger.error("Error verifying session", e);
