@@ -1,13 +1,10 @@
 package com.betfair.video.api.domain.entity;
 
-import java.util.List;
+import com.betfair.video.api.domain.valueobject.Geolocation;
+import com.betfair.video.api.domain.valueobject.UserPermissions;
 
 public record User(
-        String id,
-        String uuid,
-        List<String> ipAddresses,
-        String countryCode,
-        String subDivisionCode,
-        Integer dmaId
+        Geolocation geolocation,
+        UserPermissions permissions
 ) {
 }

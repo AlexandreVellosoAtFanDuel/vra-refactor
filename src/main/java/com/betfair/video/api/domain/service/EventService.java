@@ -14,16 +14,10 @@ import java.util.List;
 @Service
 public class EventService {
 
-    private final PermissionService permissionService;
-
-    public EventService(PermissionService permissionService) {
-        this.permissionService = permissionService;
-    }
-
     public List<VideoScheduleItem> retrieveScheduleByExternalId(User user, String externalIdSource, String externalId,
                                                                 Integer channelTypeId, Integer mobileDeviceId) {
 
-        if (!permissionService.userHasPermission(ServicePermission.VIDEO, user)) {
+        if (!user.permissions().hasPermission(ServicePermission.VIDEO)) {
             throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS, null);
         }
 

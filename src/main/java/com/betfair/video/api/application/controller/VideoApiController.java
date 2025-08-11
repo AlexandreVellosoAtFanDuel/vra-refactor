@@ -50,7 +50,7 @@ public class VideoApiController {
 
         User user = userService.createUserFromContext(context);
 
-        logger.info("[{}]: User country sub-division: {}", context.uuid(), user.subDivisionCode());
+        logger.info("[{}]: User country sub-division: {}", context.uuid(), user.geolocation().subDivisionCode());
 
         List<VideoScheduleItem> items = this.eventService.retrieveScheduleByExternalId(user, externalIdSource, externalId, channelTypeId, mobileDeviceId);
 
@@ -62,9 +62,9 @@ public class VideoApiController {
         RequestContext context = UserContextBuilder.createContextFromRequest(request);
         User user = userService.createUserFromContext(context);
 
-        logger.info("[{}] Enter retrieveUserGeolocation", user.uuid());
+        logger.info("[{}] Enter retrieveUserGeolocation", context.uuid());
 
-        return new UserGeolocationDto(user.countryCode(), user.subDivisionCode(), user.dmaId());
+        return new UserGeolocationDto(user.geolocation().countryCode(), user.geolocation().subDivisionCode(), user.geolocation().dmaId());
     }
 
 }
