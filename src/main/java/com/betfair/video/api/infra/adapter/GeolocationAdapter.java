@@ -1,9 +1,10 @@
 package com.betfair.video.api.infra.adapter;
 
 import com.betfair.video.api.domain.entity.User;
+import com.betfair.video.api.domain.entity.UserContext;
 import com.betfair.video.api.domain.port.GeolocationPort;
 import com.betfair.video.api.domain.valueobject.CountryAndSubdivisions;
-import com.betfair.video.api.domain.valueobject.UserGeolocation;
+import com.betfair.video.api.domain.valueobject.Geolocation;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.AbstractCityResponse;
@@ -39,10 +40,10 @@ public class GeolocationAdapter implements GeolocationPort {
     }
 
     @Override
-    public UserGeolocation getUserGeolocation(User user) {
-        String clientIp = getUserIpAddress(user);
+    public Geolocation getUserGeolocation(UserContext userContext) {
+        String clientIp = getUserIpAddress(userContext);
 
-        Integer metroCode = resolveDmaId(user)
+        Integer metroCode = resolveDmaId(userContext)
                 .orElse(null);
 
         try {
@@ -51,10 +52,10 @@ public class GeolocationAdapter implements GeolocationPort {
             CountryAndSubdivisions car = this.getCountryAndSubdivisions(clientAddress, cityReader);
             boolean isSuspect = SuspectNetworkAdapter.getInstance().isSuspectNetwork(clientIp);
 
-            return new UserGeolocation(car.countryCode(), car.getRegionCode(), metroCode, isSuspect);
+            return new Geolocation(car.countryCode(), car.getRegionCode(), metroCode, isSuspect);
         } catch (GeoIp2Exception | IllegalArgumentException | IOException ex) {
             logger.warn("Failed querying MaxMind GeoIp 2 database for ip {}. Falling back to default - unknown geo details", clientIp, ex);
-            return new UserGeolocation("--", null, metroCode, false);
+            return new Geolocation("--", null, metroCode, false);
         }
     }
 
@@ -87,8 +88,8 @@ public class GeolocationAdapter implements GeolocationPort {
         );
     }
 
-    private Optional<Integer> resolveDmaId(User user) {
-        String clientIp = getUserIpAddress(user);
+    private Optional<Integer> resolveDmaId(UserContext userContext) {
+        String clientIp = getUserIpAddress(userContext);
 
         Optional<Integer> dmaId = Optional.empty();
         try {
@@ -98,16 +99,16 @@ public class GeolocationAdapter implements GeolocationPort {
                     .map(Location::getMetroCode);
 
         } catch (IOException e) {
-            logger.error("[{}]: Exception occurred when handling user address {}, {}}", user.getUuid(), user.getIpAddress(), e.getMessage());
+            logger.error("[{}]: Exception occurred when handling user address {}, {}}", userContext.uuid(), clientIp, e.getMessage());
         } catch (GeoIp2Exception e) {
-            logger.error("[{}]: Exception occurred while retrieving geolocation data for user address {}, {}", user.getUuid(), user.getIpAddress(), e.getMessage());
+            logger.error("[{}]: Exception occurred while retrieving geolocation data for user address {}, {}", userContext.uuid(), clientIp, e.getMessage());
         }
 
         return dmaId;
     }
 
-    private String getUserIpAddress(User user) {
-        return Optional.ofNullable(user.getIpAddress())
+    private String getUserIpAddress(UserContext user) {
+        return Optional.ofNullable(user.resolvedIps())
                 .map(Collection::stream)
                 .map(Stream::findFirst)
                 .flatMap(firstIp -> firstIp)

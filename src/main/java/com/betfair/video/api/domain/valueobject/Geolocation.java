@@ -1,6 +1,6 @@
 package com.betfair.video.api.domain.valueobject;
 
-public record UserGeolocation(
+public record Geolocation(
         String countryCode,
         String subDivisionCode,
         Integer dmaId,

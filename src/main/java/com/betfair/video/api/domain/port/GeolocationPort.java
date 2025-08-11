@@ -1,10 +1,11 @@
 package com.betfair.video.api.domain.port;
 
 import com.betfair.video.api.domain.entity.User;
-import com.betfair.video.api.domain.valueobject.UserGeolocation;
+import com.betfair.video.api.domain.entity.UserContext;
+import com.betfair.video.api.domain.valueobject.Geolocation;
 
 public interface GeolocationPort {
 
-    UserGeolocation getUserGeolocation(User user);
+    Geolocation getUserGeolocation(UserContext context);
 
 }
