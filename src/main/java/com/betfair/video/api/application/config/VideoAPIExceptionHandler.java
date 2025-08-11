@@ -44,8 +44,9 @@ public class VideoAPIExceptionHandler {
                     NO_SESSION,
                     UNKNOWN_CONSUMER -> HttpStatus.BAD_REQUEST;
 
-            case INSUFFICIENT_ACCESS,
-                    RESTRICTED_COUNTRY,
+            case INSUFFICIENT_ACCESS -> HttpStatus.UNAUTHORIZED;
+
+            case RESTRICTED_COUNTRY,
                     INSUFFICIENT_FUNDING,
                     BBV_INSUFFICIENT_STAKES,
                     BBV_NO_STAKES,

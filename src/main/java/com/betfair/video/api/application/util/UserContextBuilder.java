@@ -1,6 +1,6 @@
 package com.betfair.video.api.application.util;
 
-import com.betfair.video.api.domain.entity.UserContext;
+import com.betfair.video.api.domain.entity.RequestContext;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class UserContextBuilder {
     private UserContextBuilder() {
     }
 
-    public static UserContext createUserFromRequest(HttpServletRequest request) {
+    public static RequestContext createContextFromRequest(HttpServletRequest request) {
         final String uuid = request.getHeader(UUID_HEADER);
 
         final String xIP = request.getHeader(X_IP);
@@ -25,7 +25,7 @@ public class UserContextBuilder {
         resolvedIps.add(xIP);
         resolvedIps.add(xIPs);
 
-        return new UserContext(uuid, resolvedIps);
+        return new RequestContext(uuid, resolvedIps);
     }
 
 }

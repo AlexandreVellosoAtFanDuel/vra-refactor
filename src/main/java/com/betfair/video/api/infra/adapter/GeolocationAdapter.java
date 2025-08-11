@@ -1,7 +1,6 @@
 package com.betfair.video.api.infra.adapter;
 
-import com.betfair.video.api.domain.entity.User;
-import com.betfair.video.api.domain.entity.UserContext;
+import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.port.GeolocationPort;
 import com.betfair.video.api.domain.valueobject.CountryAndSubdivisions;
 import com.betfair.video.api.domain.valueobject.Geolocation;
@@ -40,7 +39,7 @@ public class GeolocationAdapter implements GeolocationPort {
     }
 
     @Override
-    public Geolocation getUserGeolocation(UserContext userContext) {
+    public Geolocation getUserGeolocation(RequestContext userContext) {
         String clientIp = getUserIpAddress(userContext);
 
         Integer metroCode = resolveDmaId(userContext)
@@ -88,7 +87,7 @@ public class GeolocationAdapter implements GeolocationPort {
         );
     }
 
-    private Optional<Integer> resolveDmaId(UserContext userContext) {
+    private Optional<Integer> resolveDmaId(RequestContext userContext) {
         String clientIp = getUserIpAddress(userContext);
 
         Optional<Integer> dmaId = Optional.empty();
@@ -107,7 +106,7 @@ public class GeolocationAdapter implements GeolocationPort {
         return dmaId;
     }
 
-    private String getUserIpAddress(UserContext user) {
+    private String getUserIpAddress(RequestContext user) {
         return Optional.ofNullable(user.resolvedIps())
                 .map(Collection::stream)
                 .map(Stream::findFirst)
