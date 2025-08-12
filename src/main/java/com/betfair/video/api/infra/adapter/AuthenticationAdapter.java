@@ -31,12 +31,12 @@ public class AuthenticationAdapter implements AuthenticationPort {
         try {
             this.croClient.verifySession(request);
         } catch (FeignException fe) {
-            logger.warn("Error verifying session: {}", fe.getMessage());
-
             if (HttpStatus.UNAUTHORIZED.value() == fe.status()) {
+                logger.warn("Session verification failed with status: {}", fe.status());
                 throw new VideoAPIException(ResponseCode.Unauthorised, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS, null);
             }
 
+            logger.warn("Error when verifying session: {}", fe.getMessage());
             throw new VideoAPIException(ResponseCode.Unauthorised, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, null);
         } catch (Exception e) {
             logger.error("Error verifying session", e);
