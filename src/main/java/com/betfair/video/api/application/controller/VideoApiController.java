@@ -2,12 +2,12 @@ package com.betfair.video.api.application.controller;
 
 import com.betfair.video.api.application.dto.ContentTypeDto;
 import com.betfair.video.api.application.dto.UserGeolocationDto;
-import com.betfair.video.api.application.dto.VideoScheduleItemDto;
-import com.betfair.video.api.application.mapper.VideoScheduleItemDtoMapper;
+import com.betfair.video.api.application.dto.VideoStreamInfoDto;
+import com.betfair.video.api.application.mapper.VideoStreamInfoDtoMapper;
 import com.betfair.video.api.application.util.UserContextBuilder;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.entity.VideoScheduleItem;
+import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.service.EventService;
 import com.betfair.video.api.domain.service.UserService;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
@@ -30,16 +30,16 @@ public class VideoApiController {
 
     private final EventService eventService;
 
-    private final VideoScheduleItemDtoMapper videoScheduleItemDtoMapper;
+    private final VideoStreamInfoDtoMapper videoScheduleItemDtoMapper;
 
-    public VideoApiController(UserService userService, EventService eventService, VideoScheduleItemDtoMapper videoScheduleItemDtoMapper) {
+    public VideoApiController(UserService userService, EventService eventService, VideoStreamInfoDtoMapper videoScheduleItemDtoMapper) {
         this.userService = userService;
         this.eventService = eventService;
         this.videoScheduleItemDtoMapper = videoScheduleItemDtoMapper;
     }
 
     @RequestMapping("/retrieveStreamInfoByExternalId")
-    public List<VideoScheduleItemDto> retrieveStreamInfoByExternalId(
+    public VideoStreamInfoDto retrieveStreamInfoByExternalId(
             HttpServletRequest request,
             @RequestParam("externalIdSource") final String externalIdSource,
             @RequestParam("externalId") final String externalId,
@@ -63,7 +63,7 @@ public class VideoApiController {
 
         logger.info("[{}]: User country sub-division: {}", context.uuid(), user.geolocation().subDivisionCode());
 
-        List<VideoScheduleItem> items = this.eventService.retrieveScheduleByExternalId(
+        VideoStreamInfo item = this.eventService.retrieveScheduleByExternalId(
                 context,
                 user,
                 externalIdSource,
@@ -81,7 +81,7 @@ public class VideoApiController {
                 providerParams
         );
 
-        return videoScheduleItemDtoMapper.mapToDtoList(items);
+        return videoScheduleItemDtoMapper.mapToDto(item);
     }
 
     @RequestMapping("/retrieveUserGeolocation")

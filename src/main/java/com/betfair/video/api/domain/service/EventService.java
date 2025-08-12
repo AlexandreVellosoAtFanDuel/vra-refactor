@@ -9,14 +9,14 @@ import com.betfair.video.api.domain.entity.TypeChannel;
 import com.betfair.video.api.domain.entity.TypeMobileDevice;
 import com.betfair.video.api.domain.entity.TypeStream;
 import com.betfair.video.api.domain.entity.User;
-import com.betfair.video.api.domain.entity.VideoScheduleItem;
+import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.mapper.ExternalIdMapper;
 import com.betfair.video.api.domain.mapper.TypeStreamMapper;
 import com.betfair.video.api.domain.valueobject.ExternalId;
 import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.ServicePermission;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
-import com.betfair.video.api.domain.valueobject.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,12 +39,15 @@ public class EventService {
 
     private TypeStreamMapper typeStreamMapper;
 
-    public EventService(ExternalIdMapper externalIdMapper, TypeStreamMapper typeStreamMapper) {
+    private StreamService streamService;
+
+    public EventService(ExternalIdMapper externalIdMapper, TypeStreamMapper typeStreamMapper, StreamService streamService) {
         this.externalIdMapper = externalIdMapper;
         this.typeStreamMapper = typeStreamMapper;
+        this.streamService = streamService;
     }
 
-    public List<VideoScheduleItem> retrieveScheduleByExternalId(RequestContext context, User user, String externalIdSource, String externalId,
+    public VideoStreamInfo retrieveScheduleByExternalId(RequestContext context, User user, String externalIdSource, String externalId,
                                                                 Integer channelTypeId, List<Integer> channelSubTypeIds, Integer mobileDeviceId,
                                                                 String mobileOsVersion, Integer mobileScreenDensityDpi, VideoQuality videoQuality,
                                                                 String commentaryLanguage, Integer providerId, ContentTypeDto contentType,
@@ -89,9 +92,7 @@ public class EventService {
 
         validateChannelParams(context.uuid(), searchKey);
 
-        //VideoStreamInfo result = streamManager.getStreamInfoByExternalId(searchKey, user, Boolean.TRUE.equals(includeMetadata));
-
-        return Collections.emptyList();
+        return streamService.getStreamInfoByExternalId(searchKey, context, user, Boolean.TRUE.equals(includeMetadata));
     }
 
     private void validateChannelParams(final String uuid, final VideoStreamInfoByExternalIdSearchKey searchKey) throws VideoAPIException {

@@ -1,0 +1,17 @@
+package com.betfair.video.api.domain.valueobject;
+
+public enum TranslationEntityType {
+
+    REFERENCE_TYPE_PROVIDER,
+    REFERENCE_TYPE_SPORT,
+    REFERENCE_TYPE_CHANNEL,
+    REFERENCE_TYPE_CHANNEL_SUB_TYPE,
+    REFERENCE_TYPE_STREAM_TYPE,
+    REFERENCE_TYPE_BRAND,
+    REFERENCE_TYPE_COUNTRY,
+    REFERENCE_TYPE_COUNTRY_STATE,
+    REFERENCE_TYPE_MOBILE_DEVICE_ID;
+
+    TranslationEntityType() {
+    }
+}
