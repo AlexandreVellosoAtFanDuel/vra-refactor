@@ -16,6 +16,7 @@ import com.betfair.video.api.domain.valueobject.ExternalId;
 import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.ServicePermission;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
+import com.betfair.video.api.domain.valueobject.search.VRAStreamSearchKey;
 import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class EventService {
 
         ExternalIdSource source = ExternalIdSource.fromExternalIdSource(externalIdSource);
 
-        ExternalId parsedExternalIds = externalIdMapper.parseExternalIds(context, source, Set.of(externalId));
+        ExternalId parsedExternalIds = externalIdMapper.map(context, source, Set.of(externalId));
 
         String primaryId = null;
         String secondaryId = null;
@@ -95,7 +96,7 @@ public class EventService {
         return streamService.getStreamInfoByExternalId(searchKey, context, user, Boolean.TRUE.equals(includeMetadata));
     }
 
-    private void validateChannelParams(final String uuid, final VideoStreamInfoByExternalIdSearchKey searchKey) throws VideoAPIException {
+    private void validateChannelParams(final String uuid, final VRAStreamSearchKey searchKey) throws VideoAPIException {
         if (TypeChannel.NULL.getId().equals(searchKey.getChannelTypeId())) {
             // There are no items with such a channel type in the database
             throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, null);

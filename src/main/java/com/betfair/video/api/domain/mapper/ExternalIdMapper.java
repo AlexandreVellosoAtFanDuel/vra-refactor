@@ -32,7 +32,7 @@ public class ExternalIdMapper {
             ExternalIdSource.RAMP
     );
 
-    public ExternalId parseExternalIds(RequestContext context, ExternalIdSource externalIdSource, Set<String> externalIds) {
+    public ExternalId map(RequestContext context, ExternalIdSource externalIdSource, Set<String> externalIds) {
 
         if (!validExternalIdSources.contains(externalIdSource)) {
             logger.error("[{}]: No external ID parser was found for external ID provider {}", context.uuid(), externalIdSource);
