@@ -6,8 +6,11 @@ import com.betfair.video.api.application.exception.ResponseCode;
 import com.betfair.video.api.application.exception.VideoAPIException;
 import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -17,8 +20,16 @@ import java.util.Map;
 @ControllerAdvice
 public class VideoAPIExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(VideoAPIExceptionHandler.class);
+
+    private static final String X_UUID = "X-UUID";
+
     @ExceptionHandler(VideoAPIException.class)
     public ResponseEntity<Map<String, Object>> handleVideoAPIException(VideoAPIException ex, HttpServletRequest request) {
+
+        final String uuid = request.getHeader(X_UUID);
+
+        logger.error("[{}]: VideoAPIException occurred: {} - {}", uuid, ex.getErrorCode(), ex.getMessage());
 
         HttpStatus httpStatus = mapErrorCodeToHttpStatus(ex.getErrorCode());
 
@@ -27,8 +38,26 @@ public class VideoAPIExceptionHandler {
         return new ResponseEntity<>(errorResponse, httpStatus);
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParameterException(MissingServletRequestParameterException ex, HttpServletRequest request) {
+
+        final String uuid = request.getHeader(X_UUID);
+
+        VideoAPIException exception = new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT);
+
+        Map<String, Object> errorResponse = createErrorResponse(exception);
+
+        logger.warn("[{}]: Missing parameter: {}", uuid, ex.getParameterName());
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex, HttpServletRequest request) {
+
+        final String uuid = request.getHeader(X_UUID);
+
+        logger.error("[{}]: An unexpected error occurred: {}", uuid, ex.getMessage(), ex);
 
         VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.UNRECOGNIZED_VALUE);
 

@@ -1,4 +1,4 @@
-package com.betfair.video.api.domain.parser;
+package com.betfair.video.api.domain.mapper;
 
 import com.betfair.video.api.application.exception.ResponseCode;
 import com.betfair.video.api.application.exception.VideoAPIException;
@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-public class ExternalIdParser {
+public class ExternalIdMapper {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExternalIdParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExternalIdMapper.class);
 
     private static final String PRIMARY_SECONDARY_IDS_SEPARATOR = "@";
 
