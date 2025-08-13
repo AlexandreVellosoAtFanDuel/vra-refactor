@@ -34,8 +34,11 @@ public class GeolocationAdapter implements GeolocationPort {
 
     private final DatabaseReader cityReader;
 
-    public GeolocationAdapter(DatabaseReader cityReader) {
+    private final SuspectNetworkAdapter suspectNetworkAdapter;
+
+    public GeolocationAdapter(DatabaseReader cityReader, SuspectNetworkAdapter suspectNetworkAdapter) {
         this.cityReader = cityReader;
+        this.suspectNetworkAdapter = suspectNetworkAdapter;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class GeolocationAdapter implements GeolocationPort {
             Validate.isTrue(StringUtils.isNotBlank(clientIp));
             InetAddress clientAddress = InetAddress.getByName(clientIp);
             CountryAndSubdivisions car = this.getCountryAndSubdivisions(clientAddress, cityReader);
-            boolean isSuspect = SuspectNetworkAdapter.getInstance().isSuspectNetwork(clientIp);
+            boolean isSuspect = suspectNetworkAdapter.isSuspectNetwork(clientIp);
 
             return new Geolocation(car.countryCode(), car.getRegionCode(), metroCode, isSuspect);
         } catch (GeoIp2Exception | IllegalArgumentException | IOException ex) {
