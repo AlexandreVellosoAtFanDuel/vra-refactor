@@ -32,6 +32,9 @@ class GeolocationAdapterTest {
     @Mock
     private DatabaseReader cityReader;
 
+    @Mock
+    private SuspectNetworkAdapter suspectNetworkAdapter;
+
     @InjectMocks
     private GeolocationAdapter geolocationAdapter;
 
@@ -42,29 +45,30 @@ class GeolocationAdapterTest {
     void shouldReturnDefaultGeolocationForValidIPAddress() throws IOException, GeoIp2Exception {
         // Given
         RequestContext requestContext = new RequestContext("uuid", List.of(VALID_IP));
-        
+
         CityResponse mockCityResponse = mock(CityResponse.class);
         Country mockCountry = mock(Country.class);
         Subdivision mockSubdivision = mock(Subdivision.class);
         Location mockLocation = mock(Location.class);
-        
+
         when(mockCountry.getIsoCode()).thenReturn("US");
         when(mockCityResponse.getCountry()).thenReturn(mockCountry);
-        
+
         when(mockSubdivision.getIsoCode()).thenReturn("CA");
         when(mockCityResponse.getSubdivisions()).thenReturn(List.of(mockSubdivision));
-        
+
         when(mockLocation.getMetroCode()).thenReturn(807);
         when(mockCityResponse.getLocation()).thenReturn(mockLocation);
-        
+
         when(mockCityResponse.getTraits()).thenReturn(null);
 
-        // When
         when(cityReader.tryCity(any(InetAddress.class))).thenReturn(Optional.of(mockCityResponse));
+        when(suspectNetworkAdapter.isSuspectNetwork(VALID_IP)).thenReturn(false);
+
+        // When
+        Geolocation geolocation = geolocationAdapter.getUserGeolocation(requestContext);
 
         // Then
-        Geolocation geolocation = geolocationAdapter.getUserGeolocation(requestContext);
-        
         assertThat(geolocation).isNotNull();
         assertThat(geolocation.countryCode()).isEqualTo("US");
         assertThat(geolocation.subDivisionCode()).isEqualTo("US-CA");
