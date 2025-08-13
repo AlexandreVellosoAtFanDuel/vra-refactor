@@ -3,63 +3,55 @@ package com.betfair.video.api.domain.service;
 import com.betfair.video.api.domain.valueobject.ServicePermission;
 import com.betfair.video.api.domain.valueobject.UserPermissions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {PermissionService.class})
+@ExtendWith(MockitoExtension.class)
 @DisplayName("PermissionService Tests")
 class PermissionServiceTest {
 
-    @Nested
-    @DisplayName("AllPermissionLevels Tests")
-    @TestPropertySource(properties = {
-            "user.permissions.services=ALL",
-    })
-    class AllPermissionLevelsTest {
-        @Autowired
-        private PermissionService permissionService;
+    @InjectMocks
+    private PermissionService permissionService;
 
-        @Test
-        @DisplayName("Should validate user services for ALL")
-        void shouldValidateUserServicesForAll() {
-            UserPermissions userPermissions = permissionService.createUserPermissions();
+    @Test
+    @DisplayName("Should validate user services for ALL")
+    void shouldValidateUserServicesForAll() {
+        // Given
+        ReflectionTestUtils.setField(permissionService, "userPermissionsServices", "ALL");
 
-            assertThat(userPermissions.hasPermission(ServicePermission.VIDEO))
-                    .isTrue();
-            assertThat(userPermissions.hasPermission(ServicePermission.SCHEDULE))
-                    .isTrue();
-            assertThat(userPermissions.hasPermission(ServicePermission.REFERENCE))
-                    .isTrue();
-        }
+        // When
+        UserPermissions userPermissions = permissionService.createUserPermissions();
+
+        // Then
+        assertThat(userPermissions.hasPermission(ServicePermission.VIDEO))
+                .isTrue();
+        assertThat(userPermissions.hasPermission(ServicePermission.SCHEDULE))
+                .isTrue();
+        assertThat(userPermissions.hasPermission(ServicePermission.REFERENCE))
+                .isTrue();
     }
 
-    @Nested
-    @DisplayName("SpecificPermissionLevels Tests")
-    @TestPropertySource(properties = {
-            "user.permissions.services=SCHEDULE,VIDEO",
-    })
-    class SpecificPermissionLevels {
-        @Autowired
-        private PermissionService permissionService;
+    @Test
+    @DisplayName("Should validate user services for specific service")
+    void shouldValidateUserServicesForSpecificService() {
+        // Given
+        ReflectionTestUtils.setField(permissionService, "userPermissionsServices", "SCHEDULE,VIDEO");
 
-        @Test
-        @DisplayName("Should validate user services for specific service")
-        void shouldValidateUserServicesForSpecificService() {
-            UserPermissions userPermissions = permissionService.createUserPermissions();
+        // When
+        UserPermissions userPermissions = permissionService.createUserPermissions();
 
-            assertThat(userPermissions.hasPermission(ServicePermission.VIDEO))
-                    .isTrue();
-            assertThat(userPermissions.hasPermission(ServicePermission.SCHEDULE))
-                    .isTrue();
-            assertThat(userPermissions.hasPermission(ServicePermission.REFERENCE))
-                    .isFalse();
-        }
+        // Then
+        assertThat(userPermissions.hasPermission(ServicePermission.VIDEO))
+                .isTrue();
+        assertThat(userPermissions.hasPermission(ServicePermission.SCHEDULE))
+                .isTrue();
+        assertThat(userPermissions.hasPermission(ServicePermission.REFERENCE))
+                .isFalse();
     }
-
 
 }
