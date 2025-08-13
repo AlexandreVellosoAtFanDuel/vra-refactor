@@ -23,6 +23,7 @@ public class UserService {
         UserPermissions permissions = permissionService.createUserPermissions();
 
         return new User(
+                "accountId",
                 geolocation,
                 permissions
         );

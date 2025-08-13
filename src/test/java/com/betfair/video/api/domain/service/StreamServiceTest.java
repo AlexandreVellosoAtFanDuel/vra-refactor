@@ -7,13 +7,17 @@ import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
+import com.betfair.video.api.domain.port.ProviderFactoryPort;
 import com.betfair.video.api.domain.port.ReferenceTypesPort;
-import com.betfair.video.api.domain.port.ScheduleItemPort;
+import com.betfair.video.api.domain.port.StreamingProviderPort;
+import com.betfair.video.api.domain.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.Geolocation;
 import com.betfair.video.api.domain.valueobject.ReferenceType;
 import com.betfair.video.api.domain.valueobject.ReferenceTypeId;
 import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
+import com.betfair.video.api.domain.valueobject.VideoStreamState;
+import com.betfair.video.api.domain.valueobject.search.VideoRequestIdentifier;
 import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoSearchKeyWrapper;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -42,10 +47,19 @@ class StreamServiceTest {
     private ReferenceTypesPort referenceTypesPort;
 
     @Mock
-    private ScheduleItemPort scheduleItemPort;
+    private ConfigurationItemsPort configurationItemsPort;
 
     @Mock
-    private ConfigurationItemsPort configurationItemsPort;
+    private ProviderFactoryPort providerFactoryPort;
+
+    @Mock
+    private PermissionService permissionService;
+
+    @Mock
+    private ScheduleItemService scheduleItemService;
+
+    @Mock
+    private BetsCheckService betsCheckService;
 
     @Test
     @DisplayName("Should retrieve stream by external ID")
@@ -59,8 +73,23 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
-        when(scheduleItemPort.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
                 .thenReturn(scheduleItem);
+
+        when(scheduleItemService.getVideoStreamStateBasedOnScheduleItem(any(ScheduleItem.class), eq(user)))
+                .thenReturn(VideoStreamState.STREAM);
+
+        StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
+        when(streamingProvider.isEnabled()).thenReturn(true);
+
+        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
+                .thenReturn(streamingProvider);
+
+        when(permissionService.checkUserPermissionsAgainstItem(any(ScheduleItem.class), eq(user)))
+                .thenReturn(true);
+
+        when(betsCheckService.getBBVStatus(any(VideoRequestIdentifier.class), any(ScheduleItem.class), eq(user), anyBoolean()))
+                .thenReturn(BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG);
 
         // When
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()

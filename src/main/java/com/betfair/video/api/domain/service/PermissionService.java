@@ -1,5 +1,7 @@
 package com.betfair.video.api.domain.service;
 
+import com.betfair.video.api.domain.entity.ScheduleItem;
+import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.valueobject.ServicePermission;
 import com.betfair.video.api.domain.valueobject.UserPermissions;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,4 +42,7 @@ public class PermissionService {
         return services;
     }
 
+    public boolean checkUserPermissionsAgainstItem(ScheduleItem item, User user) {
+        return true;
+    }
 }

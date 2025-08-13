@@ -11,7 +11,7 @@ public record VideoStreamInfoSearchKeyWrapper(
 ) {
 
     public VideoRequestIdentifier getVideoRequestIdentifier(ScheduleItem item) {
-        return videoRequestIdentifier;
+        return new VideoRequestIdentifier(null, null, null, null, null, null);
     }
 
 }
