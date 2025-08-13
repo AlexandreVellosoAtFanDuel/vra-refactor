@@ -30,4 +30,9 @@ public enum ExternalIdSource {
 
         throw new IllegalArgumentException("Unknown external ID source: " + externalIdSource);
     }
+
+    public String getExternalIdDescription() {
+        return this.externalIdDescription;
+    }
+
 }
