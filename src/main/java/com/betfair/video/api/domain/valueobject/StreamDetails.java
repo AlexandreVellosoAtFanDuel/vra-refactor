@@ -5,6 +5,6 @@ import java.util.Map;
 public record StreamDetails(
         String endpoint,
         VideoQuality quality,
-        Map<String, String> params
+        Map<StreamDetailsParamEnum, String> params
 ) {
 }

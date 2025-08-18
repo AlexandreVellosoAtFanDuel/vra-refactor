@@ -20,4 +20,5 @@ public enum TypeStream {
     public int getId() {
         return id;
     }
+
 }

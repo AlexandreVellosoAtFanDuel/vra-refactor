@@ -7,6 +7,8 @@ import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
+import com.betfair.video.api.domain.port.DirectStreamConfigPort;
+import com.betfair.video.api.domain.port.InlineStreamConfigPort;
 import com.betfair.video.api.domain.port.ProviderFactoryPort;
 import com.betfair.video.api.domain.port.ReferenceTypesPort;
 import com.betfair.video.api.domain.port.StreamingProviderPort;
@@ -15,6 +17,8 @@ import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.Geolocation;
 import com.betfair.video.api.domain.valueobject.ReferenceType;
 import com.betfair.video.api.domain.valueobject.ReferenceTypeId;
+import com.betfair.video.api.domain.valueobject.StreamDetails;
+import com.betfair.video.api.domain.valueobject.StreamParams;
 import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.valueobject.VideoStreamState;
 import com.betfair.video.api.domain.valueobject.search.VideoRequestIdentifier;
@@ -61,12 +65,21 @@ class StreamServiceTest {
     @Mock
     private BetsCheckService betsCheckService;
 
+    @Mock
+    private DirectStreamConfigPort directStreamConfigPort;
+
+    @Mock
+    private InlineStreamConfigPort inlineStreamConfigPort;
+
     @Test
     @DisplayName("Should retrieve stream by external ID")
     void shouldRetrieveStreamByExternalId() {
         // Given
         RequestContext context = mock(RequestContext.class);
         User user = mock(User.class);
+
+        when(user.accountId())
+                .thenReturn("12345");
 
         ReferenceType referenceType = mock(ReferenceType.class);
         when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
@@ -81,6 +94,18 @@ class StreamServiceTest {
 
         StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
         when(streamingProvider.isEnabled()).thenReturn(true);
+
+        StreamDetails streamDetails = mock(StreamDetails.class);
+        when(streamingProvider.getStreamDetails(any(ScheduleItem.class), eq(user), any(StreamParams.class))).thenReturn(streamDetails);
+
+        when(directStreamConfigPort.isProviderInList(anyInt(), anyInt()))
+                .thenReturn(true);
+
+        when(inlineStreamConfigPort.isProviderInList(anyInt(), anyInt()))
+                .thenReturn(true);
+
+        when(configurationItemsPort.getDefaultVideoQuality(anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))
+                .thenReturn("HIGH");
 
         when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
                 .thenReturn(streamingProvider);

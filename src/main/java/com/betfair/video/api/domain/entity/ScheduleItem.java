@@ -21,7 +21,8 @@ public record ScheduleItem(
         Boolean isExtractedFromMultiMatchStream,
         java.util.Date createdDate,
         Integer brandId,
-        ScheduleItemData providerData
+        ScheduleItemData providerData,
+        ScheduleItemData overriddenData
 ) {
     public ScheduleItemData getActualProviderData() {
         return null;
