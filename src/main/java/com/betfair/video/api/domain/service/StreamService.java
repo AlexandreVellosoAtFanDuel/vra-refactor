@@ -173,37 +173,10 @@ public class StreamService {
                 ? BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG
                 : betsCheckService.getBBVStatus(identifier, item, user, isArchivedStream);
 
-        return switch (bbvStatus) {
-            case BBV_PASSED,
-                    BBV_NOT_REQUIRED_CONFIG,
-                    BBV_NOT_REQUIRED_SUPERUSER ->
-                    getStreamInfoForItem(item, provider, searchKey, user, isArchivedStream, includeMetadata);
-            case BBV_FAILED_INSUFFICIENT_STAKES -> {
-                logger.warn("[{}]: User {} does not have sufficient stakes to access stream for item with videoItemId {}.",
-                        context.uuid(), user.accountId(), item.videoItemId());
-                throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.BBV_INSUFFICIENT_STAKES, String.valueOf(item.betfairSportsType()));
-            }
-            case BBV_FAILED_NO_BETS -> {
-                logger.warn("[{}]: User {} does not have any bets to access stream for item with videoItemId {}.",
-                        context.uuid(), user.accountId(), item.videoItemId());
-                throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.BBV_NO_STAKES, String.valueOf(item.betfairSportsType()));
-            }
-            case BBV_FAILED_INSUFFICIENT_FUNDS -> {
-                logger.warn("[{}]: User {} does not have sufficient funds to access stream for item with videoItemId {}.",
-                        context.uuid(), user.accountId(), item.videoItemId());
-                throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_FUNDING, String.valueOf(item.betfairSportsType()));
-            }
-            case BBV_FAILED_DEPENDENT_SERVICE_ERROR -> {
-                logger.warn("[{}]: Dependent service error for user {} while accessing stream for item with videoItemId {}.",
-                        context.uuid(), user.accountId(), item.videoItemId());
-                throw new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, String.valueOf(item.betfairSportsType()));
-            }
-            case BBV_FAILED_TECHNICAL_ERROR -> {
-                logger.error("[{}]: Technical error for user {} while accessing stream for item with videoItemId {}.",
-                        context.uuid(), user.accountId(), item.videoItemId());
-                throw new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.GENERIC_ERROR, String.valueOf(item.betfairSportsType()));
-            }
-        };
+        // Validate BBV status, if it is not valid an exception is thrown
+        betsCheckService.validateBBVStatus(bbvStatus, item, user, context);
+
+        return getStreamInfoForItem(item, provider, searchKey, user, isArchivedStream, includeMetadata);
     }
 
     private void checkStreamStatus(ScheduleItem item, ExternalIdSource externalIdSource, User user, boolean isArchivedStream) throws VideoAPIException {
@@ -229,4 +202,5 @@ public class StreamService {
     private VideoStreamInfo getStreamInfoForItem(ScheduleItem item, StreamingProviderPort provider, VideoStreamInfoByExternalIdSearchKey searchKey, User user, boolean isArchivedStream, boolean includeMetadata) {
         return new VideoStreamInfo();
     }
+
 }

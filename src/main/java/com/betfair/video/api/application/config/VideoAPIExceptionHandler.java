@@ -43,7 +43,7 @@ public class VideoAPIExceptionHandler {
 
         final String uuid = request.getHeader(X_UUID);
 
-        VideoAPIException exception = new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT);
+        VideoAPIException exception = new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT, ex.getParameterName());
 
         Map<String, Object> errorResponse = createErrorResponse(exception);
 
@@ -59,7 +59,7 @@ public class VideoAPIExceptionHandler {
 
         logger.error("[{}]: An unexpected error occurred: {}", uuid, ex.getMessage(), ex);
 
-        VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.UNRECOGNIZED_VALUE);
+        VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.UNRECOGNIZED_VALUE, null);
 
         Map<String, Object> errorResponse = createErrorResponse(exception);
 
