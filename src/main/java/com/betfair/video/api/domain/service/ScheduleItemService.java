@@ -69,10 +69,12 @@ public class ScheduleItemService {
         }
 
         Date now = DateUtils.getCurrentDate();
+
         if (now.before(itemStartDate)) {
             // Stream has not started yet
             return VideoStreamState.NOT_STARTED;
         }
+
         if (itemEndDate != null && now.after(itemEndDate)) {
             // Stream has ended
             return VideoStreamState.FINISHED;

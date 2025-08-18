@@ -1,0 +1,214 @@
+package com.betfair.video.api.domain.service;
+
+import com.betfair.video.api.domain.entity.ScheduleItem;
+import com.betfair.video.api.domain.entity.ScheduleItemData;
+import com.betfair.video.api.domain.port.ConfigurationItemsPort;
+import com.betfair.video.api.domain.port.VideoStreamInfoPort;
+import com.betfair.video.api.domain.utils.DateUtils;
+import com.betfair.video.api.domain.valueobject.VideoStreamState;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Date;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("ScheduleItemService Tests")
+public class ScheduleItemServiceTest {
+
+    @Mock
+    private VideoStreamInfoPort videoStreamInfoPort;
+
+    @Mock
+    private PermissionService permissionService;
+
+    @Mock
+    private ConfigurationItemsPort configurationItemsPort;
+
+    private MockedStatic<DateUtils> dateUtilsMock;
+
+    @InjectMocks
+    private ScheduleItemService scheduleItemService;
+
+    @BeforeEach
+    void setUp() {
+        dateUtilsMock = mockStatic(DateUtils.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        dateUtilsMock.close();
+    }
+
+    @Test
+    @DisplayName("Should get video stream state based on schedule item - no leading or trail time")
+    void shouldGetVideoStreamStateBasedOnScheduleItemNoLeadingOrTrailTime() {
+        // Given
+        ScheduleItemData actualProviderData = mock(ScheduleItemData.class);
+
+        Date now = new Date();
+
+        // Create a Date from 30 minutes before
+        Date startDate = new Date(now.getTime() - 30 * 60 * 1000); // 30 minutes before
+        when(actualProviderData.start()).thenReturn(startDate);
+
+        Date endDate = new Date();
+        endDate.setTime(now.getTime() + 60 * 60 * 1000); // 1 hour later
+        when(actualProviderData.end()).thenReturn(endDate);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.leadTime()).thenReturn(null);
+        when(scheduleItem.trailTime()).thenReturn(null);
+        when(scheduleItem.getActualProviderData()).thenReturn(actualProviderData);
+
+        dateUtilsMock.when(DateUtils::getCurrentDate).thenReturn(now);
+
+        // When
+        VideoStreamState state = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(scheduleItem);
+
+        // Then
+        assertThat(state).isEqualTo(VideoStreamState.STREAM);
+    }
+
+    @Test
+    @DisplayName("Should get video stream state based on schedule item - leading time")
+    void shouldGetVideoStreamStateBasedOnScheduleItemLeadingTime() {
+        // Given
+        ScheduleItemData actualProviderData = mock(ScheduleItemData.class);
+
+        Date now = new Date();
+
+        // Create a Date from 30 minutes before
+        Date startDate = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes after
+        when(actualProviderData.start()).thenReturn(startDate);
+
+        Date endDate = new Date();
+        endDate.setTime(now.getTime() + 30 * 60 * 1000); // 30 minutes
+        when(actualProviderData.end()).thenReturn(endDate);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.leadTime()).thenReturn(10 * 60); // 10 minutes (lead time in seconds)
+        when(scheduleItem.trailTime()).thenReturn(null);
+        when(scheduleItem.getActualProviderData()).thenReturn(actualProviderData);
+
+        Date nowPlus10Minutes = new Date();
+        nowPlus10Minutes.setTime(now.getTime() - 10 * 60 * 1000); // 10 minutes before
+
+        dateUtilsMock.when(() -> DateUtils.shiftDateByField(any(Date.class), anyInt(), anyInt())).thenReturn(nowPlus10Minutes);
+        dateUtilsMock.when(DateUtils::getCurrentDate).thenReturn(now);
+
+        // When
+        VideoStreamState state = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(scheduleItem);
+
+        // Then
+        assertThat(state).isEqualTo(VideoStreamState.STREAM);
+    }
+
+    @Test
+    @DisplayName("Should get video stream state based on schedule item - trailing time")
+    void shouldGetVideoStreamStateBasedOnScheduleItemTrailingTime() {
+        // Given
+        ScheduleItemData actualProviderData = mock(ScheduleItemData.class);
+
+        Date now = new Date();
+
+        // Create a Date from 30 minutes before
+        Date startDate = new Date(now.getTime() - 5 * 60 * 1000); // 5 minutes before
+        when(actualProviderData.start()).thenReturn(startDate);
+
+        Date endDate = new Date();
+        endDate.setTime(now.getTime() + 30 * 60 * 1000); // 30 minutes
+        when(actualProviderData.end()).thenReturn(endDate);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.leadTime()).thenReturn(null);
+        when(scheduleItem.trailTime()).thenReturn(10 * 60); // 10 minutes (trailing time in seconds)
+        when(scheduleItem.getActualProviderData()).thenReturn(actualProviderData);
+
+        Date nowPlus10Minutes = new Date();
+        nowPlus10Minutes.setTime(now.getTime() + 10 * 60 * 1000); // 10 minutes after
+
+        dateUtilsMock.when(() -> DateUtils.shiftDateByField(any(Date.class), anyInt(), anyInt())).thenReturn(nowPlus10Minutes);
+        dateUtilsMock.when(DateUtils::getCurrentDate).thenReturn(now);
+
+        // When
+        VideoStreamState state = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(scheduleItem);
+
+        // Then
+        assertThat(state).isEqualTo(VideoStreamState.STREAM);
+    }
+
+    @Test
+    @DisplayName("Should return stream finished when date is after stream end time")
+    void shouldReturnStreamFinishedWhenDateIsAfterStreamEndTime() {
+        // Given
+        ScheduleItemData actualProviderData = mock(ScheduleItemData.class);
+
+        Date now = new Date();
+
+        // Create a Date from 30 minutes before
+        Date startDate = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour before
+        when(actualProviderData.start()).thenReturn(startDate);
+
+        Date endDate = new Date();
+        endDate.setTime(now.getTime() - 30 * 60 * 1000); // 30 minutes before
+        when(actualProviderData.end()).thenReturn(endDate);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.leadTime()).thenReturn(null);
+        when(scheduleItem.trailTime()).thenReturn(null);
+        when(scheduleItem.getActualProviderData()).thenReturn(actualProviderData);
+
+        dateUtilsMock.when(DateUtils::getCurrentDate).thenReturn(now);
+
+        // When
+        VideoStreamState state = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(scheduleItem);
+
+        // Then
+        assertThat(state).isEqualTo(VideoStreamState.FINISHED);
+    }
+
+    @Test
+    @DisplayName("Should return stream not started when date is before stream start time")
+    void shouldReturnStreamNotStartedWhenDateIsBeforeStreamStartTime() {
+        // Given
+        ScheduleItemData actualProviderData = mock(ScheduleItemData.class);
+
+        Date now = new Date();
+
+        // Create a Date from 30 minutes before
+        Date startDate = new Date(now.getTime() + 30 * 60 * 1000); // 30 minutes later
+        when(actualProviderData.start()).thenReturn(startDate);
+
+        Date endDate = new Date();
+        endDate.setTime(now.getTime() + 60 * 60 * 1000); // 1 hour later
+        when(actualProviderData.end()).thenReturn(endDate);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.leadTime()).thenReturn(null);
+        when(scheduleItem.trailTime()).thenReturn(null);
+        when(scheduleItem.getActualProviderData()).thenReturn(actualProviderData);
+
+        dateUtilsMock.when(DateUtils::getCurrentDate).thenReturn(now);
+
+        // When
+        VideoStreamState state = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(scheduleItem);
+
+        // Then
+        assertThat(state).isEqualTo(VideoStreamState.NOT_STARTED);
+    }
+
+}
