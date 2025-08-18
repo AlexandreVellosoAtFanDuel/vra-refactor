@@ -1,5 +1,9 @@
 package com.betfair.video.api.domain.entity;
 
+import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
+
+import java.util.Set;
+
 public record ScheduleItem(
         Long videoItemId,
         Integer providerId,
@@ -22,7 +26,8 @@ public record ScheduleItem(
         java.util.Date createdDate,
         Integer brandId,
         ScheduleItemData providerData,
-        ScheduleItemData overriddenData
+        ScheduleItemData overriddenData,
+        Set<ScheduleItemMapper> mappings
 ) {
     public ScheduleItemData getActualProviderData() {
         return null;

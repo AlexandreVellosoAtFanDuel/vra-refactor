@@ -15,7 +15,7 @@ public enum ExternalIdSource {
     private String externalIdDescription;
     private Integer providerId;
 
-    private ExternalIdSource(Integer externalIdSource, String externalIdDescription, Integer providerId) {
+    ExternalIdSource(Integer externalIdSource, String externalIdDescription, Integer providerId) {
         this.externalIdSource = externalIdSource;
         this.externalIdDescription = externalIdDescription;
         this.providerId = providerId;
@@ -35,4 +35,7 @@ public enum ExternalIdSource {
         return this.externalIdDescription;
     }
 
+    public Integer getExternalIdSource() {
+        return externalIdSource;
+    }
 }

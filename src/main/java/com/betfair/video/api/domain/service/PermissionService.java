@@ -4,11 +4,14 @@ import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.valueobject.ServicePermission;
 import com.betfair.video.api.domain.valueobject.UserPermissions;
+import com.betfair.video.api.domain.valueobject.search.VideoRequestIdentifier;
+import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,5 +47,9 @@ public class PermissionService {
 
     public boolean checkUserPermissionsAgainstItem(ScheduleItem item, User user) {
         return true;
+    }
+
+    public ScheduleItem filterScheduleItems(User user, List<ScheduleItem> items, VideoStreamInfoByExternalIdSearchKey searchKey, VideoRequestIdentifier eventIdentifier) {
+        return null;
     }
 }

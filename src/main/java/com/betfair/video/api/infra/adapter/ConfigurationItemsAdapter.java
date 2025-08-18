@@ -36,4 +36,8 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
         return null;
     }
 
+    @Override
+    public String findProviderWatchAndBetVenues(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
+        return null;
+    }
 }

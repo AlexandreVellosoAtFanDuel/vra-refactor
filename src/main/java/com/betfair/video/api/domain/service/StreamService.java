@@ -104,7 +104,7 @@ public class StreamService {
                 null
         );
 
-        ScheduleItem item = scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, user);
+        ScheduleItem item = scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, context, user);
 
         //try to find leading stream if current is not live yet
         ScheduleItem paddockItem = tryFindLeadingStream(item, searchKey.getPrimaryId(), videoStreamInfoSearchKeyWrapper, context, user, isArchivedVideo);
@@ -147,20 +147,20 @@ public class StreamService {
             if (Provider.ATR_PROVIDERS.contains(item.providerId())) {
                 streamState = atrScheduleService.getCachedStreamState(item, user);
             } else {
-                streamState = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(item, user);
+                streamState = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(item);
             }
 
             if (VideoStreamState.NOT_STARTED.equals(streamState)) {
                 logger.info("[{}]: Stream by externalId {} is not live yet. Trying to find pre-event paddock stream. User country: {},{}",
                         context.uuid(), externalId, user.geolocation().countryCode(), user.geolocation().subDivisionCode());
 
-                videoStreamInfoSearchKeyWrapper.videoStreamInfoByExternalIdSearchKey()
+                videoStreamInfoSearchKeyWrapper.getVideoStreamInfoByExternalIdSearchKey()
                         .setStreamTypeIds(Collections.singleton(TypeStream.PRE_VID.getId()));
 
-                videoStreamInfoSearchKeyWrapper.videoStreamInfoByExternalIdSearchKey().setProviderId(item.providerId());
+                videoStreamInfoSearchKeyWrapper.getVideoStreamInfoByExternalIdSearchKey().setProviderId(item.providerId());
 
                 try {
-                    return scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, user);
+                    return scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, context, user);
                 } catch (VideoAPIException e) {
                     //if paddock stream doesn't exist or any other error - return null
                     logger.info("[{}]: Got {} error while trying to find paddock stream for externalId {}. Returning null. Parent stream will be processed further. User country: {},{}",
@@ -202,7 +202,7 @@ public class StreamService {
         }
 
         // Make sure that the video is currently showing before proceed
-        checkStreamStatus(item, externalIdSource, user, isArchivedVideo);
+        checkStreamStatus(item, externalIdSource, context, user, isArchivedVideo);
 
         BetsCheckerStatusEnum bbvStatus = scheduleItemService.isItemWatchAndBetSupported(item)
                 ? BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG
@@ -212,13 +212,13 @@ public class StreamService {
         betsCheckService.validateBBVStatus(bbvStatus, item, user, context);
     }
 
-    private void checkStreamStatus(ScheduleItem item, ExternalIdSource externalIdSource, User user, boolean isArchivedStream) throws VideoAPIException {
+    private void checkStreamStatus(ScheduleItem item, ExternalIdSource externalIdSource, RequestContext context, User user, boolean isArchivedStream) throws VideoAPIException {
         if (!isArchivedStream) {
             VideoStreamState streamState;
             if (Provider.ATR_PROVIDERS.contains(item.providerId())) {
                 streamState = atrScheduleService.getCachedStreamState(item, user);
             } else {
-                streamState = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(item, user);
+                streamState = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(item);
             }
 
             if (!ExternalIdSource.BETFAIR_VIDEO.equals(externalIdSource) &&
@@ -228,7 +228,7 @@ public class StreamService {
                 streamState = VideoStreamState.NOT_STARTED;
             }
 
-            scheduleItemService.checkIsCurrentlyShowingAndThrow(streamState, item.videoItemId(), user, item.betfairSportsType());
+            scheduleItemService.checkIsCurrentlyShowingAndThrow(streamState, item.videoItemId(), context, user, item.betfairSportsType());
         }
     }
 

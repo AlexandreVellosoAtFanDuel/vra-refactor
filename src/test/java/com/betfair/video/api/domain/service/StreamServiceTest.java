@@ -86,10 +86,10 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
-        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
                 .thenReturn(scheduleItem);
 
-        when(scheduleItemService.getVideoStreamStateBasedOnScheduleItem(any(ScheduleItem.class), eq(user)))
+        when(scheduleItemService.getVideoStreamStateBasedOnScheduleItem(any(ScheduleItem.class)))
                 .thenReturn(VideoStreamState.STREAM);
 
         StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
@@ -174,7 +174,7 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
-        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
                 .thenReturn(scheduleItem);
 
         when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
@@ -209,7 +209,7 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
-        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
                 .thenReturn(scheduleItem);
 
         StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
@@ -250,7 +250,7 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
-        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
                 .thenReturn(scheduleItem);
 
         StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
