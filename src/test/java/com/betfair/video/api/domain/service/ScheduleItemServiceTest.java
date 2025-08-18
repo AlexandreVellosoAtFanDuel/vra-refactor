@@ -269,4 +269,25 @@ public class ScheduleItemServiceTest {
                     assertThat(videoException.getSportType()).isNull();
                 });
     }
+
+    @Test
+    @DisplayName("Should validate if item is watch and bet supported")
+    void shouldValidateIfItemIsWatchAndBetSupported() {
+        // Given
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        ScheduleItemData providerData = mock(ScheduleItemData.class);
+
+        when(providerData.venue()).thenReturn("TEST");
+        when(scheduleItem.providerData()).thenReturn(providerData);
+
+        when(configurationItemsPort.findProviderWatchAndBetVenues(anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))
+                .thenReturn("ANYTHING,TEST,RANDOM");
+
+        // When
+        boolean isSupported = scheduleItemService.isItemWatchAndBetSupported(scheduleItem);
+
+        // Then
+        assertThat(isSupported).isTrue();
+    }
+
 }
