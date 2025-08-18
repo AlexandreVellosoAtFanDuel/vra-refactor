@@ -105,22 +105,18 @@ class StreamServiceTest {
     }
 
     @Test
-    @DisplayName("Should fail if no provider was found")
-    void shouldFailIfNoProviderFound() {
+    @DisplayName("Should fail if no provider exist for video type")
+    void shouldFailIfNoProviderExistsForVideoType() {
         // Given
         RequestContext context = mock(RequestContext.class);
-        when(context.uuid()).thenReturn("test-uuid");
-
         User user = mock(User.class);
+
         Geolocation geolocation = mock(Geolocation.class);
         when(user.geolocation()).thenReturn(geolocation);
-        when(geolocation.countryCode()).thenReturn("US");
-        when(geolocation.subDivisionCode()).thenReturn("CA");
-
-        when(referenceTypesPort.findReferenceTypeById(eq(1), eq(ReferenceTypeId.VIDEO_PROVIDER)))
-                .thenReturn(null);
 
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
+                .externalIdSource(ExternalIdSource.BETFAIR_EVENT)
+                .primaryId("12345")
                 .providerId(1)
                 .build();
 
@@ -131,6 +127,123 @@ class StreamServiceTest {
                     VideoAPIException videoException = (VideoAPIException) exception;
                     assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.BadRequest);
                     assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.INVALID_INPUT);
+                    assertThat(videoException.getSportType()).isNull();
+                });
+    }
+
+    @Test
+    @DisplayName("Should fail if no provider was found")
+    void shouldFailIfNoProviderFound() {
+        // Given
+        RequestContext context = mock(RequestContext.class);
+        User user = mock(User.class);
+
+        VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
+                .externalIdSource(ExternalIdSource.BETFAIR_EVENT)
+                .primaryId("12345")
+                .providerId(1)
+                .build();
+
+        ReferenceType referenceType = mock(ReferenceType.class);
+        when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
+                .thenReturn(referenceType);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
+                .thenReturn(scheduleItem);
+
+        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
+                .thenReturn(null);
+
+        // When & Then
+        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, user, false))
+                .isInstanceOf(VideoAPIException.class)
+                .satisfies(exception -> {
+                    VideoAPIException videoException = (VideoAPIException) exception;
+                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.BadRequest);
+                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.INVALID_INPUT);
+                    assertThat(videoException.getSportType()).isNull();
+                });
+    }
+
+    @Test
+    @DisplayName("Should fail if provider is not enabled")
+    void shouldFailIfProviderNotEnabled() {
+        // Given
+        RequestContext context = mock(RequestContext.class);
+        User user = mock(User.class);
+
+        VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
+                .externalIdSource(ExternalIdSource.BETFAIR_EVENT)
+                .primaryId("12345")
+                .providerId(1)
+                .build();
+
+        ReferenceType referenceType = mock(ReferenceType.class);
+        when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
+                .thenReturn(referenceType);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
+                .thenReturn(scheduleItem);
+
+        StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
+        when(streamingProvider.isEnabled()).thenReturn(false);
+
+        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
+                .thenReturn(streamingProvider);
+
+        // When & Then
+        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, user, false))
+                .isInstanceOf(VideoAPIException.class)
+                .satisfies(exception -> {
+                    VideoAPIException videoException = (VideoAPIException) exception;
+                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
+                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND);
+                    assertThat(videoException.getSportType()).isNull();
+                });
+    }
+
+    @Test
+    @DisplayName("Should fail if user does not have permissions")
+    void shouldFailIfUserDoesNotHavePermissions() {
+        // Given
+        RequestContext context = mock(RequestContext.class);
+        User user = mock(User.class);
+
+        Geolocation geolocation = mock(Geolocation.class);
+        when(user.geolocation()).thenReturn(geolocation);
+
+        VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
+                .externalIdSource(ExternalIdSource.BETFAIR_EVENT)
+                .primaryId("12345")
+                .providerId(1)
+                .build();
+
+        ReferenceType referenceType = mock(ReferenceType.class);
+        when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
+                .thenReturn(referenceType);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(user)))
+                .thenReturn(scheduleItem);
+
+        StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
+        when(streamingProvider.isEnabled()).thenReturn(true);
+
+        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
+                .thenReturn(streamingProvider);
+
+        when(permissionService.checkUserPermissionsAgainstItem(any(ScheduleItem.class), eq(user)))
+                .thenReturn(false);
+
+        // When & Then
+        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, user, false))
+                .isInstanceOf(VideoAPIException.class)
+                .satisfies(exception -> {
+                    VideoAPIException videoException = (VideoAPIException) exception;
+                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.Forbidden);
+                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }
