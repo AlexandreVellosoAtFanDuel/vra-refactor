@@ -115,12 +115,15 @@ public class ScheduleItemService {
 
     public void checkIsCurrentlyShowingAndThrow(VideoStreamState streamState, Long videoItemId, RequestContext context, User user, Integer sportType) {
         if (VideoStreamState.NOT_STARTED.equals(streamState)) {
-            StreamExceptionLoggingUtils.logException(additionalInfoLoggingEnabled, logger, videoItemId, Level.WARN, context, user,
-                    new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED, String.valueOf(sportType)), null);
+            VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED, String.valueOf(sportType));
+            StreamExceptionLoggingUtils.logException(additionalInfoLoggingEnabled, logger, videoItemId, Level.WARN, context, user, exception, null);
+            throw exception;
         }
+
         if (VideoStreamState.FINISHED.equals(streamState)) {
-            StreamExceptionLoggingUtils.logException(additionalInfoLoggingEnabled, logger, videoItemId, Level.WARN, context, user,
-                    new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_HAS_ENDED, String.valueOf(sportType)), null);
+            VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_HAS_ENDED, String.valueOf(sportType));
+            StreamExceptionLoggingUtils.logException(additionalInfoLoggingEnabled, logger, videoItemId, Level.WARN, context, user, exception, null);
+            throw exception;
         }
     }
 

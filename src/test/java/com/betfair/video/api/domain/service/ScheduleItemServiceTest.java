@@ -1,10 +1,16 @@
 package com.betfair.video.api.domain.service;
 
+import com.betfair.video.api.application.exception.ResponseCode;
+import com.betfair.video.api.application.exception.VideoAPIException;
+import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.ScheduleItemData;
+import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.VideoStreamInfoPort;
 import com.betfair.video.api.domain.utils.DateUtils;
+import com.betfair.video.api.domain.valueobject.Geolocation;
 import com.betfair.video.api.domain.valueobject.VideoStreamState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -211,4 +218,55 @@ public class ScheduleItemServiceTest {
         assertThat(state).isEqualTo(VideoStreamState.NOT_STARTED);
     }
 
+    @Test
+    @DisplayName("Should throw exception if stream not started")
+    void shouldThrowExceptionIfStreamNotStarted() {
+        // Given
+        Geolocation geolocation = mock(Geolocation.class);
+        when(geolocation.countryCode()).thenReturn("US");
+        when(geolocation.subDivisionCode()).thenReturn("CA");
+
+        User user = mock(User.class);
+        when(user.accountId()).thenReturn("12345");
+        when(user.geolocation()).thenReturn(geolocation);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.uuid()).thenReturn("test-uuid");
+
+        // When & Then
+        assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.NOT_STARTED, 123L, context, user, 1))
+                .isInstanceOf(VideoAPIException.class)
+                .satisfies(exception -> {
+                    VideoAPIException videoException = (VideoAPIException) exception;
+                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
+                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED);
+                    assertThat(videoException.getSportType()).isNull();
+                });
+    }
+
+    @Test
+    @DisplayName("Should throw exception if stream is finished")
+    void shouldThrowExceptionIfStreamIsFinished() {
+        // Given
+        Geolocation geolocation = mock(Geolocation.class);
+        when(geolocation.countryCode()).thenReturn("US");
+        when(geolocation.subDivisionCode()).thenReturn("CA");
+
+        User user = mock(User.class);
+        when(user.accountId()).thenReturn("12345");
+        when(user.geolocation()).thenReturn(geolocation);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.uuid()).thenReturn("test-uuid");
+
+        // When & Then
+        assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.FINISHED, 123L, context, user, 1))
+                .isInstanceOf(VideoAPIException.class)
+                .satisfies(exception -> {
+                    VideoAPIException videoException = (VideoAPIException) exception;
+                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
+                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_HAS_ENDED);
+                    assertThat(videoException.getSportType()).isNull();
+                });
+    }
 }
