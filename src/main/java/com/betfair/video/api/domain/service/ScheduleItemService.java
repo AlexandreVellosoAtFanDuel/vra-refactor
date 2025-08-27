@@ -56,12 +56,12 @@ public class ScheduleItemService {
     }
 
     public VideoStreamState getVideoStreamStateBasedOnScheduleItem(ScheduleItem item) {
-        Date itemStartDate = item.getActualProviderData().start();
+        Date itemStartDate = item.getActualProviderData().getStart();
         if (item.leadTime() != null) {
             // Subtract the lead time from the start time
             itemStartDate = DateUtils.shiftDateByField(itemStartDate, Calendar.SECOND, -item.leadTime());
         }
-        Date itemEndDate = item.getActualProviderData().end();
+        Date itemEndDate = item.getActualProviderData().getEnd();
         if (itemEndDate != null && item.trailTime() != null) {
             // Add the trail time to item end time
             itemEndDate = DateUtils.shiftDateByField(itemEndDate, Calendar.SECOND, item.trailTime());
@@ -133,11 +133,11 @@ public class ScheduleItemService {
                 scheduleItem.providerId(), scheduleItem.videoChannelType(), scheduleItem.betfairSportsType(),
                 scheduleItem.streamTypeId(), scheduleItem.brandId());
 
-        return StringUtils.isNotBlank(watchAndBetVenues) && scheduleItem.providerData().venue() != null &&
+        return StringUtils.isNotBlank(watchAndBetVenues) && scheduleItem.providerData().getVenue() != null &&
                 getStringValuesSeparatedByComma(watchAndBetVenues).stream()
                         .map(String::toLowerCase)
                         .toList()
-                        .contains(scheduleItem.providerData().venue().toLowerCase());
+                        .contains(scheduleItem.providerData().getVenue().toLowerCase());
     }
 
     private ScheduleItem getBetfairEventItem(VideoStreamInfoByExternalIdSearchKey searchKey, VideoStreamInfoSearchKeyWrapper wrapper, RequestContext context, User user) {

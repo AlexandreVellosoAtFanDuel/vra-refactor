@@ -16,7 +16,7 @@ public class ScheduleItemUtils {
 
             for (ScheduleItem item : items) {
                 itemsToLog.append("{").append("videoId=").append(item.videoItemId());
-                itemsToLog.append(",videoName=").append(item.getActualProviderData().eventName()).append("},");
+                itemsToLog.append(",videoName=").append(item.getActualProviderData().getEventName()).append("},");
             }
 
             itemsToLog.append("]");

@@ -61,9 +61,9 @@ public class VideoStreamInfoMapper {
         String defaultBlockedCountries = geoRestrictionsService != null
                 ? geoRestrictionsService.getProviderBlockedCountries(scheduleItem) : null;
         String providerBlockedCountries = scheduleItem.providerData() != null
-                ? scheduleItem.providerData().blockedCountries() : null;
+                ? scheduleItem.providerData().getBlockedCountries() : null;
         String overrideBlockedCountries = scheduleItem.overriddenData() != null
-                ? scheduleItem.overriddenData().blockedCountries() : null;
+                ? scheduleItem.overriddenData().getBlockedCountries() : null;
         String aggregatedBlockedCountries = createAggregatedBlockedCountries(
                 defaultBlockedCountries, providerBlockedCountries, overrideBlockedCountries);
 
@@ -92,14 +92,14 @@ public class VideoStreamInfoMapper {
                 videoStreamInfo.setProviderEventId(scheduleItem.providerEventId());
             }
             if (scheduleItemData != null) {
-                if (StringUtils.isNotEmpty(scheduleItemData.eventName())) {
-                    videoStreamInfo.setProviderEventName(scheduleItemData.eventName());
+                if (StringUtils.isNotEmpty(scheduleItemData.getEventName())) {
+                    videoStreamInfo.setProviderEventName(scheduleItemData.getEventName());
                 }
-                if (StringUtils.isNotEmpty(scheduleItemData.competition())) {
-                    videoStreamInfo.setCompetition(scheduleItemData.competition());
+                if (StringUtils.isNotEmpty(scheduleItemData.getCompetition())) {
+                    videoStreamInfo.setCompetition(scheduleItemData.getCompetition());
                 }
-                if (scheduleItemData.start() != null) {
-                    videoStreamInfo.setStartDateTime(scheduleItemData.start());
+                if (scheduleItemData.getStart() != null) {
+                    videoStreamInfo.setStartDateTime(scheduleItemData.getStart());
                 }
             }
             if (this.sportReferenceType != null) {
