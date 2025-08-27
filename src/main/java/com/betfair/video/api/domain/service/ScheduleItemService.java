@@ -23,7 +23,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,8 +40,7 @@ public class ScheduleItemService {
 
     private static final String EXCHANGE_RACE_ID_TIME_SEPARATOR = ".";
 
-    @Value("${videoapi.additional.info.enabled}")
-    private boolean additionalInfoLoggingEnabled;
+    private final StreamExceptionLoggingUtils streamExceptionLoggingUtils;
 
     private final VideoStreamInfoPort videoStreamInfoPort;
 
@@ -50,7 +48,8 @@ public class ScheduleItemService {
 
     private final ConfigurationItemsPort configurationItemsPort;
 
-    public ScheduleItemService(VideoStreamInfoPort videoStreamInfoPort, PermissionService permissionService, ConfigurationItemsPort configurationItemsPort) {
+    public ScheduleItemService(StreamExceptionLoggingUtils streamExceptionLoggingUtils, VideoStreamInfoPort videoStreamInfoPort, PermissionService permissionService, ConfigurationItemsPort configurationItemsPort) {
+        this.streamExceptionLoggingUtils = streamExceptionLoggingUtils;
         this.videoStreamInfoPort = videoStreamInfoPort;
         this.permissionService = permissionService;
         this.configurationItemsPort = configurationItemsPort;
@@ -116,13 +115,13 @@ public class ScheduleItemService {
     public void checkIsCurrentlyShowingAndThrow(VideoStreamState streamState, Long videoItemId, RequestContext context, User user, Integer sportType) {
         if (VideoStreamState.NOT_STARTED.equals(streamState)) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED, String.valueOf(sportType));
-            StreamExceptionLoggingUtils.logException(additionalInfoLoggingEnabled, logger, videoItemId, Level.WARN, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, user, exception, null);
             throw exception;
         }
 
         if (VideoStreamState.FINISHED.equals(streamState)) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_HAS_ENDED, String.valueOf(sportType));
-            StreamExceptionLoggingUtils.logException(additionalInfoLoggingEnabled, logger, videoItemId, Level.WARN, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, user, exception, null);
             throw exception;
         }
     }
@@ -163,7 +162,7 @@ public class ScheduleItemService {
 
         wrapper.setVideoRequestIdentifier(eventIdentifier);
 
-        ScheduleItem item = permissionService.filterScheduleItems(user, items, searchKey, eventIdentifier);
+        ScheduleItem item = permissionService.filterScheduleItems(context, user, items, searchKey, eventIdentifier);
 
         putRequestedEventInfoIntoContext(item, searchKey, context);
 
@@ -268,7 +267,7 @@ public class ScheduleItemService {
         if (StringUtils.isNotBlank(valueList)) {
             StringTokenizer st = new StringTokenizer(valueList, ",");
 
-            while(st.hasMoreTokens()) {
+            while (st.hasMoreTokens()) {
                 stringSet.add(st.nextToken());
             }
         }
@@ -276,4 +275,18 @@ public class ScheduleItemService {
         return new ArrayList<>(stringSet);
     }
 
+    public boolean itemIsAvailable(ScheduleItem item, User user) {
+        // TODO: Implement method
+        return true;
+    }
+
+    public String filterItemsAgainstContentTypesAndProviders(List<ScheduleItem> items, VideoStreamInfoByExternalIdSearchKey searchKey, User user) {
+        // TODO: Implement method
+        return null;
+    }
+
+    public ScheduleItem getItemWithHighestProviderEventId(List<ScheduleItem> items) {
+        // TODO: Implement method
+        return null;
+    }
 }

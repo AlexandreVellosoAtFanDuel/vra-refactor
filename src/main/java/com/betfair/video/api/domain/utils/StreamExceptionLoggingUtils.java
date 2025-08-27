@@ -7,23 +7,29 @@ import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.valueobject.search.VideoRequestIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
+@Component
 public class StreamExceptionLoggingUtils {
+
+    @Value("${videoapi.additional.info.enabled}")
+    private boolean additionalInfoLoggingEnabled;
 
     private StreamExceptionLoggingUtils() {
     }
 
-    public static void logException(final boolean additionalInfoLoggingEnabled, Logger logger, final Long videoId, final Level logLevel, final RequestContext context, final User user,
+    public void logException(Logger logger, final Long videoId, final Level logLevel, final RequestContext context, final User user,
                                     final VideoAPIException exception, final String addInfo) throws VideoAPIException {
         VideoRequestIdentifier videoRequestIdentifier = new VideoRequestIdentifier(videoId.toString(), null, null, null, null, null);
 
-        logException(additionalInfoLoggingEnabled, logger, videoRequestIdentifier, logLevel, context, user, exception, Collections.emptyList(), addInfo);
+        logException(logger, videoRequestIdentifier, logLevel, context, user, exception, Collections.emptyList(), addInfo);
     }
 
-    private static void logException(final boolean additionalInfoLoggingEnabled, Logger logger,
+    private void logException(Logger logger,
                                      VideoRequestIdentifier identifier, final Level logLevel, final RequestContext context, final User user,
                                      final VideoAPIException exception, final List<ScheduleItem> items, final String addInfo) {
         String requestedSource = getRequestedSource(identifier);
@@ -40,7 +46,7 @@ public class StreamExceptionLoggingUtils {
         }
     }
 
-    private static String getRequestedSource(VideoRequestIdentifier identifier) {
+    private String getRequestedSource(VideoRequestIdentifier identifier) {
         String requestedSource;
 
         if (identifier != null) {

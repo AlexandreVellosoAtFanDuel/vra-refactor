@@ -1,6 +1,7 @@
 package com.betfair.video.api.domain.entity;
 
 import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
+import com.betfair.video.api.domain.valueobject.ImportStatus;
 
 import java.util.Set;
 
@@ -18,8 +19,8 @@ public record ScheduleItem(
         Integer trailTime,
         Integer videoChannelType,
         Integer videoChanelSubType,
-        Character importSt,
-        Character approvalSt,
+        ImportStatus importStatus,
+        Character approvalStatus,
         Boolean reviewStatus,
         Integer streamTypeId,
         Boolean isExtractedFromMultiMatchStream,

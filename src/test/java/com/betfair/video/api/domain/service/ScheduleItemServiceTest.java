@@ -10,7 +10,7 @@ import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.VideoStreamInfoPort;
 import com.betfair.video.api.domain.utils.DateUtils;
-import com.betfair.video.api.domain.valueobject.Geolocation;
+import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
 import com.betfair.video.api.domain.valueobject.VideoStreamState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +35,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ScheduleItemService Tests")
 public class ScheduleItemServiceTest {
+
+    @Mock
+    StreamExceptionLoggingUtils streamExceptionLoggingUtils;
 
     @Mock
     private VideoStreamInfoPort videoStreamInfoPort;
@@ -222,16 +225,9 @@ public class ScheduleItemServiceTest {
     @DisplayName("Should throw exception if stream not started")
     void shouldThrowExceptionIfStreamNotStarted() {
         // Given
-        Geolocation geolocation = mock(Geolocation.class);
-        when(geolocation.countryCode()).thenReturn("US");
-        when(geolocation.subDivisionCode()).thenReturn("CA");
-
         User user = mock(User.class);
-        when(user.accountId()).thenReturn("12345");
-        when(user.geolocation()).thenReturn(geolocation);
 
         RequestContext context = mock(RequestContext.class);
-        when(context.uuid()).thenReturn("test-uuid");
 
         // When & Then
         assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.NOT_STARTED, 123L, context, user, 1))
@@ -248,16 +244,9 @@ public class ScheduleItemServiceTest {
     @DisplayName("Should throw exception if stream is finished")
     void shouldThrowExceptionIfStreamIsFinished() {
         // Given
-        Geolocation geolocation = mock(Geolocation.class);
-        when(geolocation.countryCode()).thenReturn("US");
-        when(geolocation.subDivisionCode()).thenReturn("CA");
-
         User user = mock(User.class);
-        when(user.accountId()).thenReturn("12345");
-        when(user.geolocation()).thenReturn(geolocation);
 
         RequestContext context = mock(RequestContext.class);
-        when(context.uuid()).thenReturn("test-uuid");
 
         // When & Then
         assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.FINISHED, 123L, context, user, 1))

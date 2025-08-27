@@ -68,7 +68,8 @@ class EventServiceTest {
         when(context.uuid()).thenReturn("test-uuid");
 
         User user = mock(User.class);
-        when(user.permissions()).thenReturn(new UserPermissions(Set.of(ServicePermission.VIDEO.name())));
+        UserPermissions userPermissions = new UserPermissions(Set.of(ServicePermission.VIDEO.name()), null, null, null, null);
+        when(user.permissions()).thenReturn(userPermissions);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
         when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
@@ -97,7 +98,8 @@ class EventServiceTest {
         when(context.uuid()).thenReturn("test-uuid");
 
         User user = mock(User.class);
-        when(user.permissions()).thenReturn(new UserPermissions(Collections.emptySet()));
+        UserPermissions userPermissions = new UserPermissions(Collections.emptySet(), null, null, null, null);
+        when(user.permissions()).thenReturn(userPermissions);
 
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(context, user, null, null, null, null, null, null, null, null, null, null, null, null, null))
@@ -118,7 +120,8 @@ class EventServiceTest {
         when(context.uuid()).thenReturn("test-uuid");
 
         User user = mock(User.class);
-        when(user.permissions()).thenReturn(new UserPermissions(Set.of(ServicePermission.VIDEO.name())));
+        UserPermissions userPermissions = new UserPermissions(Set.of(ServicePermission.VIDEO.name()), null, null, null, null);
+        when(user.permissions()).thenReturn(userPermissions);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
         when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
@@ -147,7 +150,8 @@ class EventServiceTest {
         when(context.uuid()).thenReturn("test-uuid");
 
         User user = mock(User.class);
-        when(user.permissions()).thenReturn(new UserPermissions(Set.of(ServicePermission.VIDEO.name())));
+        UserPermissions userPermissions = new UserPermissions(Set.of(ServicePermission.VIDEO.name()), null, null, null, null);
+        when(user.permissions()).thenReturn(userPermissions);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
         when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
@@ -176,7 +180,8 @@ class EventServiceTest {
         when(context.uuid()).thenReturn("test-uuid");
 
         User user = mock(User.class);
-        when(user.permissions()).thenReturn(new UserPermissions(Set.of(ServicePermission.VIDEO.name())));
+        UserPermissions userPermissions = new UserPermissions(Set.of(ServicePermission.VIDEO.name()), null, null, null, null);
+        when(user.permissions()).thenReturn(userPermissions);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
         when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))

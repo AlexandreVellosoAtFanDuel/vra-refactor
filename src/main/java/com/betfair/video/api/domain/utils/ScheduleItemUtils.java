@@ -25,4 +25,8 @@ public class ScheduleItemUtils {
         return itemsToLog;
     }
 
+    public static ScheduleItem pickMaxScoredStream(String primaryId, List<ScheduleItem> items) {
+        // TODO: Implement method
+        return null;
+    }
 }
