@@ -22,8 +22,9 @@ public class UserService {
         Geolocation geolocation = userGeolocationService.getUserGeolocation(context);
         UserPermissions permissions = permissionService.createUserPermissions();
 
+        // TODO: Implement correct accountId
         return new User(
-                "accountId",
+                "123456",
                 geolocation,
                 permissions
         );

@@ -10,6 +10,10 @@ public class ProviderFactoryAdapter implements ProviderFactoryPort {
 
     private BetradarV2ProviderAdapter betradarV2ProviderAdapter;
 
+    public ProviderFactoryAdapter(BetradarV2ProviderAdapter betradarV2ProviderAdapter) {
+        this.betradarV2ProviderAdapter = betradarV2ProviderAdapter;
+    }
+
     @Override
     public StreamingProviderPort getStreamingProviderByIdAndVideoChannelId(Integer providerId, Integer videoChannelId) {
         return betradarV2ProviderAdapter;

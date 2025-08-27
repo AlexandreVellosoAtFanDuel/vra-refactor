@@ -21,19 +21,57 @@ public class VideoStreamInfoAdapter implements VideoStreamInfoPort {
 
         // TODO: Implement actual data fetching logic here
 
+        /*
+        Use this one for mock data structure reference
+        {
+            "uniqueVideoId": 159532269,
+            "providerId": 34,
+            "blockedCountries": "ZA",
+            "videoQuality": [],
+            "defaultBufferInterval": "1",
+            "sizeRestrictions": {
+                "fullScreenAllowed": false,
+                "airPlayAllowed": false,
+                "aspectRatio": "0.61",
+                "widthMax": 1080,
+                "widthDefault": 480
+            },
+            "directStream": false,
+            "inlineStream": false,
+            "videoStreamEndpoint": {
+                "playerControlParams": {
+                    "widgetName": "match.lmtPlus",
+                    "sportName": "football",
+                    "matchId": "61378347"
+                }
+            },
+            "eventId": "35394600",
+            "eventName": "SV Horn v Austria Klagenfurt",
+            "sportId": "1",
+            "sportName": "Football",
+            "providerEventId": "61378347",
+            "providerEventName": "SV HORN v SK AUSTRIA KLAGENFURT",
+            "accountId": 100002650,
+            "startDateTime": "2025-07-25T17:30:00.000Z",
+            "competition": "OFB Cup",
+            "defaultVideoQuality": "MEDIUM",
+            "contentType": "VIZ"
+        }
+         */
+
         ScheduleItemData providerData = new ScheduleItemData(
-                "eventName",
+                "SV Horn v Austria Klagenfurt",
                 "venue",
                 "country",
                 "",
                 DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, -10),
                 DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, +10),
-                "competition"
+                "OFB Cup"
         );
 
         ScheduleItem scheduleItem = new ScheduleItem(
-                1L,
-                1,
+                159532269L,
+                34,
                 "providerEventId",
                 "providerSportsType",
                 "providerLanguage",

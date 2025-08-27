@@ -6,6 +6,7 @@ import com.betfair.video.api.domain.entity.TypeStream;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Map;
 
 @Component
@@ -18,7 +19,7 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
 
     @Override
     public Map<ConfigurationType, String> getSizeRestrictions(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
-        return null;
+        return Collections.emptyMap();
     }
 
     @Override
@@ -33,7 +34,8 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
 
     @Override
     public String getDefaultVideoQuality(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
-        return null;
+        // TODO: Fetch from configuration
+        return "MEDIUM";
     }
 
     @Override
