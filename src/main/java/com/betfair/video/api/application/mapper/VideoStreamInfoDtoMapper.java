@@ -11,40 +11,26 @@ import com.betfair.video.api.domain.valueobject.SizeRestrictions;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
 import com.betfair.video.api.domain.valueobject.VideoStreamEndpoint;
 import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
+@Mapper(componentModel = "spring")
 @Component
-public class VideoStreamInfoDtoMapper {
+public interface VideoStreamInfoDtoMapper {
 
-    public VideoStreamInfoDto mapToDto(VideoStreamInfo videoStreamInfo) {
-        return new VideoStreamInfoDto(
-                videoStreamInfo.getUniqueVideoId(),
-                videoStreamInfo.getProviderId(),
-                videoStreamInfo.getBlockedCountries(),
-                mapVideoQuality(videoStreamInfo.getVideoQuality()),
-                videoStreamInfo.getDefaultBufferInterval(),
-                mapSizeRestrictions(videoStreamInfo.getSizeRestrictions()),
-                videoStreamInfo.getDirectStream(),
-                videoStreamInfo.getInlineStream(),
-                mapVideoStreamEndpoint(videoStreamInfo.getVideoStreamEndpoint()),
-                videoStreamInfo.getEventId(),
-                videoStreamInfo.getEventName(),
-                videoStreamInfo.getSportId(),
-                videoStreamInfo.getSportName(),
-                videoStreamInfo.getProviderEventId(),
-                videoStreamInfo.getProviderEventName(),
-                videoStreamInfo.getAccountId(),
-                videoStreamInfo.getStartDateTime(),
-                videoStreamInfo.getCompetition(),
-                videoStreamInfo.getDefaultVideoQuality(),
-                mapContentType(videoStreamInfo.getContentType())
-        );
-    }
+    @Mapping(target = "videoQuality", source = "videoQuality", qualifiedByName = "mapVideoQualityList")
+    @Mapping(target = "sizeRestrictions", source = "sizeRestrictions", qualifiedByName = "mapSizeRestrictions")
+    @Mapping(target = "videoStreamEndpoint", source = "videoStreamEndpoint", qualifiedByName = "mapVideoStreamEndpoint")
+    @Mapping(target = "contentType", source = "contentType", qualifiedByName = "mapContentType")
+    VideoStreamInfoDto mapToDto(VideoStreamInfo videoStreamInfo);
 
-    private List<VideoQualityDto> mapVideoQuality(List<VideoQuality> videoQuality) {
+    @Named("mapVideoQualityList")
+    default List<VideoQualityDto> mapVideoQualityList(List<VideoQuality> videoQuality) {
         if (videoQuality == null) {
             return Collections.emptyList();
         }
@@ -58,7 +44,8 @@ public class VideoStreamInfoDtoMapper {
         }).toList();
     }
 
-    private SizeRestrictionsDto mapSizeRestrictions(SizeRestrictions sizeRestrictions) {
+    @Named("mapSizeRestrictions")
+    default SizeRestrictionsDto mapSizeRestrictions(SizeRestrictions sizeRestrictions) {
         if (sizeRestrictions == null) {
             return null;
         }
@@ -72,7 +59,8 @@ public class VideoStreamInfoDtoMapper {
         );
     }
 
-    private ContentTypeDto mapContentType(ContentType contentType) {
+    @Named("mapContentType")
+    default ContentTypeDto mapContentType(ContentType contentType) {
         if (contentType == null) {
             return null;
         }
@@ -85,20 +73,20 @@ public class VideoStreamInfoDtoMapper {
         };
     }
 
-    private VideoStreamEndpointDto mapVideoStreamEndpoint(VideoStreamEndpoint videoStreamEndpoint) {
+    @Named("mapVideoStreamEndpoint")
+    default VideoStreamEndpointDto mapVideoStreamEndpoint(VideoStreamEndpoint videoStreamEndpoint) {
         if (videoStreamEndpoint == null) {
             return null;
         }
 
-        PlayerControlParamsDto playerControllParamsDto = new PlayerControlParamsDto(
+        PlayerControlParamsDto playerControlParamsDto = new PlayerControlParamsDto(
                 "match.lmtPlus",
                 "football",
                 "61378347"
         );
 
         return new VideoStreamEndpointDto(
-                playerControllParamsDto
+                playerControlParamsDto
         );
     }
-
 }

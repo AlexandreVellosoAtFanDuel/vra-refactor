@@ -3,6 +3,7 @@ package com.betfair.video.api.application.controller;
 import com.betfair.video.api.application.dto.ContentTypeDto;
 import com.betfair.video.api.application.dto.UserGeolocationDto;
 import com.betfair.video.api.application.dto.VideoStreamInfoDto;
+import com.betfair.video.api.application.mapper.UserGeolocationDtoMapper;
 import com.betfair.video.api.application.mapper.VideoStreamInfoDtoMapper;
 import com.betfair.video.api.application.util.UserContextBuilder;
 import com.betfair.video.api.domain.entity.User;
@@ -30,12 +31,15 @@ public class VideoApiController {
 
     private final EventService eventService;
 
-    private final VideoStreamInfoDtoMapper videoScheduleItemDtoMapper;
+    private final VideoStreamInfoDtoMapper videoStreamInfoDtoMapper;
 
-    public VideoApiController(UserService userService, EventService eventService, VideoStreamInfoDtoMapper videoScheduleItemDtoMapper) {
+    private final UserGeolocationDtoMapper userGeolocationDtoMapper;
+
+    public VideoApiController(UserService userService, EventService eventService, VideoStreamInfoDtoMapper videoStreamInfoDtoMapper, UserGeolocationDtoMapper userGeolocationDtoMapper) {
         this.userService = userService;
         this.eventService = eventService;
-        this.videoScheduleItemDtoMapper = videoScheduleItemDtoMapper;
+        this.videoStreamInfoDtoMapper = videoStreamInfoDtoMapper;
+        this.userGeolocationDtoMapper = userGeolocationDtoMapper;
     }
 
     @RequestMapping("/retrieveStreamInfoByExternalId")
@@ -81,7 +85,7 @@ public class VideoApiController {
                 providerParams
         );
 
-        return videoScheduleItemDtoMapper.mapToDto(item);
+        return videoStreamInfoDtoMapper.mapToDto(item);
     }
 
     @RequestMapping("/retrieveUserGeolocation")
@@ -91,7 +95,7 @@ public class VideoApiController {
 
         logger.info("[{}] Enter retrieveUserGeolocation", context.uuid());
 
-        return new UserGeolocationDto(user.geolocation().countryCode(), user.geolocation().subDivisionCode(), user.geolocation().dmaId());
+        return userGeolocationDtoMapper.mapToDto(user);
     }
 
 }
