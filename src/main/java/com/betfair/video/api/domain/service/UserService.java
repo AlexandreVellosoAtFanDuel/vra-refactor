@@ -25,6 +25,7 @@ public class UserService {
         return new User(
                 context.accountId(),
                 context.userId(),
+                context.resolvedIps().getFirst(),
                 geolocation,
                 permissions
         );

@@ -1,6 +1,6 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.application.dto.cro.ResponseVerifySession;
+import com.betfair.video.api.infra.dto.ResponseVerifySession;
 import com.betfair.video.api.domain.port.AuthenticationPort;
 import org.springframework.stereotype.Service;
 

@@ -2,7 +2,9 @@ package com.betfair.video.api.domain.port;
 
 import com.betfair.video.api.domain.entity.ConfigurationItem;
 import com.betfair.video.api.domain.entity.ConfigurationType;
+import com.betfair.video.api.domain.entity.Provider;
 import com.betfair.video.api.domain.entity.TypeStream;
+import com.betfair.video.api.domain.valueobject.StreamingFormat;
 
 import java.util.Map;
 
@@ -19,5 +21,7 @@ public interface ConfigurationItemsPort {
     String getDefaultVideoQuality(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4);
 
     String findProviderWatchAndBetVenues(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4);
+
+    StreamingFormat findPreferredStreamingFormat(Provider provider, Integer integer, Integer integer1, Integer integer2, Integer integer3);
 
 }

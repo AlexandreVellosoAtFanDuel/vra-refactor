@@ -1,6 +1,6 @@
 package com.betfair.video.api.application.controller.interceptor;
 
-import com.betfair.video.api.application.dto.cro.ResponseVerifySession;
+import com.betfair.video.api.infra.dto.ResponseVerifySession;
 import com.betfair.video.api.domain.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

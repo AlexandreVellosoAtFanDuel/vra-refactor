@@ -1,11 +1,13 @@
 package com.betfair.video.api.infra.adapter.provider;
 
+import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.port.StreamingProviderPort;
 import com.betfair.video.api.domain.valueobject.StreamDetails;
 import com.betfair.video.api.domain.valueobject.StreamParams;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -13,13 +15,16 @@ import java.util.Set;
 @Component
 public class IMGProviderAdapter implements StreamingProviderPort {
 
+    @Value("${provider.img.enabled}")
+    private String isEnabled;
+
     @Override
     public boolean isEnabled() {
-        return false;
+        return Boolean.parseBoolean(isEnabled);
     }
 
     @Override
-    public StreamDetails getStreamDetails(ScheduleItem item, User user, StreamParams streamParams) {
+    public StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, User user, StreamParams streamParams) {
         return null;
     }
 

@@ -262,7 +262,7 @@ public class StreamService {
         if (isArchivedStream) {
             streamDetails = archivedStreamService.getStreamDetails(item, user, params);
         } else {
-            streamDetails = provider.getStreamDetails(item, user, params);
+            streamDetails = provider.getStreamDetails(item, context, user, params);
         }
 
         boolean isDirectStream;

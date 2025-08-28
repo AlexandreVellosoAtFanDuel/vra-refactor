@@ -1,7 +1,7 @@
 package com.betfair.video.api.infra.adapter;
 
 import com.betfair.video.api.application.dto.cro.RequestVerifySession;
-import com.betfair.video.api.application.dto.cro.ResponseVerifySession;
+import com.betfair.video.api.infra.dto.ResponseVerifySession;
 import com.betfair.video.api.application.dto.cro.SessionToken;
 import com.betfair.video.api.application.exception.ResponseCode;
 import com.betfair.video.api.application.exception.VideoAPIException;

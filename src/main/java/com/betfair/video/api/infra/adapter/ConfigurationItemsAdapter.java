@@ -2,11 +2,12 @@ package com.betfair.video.api.infra.adapter;
 
 import com.betfair.video.api.domain.entity.ConfigurationItem;
 import com.betfair.video.api.domain.entity.ConfigurationType;
+import com.betfair.video.api.domain.entity.Provider;
 import com.betfair.video.api.domain.entity.TypeStream;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
+import com.betfair.video.api.domain.valueobject.StreamingFormat;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.Map;
 
 @Component
@@ -49,5 +50,11 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
     @Override
     public String findProviderWatchAndBetVenues(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
         return null;
+    }
+
+    @Override
+    public StreamingFormat findPreferredStreamingFormat(Provider provider, Integer integer, Integer integer1, Integer integer2, Integer integer3) {
+        // TODO: Fetch from configuration
+        return StreamingFormat.HLS;
     }
 }

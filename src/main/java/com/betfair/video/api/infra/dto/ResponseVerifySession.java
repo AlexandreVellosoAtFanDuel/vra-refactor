@@ -1,4 +1,4 @@
-package com.betfair.video.api.application.dto.cro;
+package com.betfair.video.api.infra.dto;
 
 public record ResponseVerifySession(
         String accountId,

@@ -6,6 +6,7 @@ import com.betfair.video.api.domain.valueobject.UserPermissions;
 public record User(
         String accountId,
         String userId,
+        String ip,
         Geolocation geolocation,
         UserPermissions permissions
 ) {

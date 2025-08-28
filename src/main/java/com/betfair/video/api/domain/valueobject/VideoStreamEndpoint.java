@@ -6,7 +6,7 @@ public class VideoStreamEndpoint {
         private Integer videoFormat;
         private String videoQuality;
         private String videoEndpoint;
-        private Map<StreamDetailsParamEnum,String> playerControlParams;
+        private Map<String,String> playerControlParams;
 
     public Integer getVideoFormat() {
         return videoFormat;
@@ -32,11 +32,11 @@ public class VideoStreamEndpoint {
         this.videoEndpoint = videoEndpoint;
     }
 
-    public Map<StreamDetailsParamEnum, String> getPlayerControlParams() {
+    public Map<String, String> getPlayerControlParams() {
         return playerControlParams;
     }
 
-    public void setPlayerControlParams(Map<StreamDetailsParamEnum, String> playerControlParams) {
+    public void setPlayerControlParams(Map<String, String> playerControlParams) {
         this.playerControlParams = playerControlParams;
     }
 }

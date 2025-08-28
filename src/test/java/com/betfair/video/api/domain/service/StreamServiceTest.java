@@ -109,7 +109,7 @@ class StreamServiceTest {
         when(streamingProvider.isEnabled()).thenReturn(true);
 
         StreamDetails streamDetails = mock(StreamDetails.class);
-        when(streamingProvider.getStreamDetails(any(ScheduleItem.class), eq(user), any(StreamParams.class))).thenReturn(streamDetails);
+        when(streamingProvider.getStreamDetails(any(ScheduleItem.class), eq(context), eq(user), any(StreamParams.class))).thenReturn(streamDetails);
 
         when(directStreamConfigPort.isProviderInList(anyInt(), anyInt()))
                 .thenReturn(true);
