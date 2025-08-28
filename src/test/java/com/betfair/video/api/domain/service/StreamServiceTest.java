@@ -117,7 +117,7 @@ class StreamServiceTest {
         when(betsCheckService.getBBVStatus(any(VideoRequestIdentifier.class), any(ScheduleItem.class), eq(user), anyBoolean()))
                 .thenReturn(BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG);
 
-        when(videoStreamInfoMapper.map(any(ScheduleItem.class), any(StreamDetails.class), any(), any(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), anyBoolean(), any(), any()))
+        when(videoStreamInfoMapper.map(any(ScheduleItem.class), any(StreamDetails.class), any(), any(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), anyBoolean(), any(), any(), any(), any(), any()))
                 .thenReturn(mock(VideoStreamInfo.class));
 
         // When

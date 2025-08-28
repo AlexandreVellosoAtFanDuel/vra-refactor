@@ -24,7 +24,23 @@ public enum VideoQuality {
         return value;
     }
 
-    public static Set<VideoQuality> getValidValues() {
-        return validValues;
+    public static VideoQuality fromValue(String s) {
+        for (VideoQuality v : validValues) {
+            if (v.value != null && v.value.equals(s)) {
+                return v;
+            }
+        }
+
+        return UNRECOGNIZED_VALUE;
+    }
+
+    public static boolean isValidValue(String s) {
+        for (VideoQuality videoQuality : validValues) {
+            if (videoQuality.value != null && videoQuality.value.equals(s)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

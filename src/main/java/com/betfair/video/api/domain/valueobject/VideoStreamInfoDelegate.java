@@ -19,10 +19,7 @@ public class VideoStreamInfoDelegate {
         this.defaultVideoQuality = defaultVideoQuality;
     }
 
-    public void setRawDefaultVideoQualityValue(String s) {
-        this.defaultVideoQuality = VideoQuality.getValidValues().stream()
-                .filter(videoQuality -> videoQuality.name().equalsIgnoreCase(s))
-                .findFirst()
-                .orElse(VideoQuality.UNRECOGNIZED_VALUE);
+    public void setRawDefaultVideoQualityValue(String value) {
+        this.defaultVideoQuality = VideoQuality.fromValue(value);
     }
 }

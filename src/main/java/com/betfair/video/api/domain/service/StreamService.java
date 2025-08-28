@@ -39,7 +39,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -294,7 +293,7 @@ public class StreamService {
             }
         }
 
-        var videoStreamInfo = videoStreamInfoMapper.map(
+        return videoStreamInfoMapper.map(
                 item,
                 streamDetails,
                 provider.getAvailableVideoQualityValues(),
@@ -313,23 +312,6 @@ public class StreamService {
                 eventName,
                 exchangeRaceId
         );
-
-        putRequestedEventInfoIntoContext(videoStreamInfo, item, (VideoStreamInfoByExternalIdSearchKey) searchKey, context);
-
-        return videoStreamInfo;
-    }
-
-    private void putRequestedEventInfoIntoContext(VideoStreamInfo videoStreamInfo, ScheduleItem item, VideoStreamInfoByExternalIdSearchKey searchKey, RequestContext context) {
-        if (item != null && item.mappings() != null && !item.mappings().isEmpty()) {
-            ScheduleItemMapper mapping = filterMappingsByExternalId(item, searchKey, context);
-
-            if (mapping != null && mapping.scheduleItemMappingKey() != null && mapping.scheduleItemMappingKey().providerEventKey() != null) {
-                videoStreamInfo.setEventId(mapping.scheduleItemMappingKey().providerEventKey().primaryId());
-                videoStreamInfo.setEventName(removeCommas(removeLineBrakes(mapping.mappingDescription())));
-                videoStreamInfo.setExchangeRaceId(mapping.exchangeRaceId());
-            }
-
-        }
     }
 
     private String removeCommas(String string) {
@@ -489,14 +471,14 @@ public class StreamService {
         String defaultVideoQuality = configurationItemsPort.getDefaultVideoQuality(item.providerId(),
                 item.videoChannelType(), item.betfairSportsType(), item.streamTypeId(), item.brandId());
 
-        if (StringUtils.isNotBlank(defaultVideoQuality) && isStringConvertibleToEnumValue(VideoQuality.getValidValues(), defaultVideoQuality)) {
+        if (StringUtils.isNotBlank(defaultVideoQuality) && VideoQuality.isValidValue(defaultVideoQuality)) {
             return VideoQuality.valueOf(defaultVideoQuality);
         }
 
         return null;
     }
 
-    public static ContentType convertStreamTypeIdToContentType(Integer streamTypeId) {
+    private static ContentType convertStreamTypeIdToContentType(Integer streamTypeId) {
         if (TypeStream.VID.getId() == streamTypeId) {
             return ContentType.VID;
         } else if (TypeStream.VIZ.getId() == streamTypeId) {
@@ -510,21 +492,6 @@ public class StreamService {
 
     private boolean isStringPositiveNumber(String checkingValue) {
         return NumberUtils.isNumber(checkingValue) && !checkingValue.startsWith("-");
-    }
-
-    private boolean isStringConvertibleToEnumValue(Set<VideoQuality> validValues, String checkingValue) {
-        Iterator var2 = validValues.iterator();
-
-        Enum enumValue;
-        do {
-            if (!var2.hasNext()) {
-                return false;
-            }
-
-            enumValue = (Enum) var2.next();
-        } while (!enumValue.name().equals(checkingValue));
-
-        return true;
     }
 
 }
