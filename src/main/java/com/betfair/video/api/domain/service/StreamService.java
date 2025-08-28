@@ -9,6 +9,7 @@ import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.TypeStream;
 import com.betfair.video.api.domain.entity.User;
+import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
 import com.betfair.video.api.domain.mapper.VideoStreamInfoMapper;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.DirectStreamConfigPort;
@@ -37,14 +38,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 @Service
 public class StreamService {
 
     private static final Logger logger = LoggerFactory.getLogger(StreamService.class);
+
+    private static final String EXCHANGE_RACE_ID_TIME_SEPARATOR = ".";
+
+    public static final Pattern LINEBREAKS_PATTERN = Pattern.compile("(\r)|(\n)");
+
+    public static final Pattern COMMA_PATTERN = Pattern.compile(",");
 
     private final ReferenceTypesPort referenceTypesPort;
 
@@ -128,7 +138,7 @@ public class StreamService {
 
         StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId(), item.videoChannelType());
 
-        VideoStreamInfo streamInfo = getStreamInfoForItem(item, provider, searchKey, user, isArchivedVideo, includeMetadata);
+        VideoStreamInfo streamInfo = getStreamInfoForItem(item, provider, searchKey, context, user, isArchivedVideo, includeMetadata);
 
         if (isArchivedVideo && streamInfo != null) {
             streamInfo.setTimeformRaceId(searchKey.getPrimaryId());
@@ -235,7 +245,7 @@ public class StreamService {
         }
     }
 
-    private VideoStreamInfo getStreamInfoForItem(ScheduleItem item, StreamingProviderPort provider, VRAStreamSearchKey searchKey,
+    private VideoStreamInfo getStreamInfoForItem(ScheduleItem item, StreamingProviderPort provider, VRAStreamSearchKey searchKey, RequestContext context,
                                                  User user, boolean isArchivedStream, boolean includeMetadata) throws VideoAPIException {
 
         StreamParams params = new StreamParams(
@@ -270,7 +280,21 @@ public class StreamService {
             isInlineStream = isDirectStream && inlineStreamConfigPort.isProviderInList(item.providerId(), item.videoChannelType());
         }
 
-        return videoStreamInfoMapper.map(
+        String eventId = null;
+        String eventName = null;
+        String exchangeRaceId = null;
+
+        if (item.mappings() != null && !item.mappings().isEmpty()) {
+            ScheduleItemMapper mapping = filterMappingsByExternalId(item, searchKey, context);
+
+            if (mapping != null && mapping.scheduleItemMappingKey() != null && mapping.scheduleItemMappingKey().providerEventKey() != null) {
+                eventId = mapping.scheduleItemMappingKey().providerEventKey().primaryId();
+                eventName = removeCommas(removeLineBrakes(mapping.mappingDescription()));
+                exchangeRaceId = mapping.exchangeRaceId();
+            }
+        }
+
+        var videoStreamInfo = videoStreamInfoMapper.map(
                 item,
                 streamDetails,
                 provider.getAvailableVideoQualityValues(),
@@ -284,8 +308,113 @@ public class StreamService {
                 user,
                 includeMetadata,
                 getVideoPlayerConfig(item, streamDetails),
-                geoRestrictionsService
+                geoRestrictionsService,
+                eventId,
+                eventName,
+                exchangeRaceId
         );
+
+        putRequestedEventInfoIntoContext(videoStreamInfo, item, (VideoStreamInfoByExternalIdSearchKey) searchKey, context);
+
+        return videoStreamInfo;
+    }
+
+    private void putRequestedEventInfoIntoContext(VideoStreamInfo videoStreamInfo, ScheduleItem item, VideoStreamInfoByExternalIdSearchKey searchKey, RequestContext context) {
+        if (item != null && item.mappings() != null && !item.mappings().isEmpty()) {
+            ScheduleItemMapper mapping = filterMappingsByExternalId(item, searchKey, context);
+
+            if (mapping != null && mapping.scheduleItemMappingKey() != null && mapping.scheduleItemMappingKey().providerEventKey() != null) {
+                videoStreamInfo.setEventId(mapping.scheduleItemMappingKey().providerEventKey().primaryId());
+                videoStreamInfo.setEventName(removeCommas(removeLineBrakes(mapping.mappingDescription())));
+                videoStreamInfo.setExchangeRaceId(mapping.exchangeRaceId());
+            }
+
+        }
+    }
+
+    private String removeCommas(String string) {
+        if (string != null) {
+            Matcher m = COMMA_PATTERN.matcher(string);
+            return m.replaceAll("");
+        } else {
+            return null;
+        }
+    }
+
+    private String removeLineBrakes(String string) {
+        if (string != null) {
+            Matcher m = LINEBREAKS_PATTERN.matcher(string);
+            return m.replaceAll("");
+        } else {
+            return null;
+        }
+    }
+
+    private ScheduleItemMapper filterMappingsByExternalId(ScheduleItem item, VRAStreamSearchKey searchKey, RequestContext context) {
+        Set<ScheduleItemMapper> filteredMappings = new HashSet<>();
+
+        if (!(searchKey instanceof VideoStreamInfoByExternalIdSearchKey)) {
+            return null;
+        }
+
+        VideoStreamInfoByExternalIdSearchKey byExternalIdSearchKey = (VideoStreamInfoByExternalIdSearchKey) searchKey;
+        String externalId = byExternalIdSearchKey.getPrimaryId();
+
+        if (externalId == null) {
+            return null;
+        }
+
+        for (ScheduleItemMapper mapping : item.mappings()) {
+            boolean isRequestedMapping = isRequestedMapping(mapping, byExternalIdSearchKey, externalId);
+
+            if (isRequestedMapping) {
+                filteredMappings.add(mapping);
+            }
+        }
+
+        if (filteredMappings.isEmpty()) {
+            return null;
+        }
+
+        if (filteredMappings.size() == 1) {
+            return filteredMappings.iterator().next();
+        }
+
+        ScheduleItemMapper pickedMapping = filteredMappings.iterator().next();
+
+        if (ExternalIdSource.EXCHANGE_RACE.getExternalIdSource().equals(byExternalIdSearchKey.getExternalIdSource().getExternalIdSource())
+                && externalId.contains(EXCHANGE_RACE_ID_TIME_SEPARATOR)) {
+            //for "by race id" request its possible that >1 mappings has same race id, so we need to pick one
+            String eventIdExtractedFromRaceId = externalId.substring(0, externalId.indexOf(EXCHANGE_RACE_ID_TIME_SEPARATOR));
+
+            for (ScheduleItemMapper mapping : filteredMappings) {
+                String mappingEventId = mapping.scheduleItemMappingKey().providerEventKey().primaryId();
+                if (eventIdExtractedFromRaceId.equals(mappingEventId)) {
+                    pickedMapping = mapping;
+                    break;
+                }
+            }
+        } else {
+            logger.error("[{}]: has >1 mappings for schedule item, will pick 1st available one to " +
+                            "extract event id. This is not critical but should not happen. Search key: {}. Filtered mappings: {}",
+                    context.uuid(), searchKey, filteredMappings);
+        }
+
+        return pickedMapping;
+    }
+
+    private boolean isRequestedMapping(ScheduleItemMapper mapping, VideoStreamInfoByExternalIdSearchKey byExternalIdSearchKey, String externalId) {
+        boolean isRequestedMapping;
+
+        if (ExternalIdSource.EXCHANGE_RACE.getExternalIdSource().equals(byExternalIdSearchKey.getExternalIdSource().getExternalIdSource())) {
+            isRequestedMapping = externalId.equals(mapping.exchangeRaceId());
+        } else if (ExternalIdSource.RAMP.getExternalIdSource().equals(byExternalIdSearchKey.getExternalIdSource().getExternalIdSource())) {
+            isRequestedMapping = externalId.equals(mapping.rampId());
+        } else {
+            isRequestedMapping = externalId.equals(mapping.scheduleItemMappingKey().providerEventKey().primaryId());
+        }
+
+        return isRequestedMapping;
     }
 
     private String getVideoPlayerConfig(ScheduleItem scheduleItem, StreamDetails streamDetails) {

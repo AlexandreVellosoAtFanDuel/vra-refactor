@@ -72,7 +72,10 @@ public interface VideoStreamInfoMapStruct {
             User user,
             boolean includeMetadata,
             String videoPlayerConfig,
-            @Context GeoRestrictionsService geoRestrictionsService
+            @Context GeoRestrictionsService geoRestrictionsService,
+            String eventId,
+            String eventName,
+            String exchangeRaceId
     );
 
     @Named("mapBlockedCountries")

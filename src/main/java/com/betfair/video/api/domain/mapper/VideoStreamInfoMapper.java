@@ -40,7 +40,10 @@ public class VideoStreamInfoMapper {
             final User user,
             final boolean includeMetadata,
             final String videoPlayerConfig,
-            final GeoRestrictionsService geoRestrictionsService
+            final GeoRestrictionsService geoRestrictionsService,
+            final String eventId,
+            final String eventName,
+            final String exchangeRaceId
     ) {
         VideoStreamInfo videoStreamInfo = mapStruct.mapToVideoStreamInfo(
                 scheduleItem,
@@ -56,7 +59,10 @@ public class VideoStreamInfoMapper {
                 user,
                 includeMetadata,
                 videoPlayerConfig,
-                geoRestrictionsService
+                geoRestrictionsService,
+                eventId,
+                eventName,
+                exchangeRaceId
         );
 
         if (includeMetadata) {
@@ -82,26 +88,6 @@ public class VideoStreamInfoMapper {
             if (sportReferenceType != null) {
                 videoStreamInfo.setSportName(sportReferenceType.description());
             }
-        }
-
-        // TODO:  String requestedEventId = (String) user.getCurrentContextHolder().params.get(User.CurrentContextHolder.PARAM_STREAM_REQUESTED_EVENT_ID);
-        String requestedEventId = null;
-
-        // TODO: String requestedExchangeRaceId = (String) user.getCurrentContextHolder().params.get(User.CurrentContextHolder.EXCHANGE_RACE_ID);
-        String requestedExchangeRaceId = null;
-
-        // TODO: String requestedMappingDescription = (String) user.getCurrentContextHolder().params.get(User.CurrentContextHolder.PARAM_STREAM_MAPPING_DESCRIPTION);
-        String requestedMappingDescription = null;
-
-        if (StringUtils.isNotEmpty(requestedEventId)) {
-            videoStreamInfo.setEventId(requestedEventId);
-        }
-
-        if (StringUtils.isNotEmpty(requestedExchangeRaceId)) {
-            videoStreamInfo.setExchangeRaceId(requestedExchangeRaceId);
-        }
-        if (includeMetadata && StringUtils.isNotEmpty(requestedMappingDescription)) {
-            videoStreamInfo.setEventName(requestedMappingDescription);
         }
 
         return videoStreamInfo;
