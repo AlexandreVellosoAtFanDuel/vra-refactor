@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GeoRestrictionsService {
     public String getProviderBlockedCountries(ScheduleItem scheduleItem) {
-        return null;
+        // TODO: Fetch provider blocked countries
+        return "ZA";
     }
 }

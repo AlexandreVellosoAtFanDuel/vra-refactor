@@ -10,7 +10,8 @@ public class CachedReferenceTypesAdapter implements ReferenceTypesPort {
 
     @Override
     public ReferenceType findReferenceTypeById(Integer referenceTypeId, ReferenceTypeId referenceTypeEnum) {
-        return null;
+        // TODO: Implement actual caching and fetching logic here
+        return new ReferenceType("-1", "Other sports types");
     }
 
 }

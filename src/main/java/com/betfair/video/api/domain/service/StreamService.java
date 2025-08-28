@@ -296,21 +296,54 @@ public class StreamService {
         boolean configurationItemExist = configurationItem != null;
         if (configurationItemExist) {
             String streamFormat = streamDetails.params().get(StreamDetailsParamEnum.STREAM_FORMAT_PARAM_NAME);
-            boolean streamFormatExist = streamFormat != null && !"".equals(streamFormat);
+            boolean streamFormatExist = streamFormat != null && !streamFormat.isEmpty();
 
             String configValue = configurationItem.value();
-            boolean configValueExist = configValue != null && !"".equals(configValue);
+            boolean configValueExist = configValue != null && !configValue.isEmpty();
 
-            if (streamFormatExist) {
-                if (configValueExist) {
-                    videoPlayerConfig = null;
-                }
+            if (streamFormatExist && configValueExist) {
+                videoPlayerConfig = getVideoPlayerConfigByStreamFormat(configValue, streamFormat);
             }
         }
 
         return videoPlayerConfig;
     }
 
+    private String getVideoPlayerConfigByStreamFormat(String playerConfig, String streamFormat) {
+        String playerConfigByStreamFormat = null;
+        String[] configPerFormatArray = playerConfig.split("--");
+
+        for (String formatConfig : configPerFormatArray) {
+            boolean isCurrentStreamFormatConfig = formatConfig.contains(streamFormat);
+            if (isCurrentStreamFormatConfig) {
+                playerConfigByStreamFormat = retrievePlayerConfigValue(formatConfig);
+            }
+        }
+
+        return playerConfigByStreamFormat;
+    }
+
+    private String retrievePlayerConfigValue(String formatConfig) {
+        String playerConfigByStreamFormat = null;
+        String[] formatAndConfigArray = formatConfig.split("::");
+        boolean isCorrectFormatAndConfigArray = formatAndConfigArray.length > 1;
+        if (isCorrectFormatAndConfigArray) {
+            String configValue = formatAndConfigArray[1];
+            if (isJsonFormat(configValue)) {
+                playerConfigByStreamFormat = configValue;
+            } else {
+                logger.warn("Video player config format is not json : {}", formatConfig);
+            }
+        } else {
+            logger.warn("Incorrect video player config format : {}", formatConfig);
+        }
+
+        return playerConfigByStreamFormat;
+    }
+
+    private static boolean isJsonFormat(String value) {
+        return value.contains("{") && value.contains("}");
+    }
 
     private String getDefaultBufferingValue(final ScheduleItem item) {
         String defaultBufferingInterval = configurationItemsPort.getDefaultBufferingInterval(item.providerId(),

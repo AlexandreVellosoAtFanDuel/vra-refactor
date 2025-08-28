@@ -168,12 +168,12 @@ public interface VideoStreamInfoMapStruct {
         return sportReferenceType != null ? sportReferenceType.description() : null;
     }
 
-    // Helper methods
     default Integer parseInteger(String value) {
-        if (NumberUtils.isCreatable(value)) {
-            return NumberUtils.createNumber(value).intValue();
+        if (!NumberUtils.isCreatable(value)) {
+            return null;
         }
-        return null;
+
+        return NumberUtils.createNumber(value).intValue();
     }
 
     default String createAggregatedBlockedCountries(String... blockedCountries) {

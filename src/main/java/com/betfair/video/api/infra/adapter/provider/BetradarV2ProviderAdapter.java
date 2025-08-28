@@ -25,19 +25,19 @@ public class BetradarV2ProviderAdapter implements StreamingProviderPort {
     public StreamDetails getStreamDetails(ScheduleItem item, User user, StreamParams streamParams) {
         // TODO: implement actual logic to fetch stream details
         Map<StreamDetailsParamEnum, String> params = Map.of(
-                StreamDetailsParamEnum.STREAM_NAME_PARAM_NAME, "stream name",
-                StreamDetailsParamEnum.STREAM_FORMAT_PARAM_NAME, "format"
+                StreamDetailsParamEnum.STREAM_FORMAT_PARAM_NAME, "hls"
         );
 
         return new StreamDetails(
-                "http://example.com/stream.m3u8",
-                VideoQuality.HIGH,
+                "https://api.livestreaming.imgarena.com/api/v2/streaming/events2/stream?operatorId=226",
+                null,
                 params
         );
     }
 
     @Override
     public Set<VideoQuality> getAvailableVideoQualityValues() {
-        return null;
+        // TODO: implement actual logic to fetch available video quality values
+        return Set.of(VideoQuality.HIGH);
     }
 }

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Mapper(componentModel = "spring")
 @Component
@@ -79,14 +80,11 @@ public interface VideoStreamInfoDtoMapper {
             return null;
         }
 
-        PlayerControlParamsDto playerControlParamsDto = new PlayerControlParamsDto(
-                "match.lmtPlus",
-                "football",
-                "61378347"
-        );
+        Map<String, String> playerControlParams = Map.of("streamFormat", "hls");
 
         return new VideoStreamEndpointDto(
-                playerControlParamsDto
+                "https://api.livestreaming.imgarena.com/api/v2/streaming/events2/stream?operatorId=226",
+                playerControlParams
         );
     }
 }

@@ -20,6 +20,7 @@ public record VideoStreamInfoDto(
         String providerEventId,
         String providerEventName,
         Long accountId,
+        String videoPlayerConfig,
         Date startDateTime,
         String competition,
         String defaultVideoQuality,

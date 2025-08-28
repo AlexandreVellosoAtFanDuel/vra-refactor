@@ -12,7 +12,8 @@ public class DirectStreamConfigAdapter implements DirectStreamConfigPort {
 
     @Override
     public boolean isProviderInList(Integer integer, Integer integer1) {
-        return false;
+        // TODO: fetch from configuration
+        return true;
     }
 
 }

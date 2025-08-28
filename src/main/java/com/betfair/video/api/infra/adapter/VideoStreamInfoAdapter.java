@@ -1,10 +1,12 @@
 package com.betfair.video.api.infra.adapter;
 
+import com.betfair.video.api.domain.entity.AuditItem;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.ScheduleItemData;
 import com.betfair.video.api.domain.exception.DataIsNotReadyException;
 import com.betfair.video.api.domain.port.VideoStreamInfoPort;
 import com.betfair.video.api.domain.utils.DateUtils;
+import com.betfair.video.api.domain.valueobject.ImportStatus;
 import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
 import org.springframework.stereotype.Component;
 
@@ -21,77 +23,52 @@ public class VideoStreamInfoAdapter implements VideoStreamInfoPort {
 
         // TODO: Implement actual data fetching logic here
 
-        /*
-        Use this one for mock data structure reference
-        {
-            "uniqueVideoId": 159532269,
-            "providerId": 34,
-            "blockedCountries": "ZA",
-            "videoQuality": [],
-            "defaultBufferInterval": "1",
-            "sizeRestrictions": {
-                "fullScreenAllowed": false,
-                "airPlayAllowed": false,
-                "aspectRatio": "0.61",
-                "widthMax": 1080,
-                "widthDefault": 480
-            },
-            "directStream": false,
-            "inlineStream": false,
-            "videoStreamEndpoint": {
-                "playerControlParams": {
-                    "widgetName": "match.lmtPlus",
-                    "sportName": "football",
-                    "matchId": "61378347"
-                }
-            },
-            "eventId": "35394600",
-            "eventName": "SV Horn v Austria Klagenfurt",
-            "sportId": "1",
-            "sportName": "Football",
-            "providerEventId": "61378347",
-            "providerEventName": "SV HORN v SK AUSTRIA KLAGENFURT",
-            "accountId": 100002650,
-            "startDateTime": "2025-07-25T17:30:00.000Z",
-            "competition": "OFB Cup",
-            "defaultVideoQuality": "MEDIUM",
-            "contentType": "VIZ"
-        }
-         */
-
         ScheduleItemData providerData = new ScheduleItemData(
-                "SV Horn v Austria Klagenfurt",
-                "venue",
-                "country",
-                "",
+                "Live Test Event",
+                null,
+                null,
+                null,
                 DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, -10),
                 DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, +10),
-                "OFB Cup"
+                null
         );
 
+        ScheduleItemData overriddenData = new ScheduleItemData(
+                "Live Test Event",
+                null,
+                null,
+                null,
+                DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, -10),
+                DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, +10),
+                null
+        );
+
+        AuditItem auditItem = new AuditItem(1, "system", new Date(), "127.0.0.1");
+
         ScheduleItem scheduleItem = new ScheduleItem(
-                159532269L,
-                34,
-                "providerEventId",
-                "providerSportsType",
-                "providerLanguage",
+                103672720L,
+                26,
+                "2",
+                3,
+                null,
+                null,
+                null,
+                null,
+                -1,
+                300,
+                0,
+                1,
+                1,
+                ImportStatus.UPDATED,
+                auditItem,
+                'A',
                 false,
-                "providerStreamingUrl",
-                false,
-                1,
-                1,
-                1,
-                1,
-                null,
-                null,
-                null,
-                null,
                 1,
                 null,
                 new Date(),
                 3,
                 providerData,
-                null,
+                overriddenData,
                 null
         );
 
