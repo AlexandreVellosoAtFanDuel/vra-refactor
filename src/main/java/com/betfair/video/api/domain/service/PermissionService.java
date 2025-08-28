@@ -97,7 +97,7 @@ public class PermissionService {
             additionalInfo = String.format("{No ScheduleItem found by search key: %s}", searchKey);
 
             VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, additionalInfo);
-            streamExceptionLoggingUtils.logException(logger, Long.valueOf(eventIdentifier.videoId()), Level.WARN, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, eventIdentifier, Level.WARN, context, user, exception, items, null);
             throw exception;
         }
 

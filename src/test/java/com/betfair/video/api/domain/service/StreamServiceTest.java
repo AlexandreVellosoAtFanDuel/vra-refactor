@@ -3,9 +3,12 @@ package com.betfair.video.api.domain.service;
 import com.betfair.video.api.application.exception.ResponseCode;
 import com.betfair.video.api.application.exception.VideoAPIException;
 import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.domain.entity.ProviderEventKey;
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
+import com.betfair.video.api.domain.entity.ScheduleItemMappingKey;
 import com.betfair.video.api.domain.entity.User;
+import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
 import com.betfair.video.api.domain.mapper.VideoStreamInfoMapper;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.DirectStreamConfigPort;
@@ -31,6 +34,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -87,6 +92,13 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
+
+        ScheduleItemMapper mapper = mock(ScheduleItemMapper.class);
+        when(mapper.scheduleItemMappingKey()).thenReturn(new ScheduleItemMappingKey("videoItemId", new ProviderEventKey(1, "12345", "EVENT:12345")));
+
+        Set<ScheduleItemMapper> mappings = Set.of(mapper);
+        when(scheduleItem.mappings()).thenReturn(mappings);
+
         when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
                 .thenReturn(scheduleItem);
 

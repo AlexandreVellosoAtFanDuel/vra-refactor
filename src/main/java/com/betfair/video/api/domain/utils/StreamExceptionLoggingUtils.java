@@ -29,7 +29,7 @@ public class StreamExceptionLoggingUtils {
         logException(logger, videoRequestIdentifier, logLevel, context, user, exception, Collections.emptyList(), addInfo);
     }
 
-    private void logException(Logger logger,
+    public void logException(Logger logger,
                                      VideoRequestIdentifier identifier, final Level logLevel, final RequestContext context, final User user,
                                      final VideoAPIException exception, final List<ScheduleItem> items, final String addInfo) {
         String requestedSource = getRequestedSource(identifier);

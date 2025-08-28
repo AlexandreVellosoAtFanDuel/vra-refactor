@@ -1,95 +1,67 @@
 package com.betfair.video.api.infra.adapter;
 
-import com.betfair.video.api.domain.entity.AuditItem;
-import com.betfair.video.api.domain.entity.ProviderEventKey;
 import com.betfair.video.api.domain.entity.ScheduleItem;
-import com.betfair.video.api.domain.entity.ScheduleItemData;
-import com.betfair.video.api.domain.entity.ScheduleItemMappingKey;
-import com.betfair.video.api.domain.exception.DataIsNotReadyException;
-import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
 import com.betfair.video.api.domain.port.VideoStreamInfoPort;
-import com.betfair.video.api.domain.utils.DateUtils;
+import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.ImportStatus;
+import com.betfair.video.api.domain.valueobject.search.VRAStreamSearchKey;
 import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @Component
 public class VideoStreamInfoAdapter implements VideoStreamInfoPort {
 
+    private static final Logger logger = LoggerFactory.getLogger(VideoStreamInfoAdapter.class);
+
+    private static final Set<ImportStatus> ALLOWED_MAPPING_STATUSES = EnumSet.of(ImportStatus.NEW, ImportStatus.UPDATED, ImportStatus.OVERRIDDEN);
+
+    private final CachedScheduleItems cachedScheduleItems;
+
+    public VideoStreamInfoAdapter(CachedScheduleItems cachedScheduleItems) {
+        this.cachedScheduleItems = cachedScheduleItems;
+    }
+
     @Override
-    public List<ScheduleItem> getVideoStreamInfoByExternalId(VideoStreamInfoByExternalIdSearchKey searchKey) throws DataIsNotReadyException {
+    public List<ScheduleItem> getVideoStreamInfoByExternalId(VideoStreamInfoByExternalIdSearchKey searchKey) {
+        UUID tId = UUID.randomUUID();
+        List<ScheduleItem> cachedItems = cachedScheduleItems.getAllAvailableEvents();
+        logger.info("[{}] Retrieved {} cached schedule items", tId, cachedItems.size());
 
-        // TODO: Implement actual data fetching logic here
+        Stream<ScheduleItem> items = applyCommonFilters(cachedItems.stream(), searchKey)
+                .filter(scheduleItem -> scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey() != null)
+                .filter(scheduleItem -> scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey() != null)
+                .filter(scheduleItem -> searchKey.getSecondaryId() == null || searchKey.getSecondaryId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().secondaryId()))
+                .filter(scheduleItem -> !(searchKey.getExternalIdSource() != null && searchKey.getExternalIdSource().getProviderId() != null) || searchKey.getExternalIdSource().getProviderId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().providerId()));
 
-        ScheduleItemData providerData = new ScheduleItemData(
-                "Live Test Event",
-                null,
-                null,
-                null,
-                DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, -10),
-                DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, +10),
-                null
-        );
+        if (ExternalIdSource.EXCHANGE_RACE.getExternalIdSource().equals(searchKey.getExternalIdSource().getExternalIdSource())) {
+            items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().exchangeRaceId()));
+        } else if (ExternalIdSource.RAMP.getExternalIdSource().equals(searchKey.getExternalIdSource().getExternalIdSource())) {
+            items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().rampId()));
+        } else {
+            items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().primaryId()));
+        }
+        List<ScheduleItem> result = items.toList();
+        logger.info("[{}] Found {} cached schedule items", tId, result.size());
+        return result;
+    }
 
-        ScheduleItemData overriddenData = new ScheduleItemData(
-                "Live Test Event",
-                null,
-                null,
-                null,
-                DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, -10),
-                DateUtils.shiftDateByField(new Date(), Calendar.MINUTE, +10),
-                null
-        );
-
-        AuditItem auditItem = new AuditItem(1, "system", new Date(), "127.0.0.1");
-
-        ScheduleItemMappingKey scheduleItemMappingKey = new ScheduleItemMappingKey("103672720", new ProviderEventKey(7, "33987267", "EVENT:33987267"));
-
-        Set<ScheduleItemMapper> mappings = Set.of(new ScheduleItemMapper(
-                null,
-                null,
-                scheduleItemMappingKey,
-                "San Francisco 49ers @ Kansas City Chiefs"
-        ));
-
-        /*
-        ScheduleItemMapping{scheduleItemMappingKey=MappingProviderEventKey{videoItemId=103672720, providerEventKey=ProviderEventKey{providerId=7, primaryId=33987267, secondaryId=EVENT:33987267}}, mappingDescription='San Francisco 49ers @ Kansas City Chiefs', exchangeRaceId='null', rampId='null', meetingName='null', venueName='null', winMarketName='null', mappingSt=O, approvalSt=A, matchingTypeId=null, facetStartTime=null, specialLogicMatchedItemScore=null, editDistanceMatchedItemScore=null, usedMatchers='null', totalMatchedItemScore=null, manuallyApprovedFlag=null, createdDate=Mon Sep 09 11:10:28 GMT 2024, audit=null}
-         */
-
-        ScheduleItem scheduleItem = new ScheduleItem(
-                103672720L,
-                26,
-                "2",
-                3,
-                null,
-                null,
-                null,
-                null,
-                -1,
-                300,
-                0,
-                1,
-                1,
-                ImportStatus.UPDATED,
-                auditItem,
-                'A',
-                false,
-                1,
-                null,
-                new Date(),
-                3,
-                providerData,
-                overriddenData,
-                mappings
-        );
-
-        return Collections.singletonList(scheduleItem);
+    private Stream<ScheduleItem> applyCommonFilters(Stream<ScheduleItem> items, VRAStreamSearchKey searchKey) {
+        return items.filter(scheduleItem -> searchKey.getProviderId() == null || searchKey.getProviderId().equals(scheduleItem.providerId()))
+                .filter(scheduleItem -> searchKey.getChannelTypeId() == null || searchKey.getChannelTypeId().equals(scheduleItem.videoChannelType()))
+                .filter(scheduleItem -> CollectionUtils.isEmpty(searchKey.getChannelSubTypeIds()) || searchKey.getChannelSubTypeIds().contains(scheduleItem.videoChanelSubType()))
+                .filter(scheduleItem -> CollectionUtils.isEmpty(searchKey.getStreamTypeIds()) || searchKey.getStreamTypeIds().contains(scheduleItem.streamTypeId()))
+                .filter(scheduleItem -> ImportStatus.DELETED != scheduleItem.importStatus())
+                .filter(scheduleItem -> scheduleItem.mappings().stream().findFirst().isPresent())
+                .filter(scheduleItem -> ALLOWED_MAPPING_STATUSES.contains(scheduleItem.mappings().stream().findFirst().get().mappingStatus()));
     }
 
 }

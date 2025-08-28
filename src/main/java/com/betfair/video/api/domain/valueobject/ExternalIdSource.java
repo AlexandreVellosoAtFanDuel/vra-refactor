@@ -38,4 +38,8 @@ public enum ExternalIdSource {
     public Integer getExternalIdSource() {
         return externalIdSource;
     }
+
+    public Integer getProviderId() {
+        return providerId;
+    }
 }
