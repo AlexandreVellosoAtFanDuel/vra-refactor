@@ -1,6 +1,7 @@
 package com.betfair.video.api.infra.adapter;
 
 import com.betfair.video.api.application.dto.cro.RequestVerifySession;
+import com.betfair.video.api.application.dto.cro.ResponseVerifySession;
 import com.betfair.video.api.application.dto.cro.SessionToken;
 import com.betfair.video.api.application.exception.ResponseCode;
 import com.betfair.video.api.application.exception.VideoAPIException;
@@ -25,11 +26,11 @@ public class AuthenticationAdapter implements AuthenticationPort {
     }
 
     @Override
-    public void verifySession(String sessionToken) {
+    public ResponseVerifySession verifySession(String sessionToken) {
         var request = new RequestVerifySession(new SessionToken(sessionToken), null, "TRUE");
 
         try {
-            this.croClient.verifySession(request);
+            return this.croClient.verifySession(request);
         } catch (FeignException fe) {
             if (HttpStatus.UNAUTHORIZED.value() == fe.status()) {
                 logger.warn("Session verification failed with status: {}", fe.status());
