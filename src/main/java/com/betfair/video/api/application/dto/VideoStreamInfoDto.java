@@ -1,8 +1,11 @@
 package com.betfair.video.api.application.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import java.util.Date;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record VideoStreamInfoDto(
         Long uniqueVideoId,
         Integer providerId,
