@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ScheduleItemService Tests")
-public class ScheduleItemServiceTest {
+class ScheduleItemServiceTest {
 
     @Mock
     StreamExceptionLoggingUtils streamExceptionLoggingUtils;
@@ -73,11 +73,11 @@ public class ScheduleItemServiceTest {
 
         // Create a Date from 30 minutes before
         Date startDate = new Date(now.getTime() - 30 * 60 * 1000); // 30 minutes before
-        when(actualProviderData.start()).thenReturn(startDate);
+        when(actualProviderData.getStart()).thenReturn(startDate);
 
         Date endDate = new Date();
         endDate.setTime(now.getTime() + 60 * 60 * 1000); // 1 hour later
-        when(actualProviderData.end()).thenReturn(endDate);
+        when(actualProviderData.getEnd()).thenReturn(endDate);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         when(scheduleItem.leadTime()).thenReturn(null);
@@ -103,11 +103,11 @@ public class ScheduleItemServiceTest {
 
         // Create a Date from 30 minutes before
         Date startDate = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes after
-        when(actualProviderData.start()).thenReturn(startDate);
+        when(actualProviderData.getStart()).thenReturn(startDate);
 
         Date endDate = new Date();
         endDate.setTime(now.getTime() + 30 * 60 * 1000); // 30 minutes
-        when(actualProviderData.end()).thenReturn(endDate);
+        when(actualProviderData.getEnd()).thenReturn(endDate);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         when(scheduleItem.leadTime()).thenReturn(10 * 60); // 10 minutes (lead time in seconds)
@@ -137,11 +137,11 @@ public class ScheduleItemServiceTest {
 
         // Create a Date from 30 minutes before
         Date startDate = new Date(now.getTime() - 5 * 60 * 1000); // 5 minutes before
-        when(actualProviderData.start()).thenReturn(startDate);
+        when(actualProviderData.getStart()).thenReturn(startDate);
 
         Date endDate = new Date();
         endDate.setTime(now.getTime() + 30 * 60 * 1000); // 30 minutes
-        when(actualProviderData.end()).thenReturn(endDate);
+        when(actualProviderData.getEnd()).thenReturn(endDate);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         when(scheduleItem.leadTime()).thenReturn(null);
@@ -171,11 +171,11 @@ public class ScheduleItemServiceTest {
 
         // Create a Date from 30 minutes before
         Date startDate = new Date(now.getTime() - 60 * 60 * 1000); // 1 hour before
-        when(actualProviderData.start()).thenReturn(startDate);
+        when(actualProviderData.getStart()).thenReturn(startDate);
 
         Date endDate = new Date();
         endDate.setTime(now.getTime() - 30 * 60 * 1000); // 30 minutes before
-        when(actualProviderData.end()).thenReturn(endDate);
+        when(actualProviderData.getEnd()).thenReturn(endDate);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         when(scheduleItem.leadTime()).thenReturn(null);
@@ -201,11 +201,11 @@ public class ScheduleItemServiceTest {
 
         // Create a Date from 30 minutes before
         Date startDate = new Date(now.getTime() + 30 * 60 * 1000); // 30 minutes later
-        when(actualProviderData.start()).thenReturn(startDate);
+        when(actualProviderData.getStart()).thenReturn(startDate);
 
         Date endDate = new Date();
         endDate.setTime(now.getTime() + 60 * 60 * 1000); // 1 hour later
-        when(actualProviderData.end()).thenReturn(endDate);
+        when(actualProviderData.getEnd()).thenReturn(endDate);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         when(scheduleItem.leadTime()).thenReturn(null);
@@ -266,7 +266,7 @@ public class ScheduleItemServiceTest {
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         ScheduleItemData providerData = mock(ScheduleItemData.class);
 
-        when(providerData.venue()).thenReturn("TEST");
+        when(providerData.getVenue()).thenReturn("TEST");
         when(scheduleItem.providerData()).thenReturn(providerData);
 
         when(configurationItemsPort.findProviderWatchAndBetVenues(anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))

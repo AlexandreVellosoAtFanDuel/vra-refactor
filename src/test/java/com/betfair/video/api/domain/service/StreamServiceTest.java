@@ -6,6 +6,7 @@ import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnu
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.User;
+import com.betfair.video.api.domain.mapper.VideoStreamInfoMapper;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.DirectStreamConfigPort;
 import com.betfair.video.api.domain.port.InlineStreamConfigPort;
@@ -71,15 +72,15 @@ class StreamServiceTest {
     @Mock
     private InlineStreamConfigPort inlineStreamConfigPort;
 
+    @Mock
+    private VideoStreamInfoMapper videoStreamInfoMapper;
+
     @Test
     @DisplayName("Should retrieve stream by external ID")
     void shouldRetrieveStreamByExternalId() {
         // Given
         RequestContext context = mock(RequestContext.class);
         User user = mock(User.class);
-
-        when(user.accountId())
-                .thenReturn("12345");
 
         ReferenceType referenceType = mock(ReferenceType.class);
         when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
@@ -115,6 +116,9 @@ class StreamServiceTest {
 
         when(betsCheckService.getBBVStatus(any(VideoRequestIdentifier.class), any(ScheduleItem.class), eq(user), anyBoolean()))
                 .thenReturn(BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG);
+
+        when(videoStreamInfoMapper.map(any(ScheduleItem.class), any(StreamDetails.class), any(), any(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), anyBoolean(), any(), any()))
+                .thenReturn(mock(VideoStreamInfo.class));
 
         // When
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()

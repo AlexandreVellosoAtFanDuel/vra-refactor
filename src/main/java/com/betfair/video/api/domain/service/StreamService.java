@@ -68,12 +68,14 @@ public class StreamService {
 
     private final GeoRestrictionsService geoRestrictionsService;
 
+    private final VideoStreamInfoMapper videoStreamInfoMapper;
+
     public StreamService(ReferenceTypesPort referenceTypesPort, ConfigurationItemsPort configurationItemsPort,
                          AtrScheduleService atrScheduleService, ScheduleItemService scheduleItemService,
                          ProviderFactoryPort providerFactoryPort, PermissionService permissionService,
                          BetsCheckService betsCheckService, ArchivedStreamService archivedStreamService,
                          DirectStreamConfigPort directStreamConfigPort, InlineStreamConfigPort inlineStreamConfigPort,
-                         GeoRestrictionsService geoRestrictionsService) {
+                         GeoRestrictionsService geoRestrictionsService, VideoStreamInfoMapper videoStreamInfoMapper) {
         this.referenceTypesPort = referenceTypesPort;
         this.configurationItemsPort = configurationItemsPort;
         this.atrScheduleService = atrScheduleService;
@@ -85,6 +87,7 @@ public class StreamService {
         this.directStreamConfigPort = directStreamConfigPort;
         this.inlineStreamConfigPort = inlineStreamConfigPort;
         this.geoRestrictionsService = geoRestrictionsService;
+        this.videoStreamInfoMapper = videoStreamInfoMapper;
     }
 
     public VideoStreamInfo getStreamInfoByExternalId(final VideoStreamInfoByExternalIdSearchKey searchKey, final RequestContext context, final User user, final boolean includeMetadata) {
@@ -259,6 +262,7 @@ public class StreamService {
         } else {
             isDirectStream = directStreamConfigPort.isProviderInList(item.providerId(), item.videoChannelType());
         }
+
         boolean isInlineStream;
         if (isArchivedStream) {
             isInlineStream = isDirectStream && inlineStreamConfigPort.isArchivedProviderInList(item.providerId(), searchKey.getMobileDeviceId() != null);
@@ -266,20 +270,22 @@ public class StreamService {
             isInlineStream = isDirectStream && inlineStreamConfigPort.isProviderInList(item.providerId(), item.videoChannelType());
         }
 
-        VideoStreamInfoMapper generator = new VideoStreamInfoMapper(item, streamDetails, geoRestrictionsService, includeMetadata);
-        generator.setUser(user);
-        generator.setAvailableVideoQualityValues(provider.getAvailableVideoQualityValues());
-        generator.setDirectStream(isDirectStream);
-        generator.setInlineStream(isInlineStream);
-        generator.setContentType(convertStreamTypeIdToContentType(item.streamTypeId()));
-        generator.setSizeRestrictions(configurationItemsPort.getSizeRestrictions(item.providerId(),
-                item.videoChannelType(), item.betfairSportsType(), item.streamTypeId(), item.brandId()));
-        generator.setVideoPlayerConfig(getVideoPlayerConfig(item, streamDetails));
-        generator.setSportReferenceType(referenceTypesPort.findReferenceTypeById(item.betfairSportsType(), ReferenceTypeId.SPORTS_TYPE));
-
-        setDefaultParameterValues(generator, item);
-
-        return generator.generateResponse();
+        return videoStreamInfoMapper.map(
+                item,
+                streamDetails,
+                provider.getAvailableVideoQualityValues(),
+                configurationItemsPort.getSizeRestrictions(item.providerId(), item.videoChannelType(), item.betfairSportsType(), item.streamTypeId(), item.brandId()),
+                isDirectStream,
+                isInlineStream,
+                convertStreamTypeIdToContentType(item.streamTypeId()),
+                referenceTypesPort.findReferenceTypeById(item.betfairSportsType(), ReferenceTypeId.SPORTS_TYPE),
+                getDefaultVideoQuality(item),
+                getDefaultBufferingValue(item),
+                user,
+                includeMetadata,
+                getVideoPlayerConfig(item, streamDetails),
+                geoRestrictionsService
+        );
     }
 
     private String getVideoPlayerConfig(ScheduleItem scheduleItem, StreamDetails streamDetails) {
@@ -305,20 +311,27 @@ public class StreamService {
         return videoPlayerConfig;
     }
 
-    private void setDefaultParameterValues(final VideoStreamInfoMapper generator, final ScheduleItem item) {
+
+    private String getDefaultBufferingValue(final ScheduleItem item) {
         String defaultBufferingInterval = configurationItemsPort.getDefaultBufferingInterval(item.providerId(),
                 item.videoChannelType(), item.betfairSportsType(), item.streamTypeId(), item.brandId());
 
         if (StringUtils.isNotBlank(defaultBufferingInterval) && isStringPositiveNumber(defaultBufferingInterval)) {
-            generator.setDefaultBufferingValue(defaultBufferingInterval);
+            return defaultBufferingInterval;
         }
 
+        return null;
+    }
+
+    private VideoQuality getDefaultVideoQuality(final ScheduleItem item) {
         String defaultVideoQuality = configurationItemsPort.getDefaultVideoQuality(item.providerId(),
                 item.videoChannelType(), item.betfairSportsType(), item.streamTypeId(), item.brandId());
 
         if (StringUtils.isNotBlank(defaultVideoQuality) && isStringConvertibleToEnumValue(VideoQuality.getValidValues(), defaultVideoQuality)) {
-            generator.setDefaultVideoQuality(VideoQuality.valueOf(defaultVideoQuality));
+            return VideoQuality.valueOf(defaultVideoQuality);
         }
+
+        return null;
     }
 
     public static ContentType convertStreamTypeIdToContentType(Integer streamTypeId) {
