@@ -133,7 +133,7 @@ public class StreamService {
         VideoRequestIdentifier identifier = videoStreamInfoSearchKeyWrapper.getVideoRequestIdentifier(item);
 
         // A single video item was found
-        validateScheduleItem(searchKey, identifier, searchKey.getExternalIdSource(), item, context, user, isArchivedVideo);
+        validateScheduleItem(identifier, searchKey.getExternalIdSource(), item, context, user, isArchivedVideo);
 
         StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId(), item.videoChannelType());
 
@@ -190,7 +190,7 @@ public class StreamService {
                                                      String requestedStreamId, String videoItemId) {
     }
 
-    private void validateScheduleItem(VideoStreamInfoByExternalIdSearchKey searchKey, VideoRequestIdentifier identifier, ExternalIdSource externalIdSource, ScheduleItem item, RequestContext context, User user, boolean isArchivedVideo) {
+    private void validateScheduleItem(VideoRequestIdentifier identifier, ExternalIdSource externalIdSource, ScheduleItem item, RequestContext context, User user, boolean isArchivedVideo) {
 
         StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId(), item.videoChannelType());
 
@@ -364,7 +364,7 @@ public class StreamService {
 
         ScheduleItemMapper pickedMapping = filteredMappings.iterator().next();
 
-        if (ExternalIdSource.EXCHANGE_RACE.getExternalIdSource().equals(byExternalIdSearchKey.getExternalIdSource().getExternalIdSource())
+        if (ExternalIdSource.EXCHANGE_RACE.getSource().equals(byExternalIdSearchKey.getExternalIdSource().getSource())
                 && externalId.contains(EXCHANGE_RACE_ID_TIME_SEPARATOR)) {
             //for "by race id" request its possible that >1 mappings has same race id, so we need to pick one
             String eventIdExtractedFromRaceId = externalId.substring(0, externalId.indexOf(EXCHANGE_RACE_ID_TIME_SEPARATOR));
@@ -388,9 +388,9 @@ public class StreamService {
     private boolean isRequestedMapping(ScheduleItemMapper mapping, VideoStreamInfoByExternalIdSearchKey byExternalIdSearchKey, String externalId) {
         boolean isRequestedMapping;
 
-        if (ExternalIdSource.EXCHANGE_RACE.getExternalIdSource().equals(byExternalIdSearchKey.getExternalIdSource().getExternalIdSource())) {
+        if (ExternalIdSource.EXCHANGE_RACE.getSource().equals(byExternalIdSearchKey.getExternalIdSource().getSource())) {
             isRequestedMapping = externalId.equals(mapping.exchangeRaceId());
-        } else if (ExternalIdSource.RAMP.getExternalIdSource().equals(byExternalIdSearchKey.getExternalIdSource().getExternalIdSource())) {
+        } else if (ExternalIdSource.RAMP.getSource().equals(byExternalIdSearchKey.getExternalIdSource().getSource())) {
             isRequestedMapping = externalId.equals(mapping.rampId());
         } else {
             isRequestedMapping = externalId.equals(mapping.scheduleItemMappingKey().providerEventKey().primaryId());

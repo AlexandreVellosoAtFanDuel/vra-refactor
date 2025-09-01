@@ -11,19 +11,19 @@ public enum ExternalIdSource {
     BETFAIR_VIDEO(5, "BETFAIR_VIDEO", 7),
     RAMP(6, "RAMP", 7);
 
-    private Integer externalIdSource;
-    private String externalIdDescription;
-    private Integer providerId;
+    private final Integer source;
+    private final String externalIdDescription;
+    private final Integer providerId;
 
-    ExternalIdSource(Integer externalIdSource, String externalIdDescription, Integer providerId) {
-        this.externalIdSource = externalIdSource;
+    ExternalIdSource(Integer source, String externalIdDescription, Integer providerId) {
+        this.source = source;
         this.externalIdDescription = externalIdDescription;
         this.providerId = providerId;
     }
 
     public static ExternalIdSource fromExternalIdSource(String externalIdSource) {
         for (ExternalIdSource source : ExternalIdSource.values()) {
-            if (Objects.equals(source.externalIdSource, Integer.valueOf(externalIdSource))) {
+            if (Objects.equals(source.source, Integer.valueOf(externalIdSource))) {
                 return source;
             }
         }
@@ -35,8 +35,8 @@ public enum ExternalIdSource {
         return this.externalIdDescription;
     }
 
-    public Integer getExternalIdSource() {
-        return externalIdSource;
+    public Integer getSource() {
+        return source;
     }
 
     public Integer getProviderId() {

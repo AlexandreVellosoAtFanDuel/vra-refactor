@@ -86,21 +86,7 @@ public class ScheduleItemService {
                     context.uuid(), user.accountId(), searchKey.getExternalIdSource(), searchKey.getPrimaryId(), searchKey.getSecondaryId());
         }
 
-        ScheduleItem item = null;
-
-        final ExternalIdSource source = wrapper.getExternalIdSource();
-
-        if (source != null) {
-            switch (source) {
-                case ExternalIdSource.BETFAIR_VIDEO,
-                        ExternalIdSource.BETFAIR_MARKET,
-                        ExternalIdSource.TIMEFORM,
-                        ExternalIdSource.EXCHANGE_RACE,
-                        ExternalIdSource.RAMP ->
-                        throw new IllegalArgumentException(String.format("External ID source not implemented: %s", source.getExternalIdDescription()));
-                case ExternalIdSource.BETFAIR_EVENT -> item = getBetfairEventItem(searchKey, wrapper, context, user);
-            }
-        }
+        ScheduleItem item = getBetfairEventItem(searchKey, wrapper, context, user);
 
         checkItemsProviderAllowedForAppkey(item, user);
         checkItemsVenueAllowedForAppkey(item, user);

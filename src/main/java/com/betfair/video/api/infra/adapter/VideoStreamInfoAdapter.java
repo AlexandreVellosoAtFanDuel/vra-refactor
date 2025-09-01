@@ -42,9 +42,9 @@ public class VideoStreamInfoAdapter implements VideoStreamInfoPort {
                 .filter(scheduleItem -> searchKey.getSecondaryId() == null || searchKey.getSecondaryId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().secondaryId()))
                 .filter(scheduleItem -> !(searchKey.getExternalIdSource() != null && searchKey.getExternalIdSource().getProviderId() != null) || searchKey.getExternalIdSource().getProviderId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().providerId()));
 
-        if (ExternalIdSource.EXCHANGE_RACE.getExternalIdSource().equals(searchKey.getExternalIdSource().getExternalIdSource())) {
+        if (ExternalIdSource.EXCHANGE_RACE.getSource().equals(searchKey.getExternalIdSource().getSource())) {
             items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().exchangeRaceId()));
-        } else if (ExternalIdSource.RAMP.getExternalIdSource().equals(searchKey.getExternalIdSource().getExternalIdSource())) {
+        } else if (ExternalIdSource.RAMP.getSource().equals(searchKey.getExternalIdSource().getSource())) {
             items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().rampId()));
         } else {
             items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().primaryId()));
