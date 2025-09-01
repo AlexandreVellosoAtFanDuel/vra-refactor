@@ -30,10 +30,6 @@ public enum ExternalIdSource {
         return this.externalIdDescription;
     }
 
-    public Integer getSource() {
-        return source;
-    }
-
     public Integer getProviderId() {
         return providerId;
     }

@@ -6,7 +6,6 @@ import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnu
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.ScheduleItemData;
-import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.VideoStreamInfoPort;
 import com.betfair.video.api.domain.utils.DateUtils;
@@ -225,8 +224,6 @@ class ScheduleItemServiceTest {
     @DisplayName("Should throw exception if stream not started")
     void shouldThrowExceptionIfStreamNotStarted() {
         // Given
-        User user = mock(User.class);
-
         RequestContext context = mock(RequestContext.class);
 
         // When & Then
@@ -244,8 +241,6 @@ class ScheduleItemServiceTest {
     @DisplayName("Should throw exception if stream is finished")
     void shouldThrowExceptionIfStreamIsFinished() {
         // Given
-        User user = mock(User.class);
-
         RequestContext context = mock(RequestContext.class);
 
         // When & Then

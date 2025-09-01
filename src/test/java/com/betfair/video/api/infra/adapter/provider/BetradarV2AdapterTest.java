@@ -87,9 +87,10 @@ class BetradarV2AdapterTest {
         Set<VideoQuality> qualities = betradarV2Adapter.getAvailableVideoQualityValues();
 
         // Then
-        assertThat(qualities).isNotEmpty();
-        assertThat(qualities).hasSize(1);
-        assertThat(qualities).contains(VideoQuality.HIGH);
+        assertThat(qualities)
+                .isNotEmpty()
+                .hasSize(1)
+                .contains(VideoQuality.HIGH);
     }
 
     @Test
@@ -141,9 +142,10 @@ class BetradarV2AdapterTest {
         assertThat(streamDetails.quality()).isEqualTo(VideoQuality.HIGH);
 
         var params = streamDetails.params();
-        assertThat(params).isNotNull();
-        assertThat(params.size()).isEqualTo(1);
-        assertThat(params.get("streamFormat")).isEqualTo(StreamingFormat.HLS.getValue());
+        assertThat(params)
+                .isNotNull()
+                .hasSize(1)
+                .containsEntry("streamFormat", StreamingFormat.HLS.getValue());
     }
 
     @Test
@@ -157,7 +159,6 @@ class BetradarV2AdapterTest {
         when(scheduleItem.providerEventId()).thenReturn("notExist123");
 
         RequestContext context = mock(RequestContext.class);
-        User user = mock(User.class);
         StreamParams streamParams = mock(StreamParams.class);
 
         AudioVisualEventDto eventDto = mock(AudioVisualEventDto.class);

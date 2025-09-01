@@ -3,7 +3,6 @@ package com.betfair.video.api.domain.utils;
 import com.betfair.video.api.application.exception.VideoAPIException;
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
-import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.valueobject.search.VideoRequestIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;

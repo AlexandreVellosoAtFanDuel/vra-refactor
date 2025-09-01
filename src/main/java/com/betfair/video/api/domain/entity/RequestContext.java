@@ -3,8 +3,8 @@ package com.betfair.video.api.domain.entity;
 import java.util.List;
 
 public class RequestContext {
-    private String uuid;
-    private List<String> resolvedIps;
+    private final String uuid;
+    private final List<String> resolvedIps;
     private User user;
 
     public RequestContext(String uuid, List<String> resolvedIps) {

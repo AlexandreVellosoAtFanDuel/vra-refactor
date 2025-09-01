@@ -35,11 +35,11 @@ public class EventService {
     @Value("${streaming.brand.id}")
     private Integer streamingBrandId;
 
-    private ExternalIdMapper externalIdMapper;
+    private final ExternalIdMapper externalIdMapper;
 
-    private TypeStreamMapper typeStreamMapper;
+    private final TypeStreamMapper typeStreamMapper;
 
-    private StreamService streamService;
+    private final StreamService streamService;
 
     public EventService(ExternalIdMapper externalIdMapper, TypeStreamMapper typeStreamMapper, StreamService streamService) {
         this.externalIdMapper = externalIdMapper;

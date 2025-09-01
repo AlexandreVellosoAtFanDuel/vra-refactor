@@ -1,9 +1,5 @@
 package com.betfair.video.api.domain.mapper;
 
-import com.betfair.video.api.application.exception.ResponseCode;
-import com.betfair.video.api.application.exception.VideoAPIException;
-import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
-import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.valueobject.ExternalId;
 import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ExternalIdMapper Tests")
@@ -29,8 +23,6 @@ class ExternalIdMapperTest {
     @DisplayName("Should successfully map valid external IDs")
     void shouldSuccessfullyMapValidExternalIds() {
         // Given
-        RequestContext context = mock(RequestContext.class);
-
         ExternalIdSource externalIdSource = ExternalIdSource.BETFAIR_EVENT;
         Set<String> externalIds = Set.of("12345");
 

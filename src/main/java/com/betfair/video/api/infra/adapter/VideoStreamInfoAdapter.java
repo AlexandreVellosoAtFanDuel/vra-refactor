@@ -2,7 +2,6 @@ package com.betfair.video.api.infra.adapter;
 
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.port.VideoStreamInfoPort;
-import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.ImportStatus;
 import com.betfair.video.api.domain.valueobject.search.VRAStreamSearchKey;
 import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
