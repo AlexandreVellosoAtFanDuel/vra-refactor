@@ -143,9 +143,7 @@ public class ScheduleItemService {
 
         wrapper.setVideoRequestIdentifier(eventIdentifier);
 
-        ScheduleItem item = permissionService.filterScheduleItems(context, items, searchKey, eventIdentifier);
-
-        return item;
+        return permissionService.filterScheduleItems(context, items, searchKey, eventIdentifier);
     }
 
     private void checkItemsProviderAllowedForAppkey(ScheduleItem item, User user) {

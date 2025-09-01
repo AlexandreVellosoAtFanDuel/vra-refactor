@@ -15,4 +15,7 @@ public enum StreamDetailsParamEnum {
         this.paramName = paramName;
     }
 
+    public String getParamName() {
+        return paramName;
+    }
 }

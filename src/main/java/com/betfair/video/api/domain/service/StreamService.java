@@ -47,8 +47,6 @@ public class StreamService {
 
     private static final Logger logger = LoggerFactory.getLogger(StreamService.class);
 
-    private static final String EXCHANGE_RACE_ID_TIME_SEPARATOR = ".";
-
     public static final Pattern LINEBREAKS_PATTERN = Pattern.compile("(\r)|(\n)");
 
     public static final Pattern COMMA_PATTERN = Pattern.compile(",");
@@ -56,8 +54,6 @@ public class StreamService {
     private final ReferenceTypesPort referenceTypesPort;
 
     private final ConfigurationItemsPort configurationItemsPort;
-
-    private final AtrScheduleService atrScheduleService;
 
     private final ScheduleItemService scheduleItemService;
 
@@ -76,14 +72,12 @@ public class StreamService {
     private final VideoStreamInfoMapper videoStreamInfoMapper;
 
     public StreamService(ReferenceTypesPort referenceTypesPort, ConfigurationItemsPort configurationItemsPort,
-                         AtrScheduleService atrScheduleService, ScheduleItemService scheduleItemService,
-                         ProviderFactoryPort providerFactoryPort, PermissionService permissionService,
-                         BetsCheckService betsCheckService, DirectStreamConfigPort directStreamConfigPort,
-                         InlineStreamConfigPort inlineStreamConfigPort, GeoRestrictionsService geoRestrictionsService,
-                         VideoStreamInfoMapper videoStreamInfoMapper) {
+                         ScheduleItemService scheduleItemService, ProviderFactoryPort providerFactoryPort,
+                         PermissionService permissionService, BetsCheckService betsCheckService,
+                         DirectStreamConfigPort directStreamConfigPort, InlineStreamConfigPort inlineStreamConfigPort,
+                         GeoRestrictionsService geoRestrictionsService, VideoStreamInfoMapper videoStreamInfoMapper) {
         this.referenceTypesPort = referenceTypesPort;
         this.configurationItemsPort = configurationItemsPort;
-        this.atrScheduleService = atrScheduleService;
         this.scheduleItemService = scheduleItemService;
         this.providerFactoryPort = providerFactoryPort;
         this.permissionService = permissionService;
@@ -209,7 +203,7 @@ public class StreamService {
     private void checkStreamStatus(ScheduleItem item, RequestContext context) throws VideoAPIException {
         VideoStreamState streamState = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(item);
 
-        if (TypeStream.PRE_VID.equals(item.streamTypeId()) && VideoStreamState.FINISHED.equals(streamState)) {
+        if (item.streamTypeId().equals(TypeStream.PRE_VID.getId()) && VideoStreamState.FINISHED.equals(streamState)) {
             //in case of finished paddock we should return NOT_STARTED because in means that we are currently inside a window
             //between end of paddock and before start of event stream
             streamState = VideoStreamState.NOT_STARTED;
@@ -341,7 +335,7 @@ public class StreamService {
 
         boolean configurationItemExist = configurationItem != null;
         if (configurationItemExist) {
-            String streamFormat = streamDetails.params().get(StreamDetailsParamEnum.STREAM_FORMAT_PARAM_NAME);
+            String streamFormat = streamDetails.params().get(StreamDetailsParamEnum.STREAM_FORMAT_PARAM_NAME.getParamName());
             boolean streamFormatExist = streamFormat != null && !streamFormat.isEmpty();
 
             String configValue = configurationItem.value();
@@ -426,7 +420,7 @@ public class StreamService {
     }
 
     private boolean isStringPositiveNumber(String checkingValue) {
-        return NumberUtils.isNumber(checkingValue) && !checkingValue.startsWith("-");
+        return NumberUtils.isCreatable(checkingValue) && !checkingValue.startsWith("-");
     }
 
 }
