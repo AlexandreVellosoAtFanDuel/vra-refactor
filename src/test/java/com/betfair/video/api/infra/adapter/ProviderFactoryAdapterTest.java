@@ -4,7 +4,7 @@ package com.betfair.video.api.infra.adapter;
 import com.betfair.video.api.application.exception.ResponseCode;
 import com.betfair.video.api.application.exception.VideoAPIException;
 import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
-import com.betfair.video.api.infra.adapter.provider.betradarv2.BetradarV2ProviderAdapter;
+import com.betfair.video.api.infra.adapter.provider.BetradarV2Adapter;
 import com.betfair.video.api.infra.adapter.provider.IMGProviderAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class ProviderFactoryAdapterTest {
 
     @Mock
-    private BetradarV2ProviderAdapter betradarV2ProviderAdapter;
+    private BetradarV2Adapter betradarV2ProviderAdapter;
 
     @Mock
     private IMGProviderAdapter imgProviderAdapter;

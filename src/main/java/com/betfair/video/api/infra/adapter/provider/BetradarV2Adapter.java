@@ -1,4 +1,4 @@
-package com.betfair.video.api.infra.adapter.provider.betradarv2;
+package com.betfair.video.api.infra.adapter.provider;
 
 import com.betfair.video.api.application.exception.ResponseCode;
 import com.betfair.video.api.application.exception.VideoAPIException;
@@ -15,6 +15,7 @@ import com.betfair.video.api.domain.valueobject.StreamDetails;
 import com.betfair.video.api.domain.valueobject.StreamParams;
 import com.betfair.video.api.domain.valueobject.StreamingFormat;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
+import com.betfair.video.api.infra.client.BetRadarV2Client;
 import com.betfair.video.api.infra.dto.betradarv2.AudioVisualEventDto;
 import com.betfair.video.api.infra.dto.betradarv2.ContentDto;
 import com.betfair.video.api.infra.dto.betradarv2.StreamDto;
@@ -36,9 +37,9 @@ import java.util.Optional;
 import java.util.Set;
 
 @Component
-public class BetradarV2ProviderAdapter implements StreamingProviderPort {
+public class BetradarV2Adapter implements StreamingProviderPort {
 
-    private static final Logger logger = LoggerFactory.getLogger(BetradarV2ProviderAdapter.class);
+    private static final Logger logger = LoggerFactory.getLogger(BetradarV2Adapter.class);
 
     private static final int CACHE_COMPENSATION_TIME_MILLS = 5 * 1000;
 
@@ -51,14 +52,14 @@ public class BetradarV2ProviderAdapter implements StreamingProviderPort {
     @Value("${provider.betradar.v2.recommended.stream.status.ids}")
     private String recommendedStreamProductIds;
 
-    private final BetRadarV2Adapter betradarV2Adapter;
+    private final BetRadarV2Client betRadarV2Client;
 
     private final ConfigurationItemsPort configurationItemsRepository;
 
     private final StreamExceptionLoggingUtils streamExceptionLoggingUtils;
 
-    public BetradarV2ProviderAdapter(BetRadarV2Adapter betradarV2Adapter, ConfigurationItemsPort configurationItemsRepository, StreamExceptionLoggingUtils streamExceptionLoggingUtils) {
-        this.betradarV2Adapter = betradarV2Adapter;
+    public BetradarV2Adapter(BetRadarV2Client betRadarV2Client, ConfigurationItemsPort configurationItemsRepository, StreamExceptionLoggingUtils streamExceptionLoggingUtils) {
+        this.betRadarV2Client = betRadarV2Client;
         this.configurationItemsRepository = configurationItemsRepository;
         this.streamExceptionLoggingUtils = streamExceptionLoggingUtils;
     }
@@ -74,7 +75,7 @@ public class BetradarV2ProviderAdapter implements StreamingProviderPort {
 
     @Override
     public StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, User user, StreamParams streamParams) {
-        AudioVisualEventDto event = retrieveAudioVisualEventFromCache(item)
+        AudioVisualEventDto event = getAudioVisualEventByScheduleItem(item)
                 .orElseThrow(() -> {
                             VideoAPIException exception = createStreamNotActiveException(item);
                             streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, user, exception, null);
@@ -105,9 +106,32 @@ public class BetradarV2ProviderAdapter implements StreamingProviderPort {
             default -> streamFormat.getValue();
         };
 
-        StreamUrlDto streamUrl = betradarV2Adapter.getStreamLink(availableStream.id(), providerStreamFormatName, requestParams.get(RequestParams.USER_IP.name()));
+        StreamUrlDto streamUrl = getStreamLink(availableStream.id(), providerStreamFormatName, requestParams.get(RequestParams.USER_IP.name()));
 
         return convertToStreamDetails(streamUrl, requestParams);
+    }
+
+    @Override
+    public Set<VideoQuality> getAvailableVideoQualityValues() {
+        // TODO: implement actual logic to fetch available video quality values
+        return Set.of(VideoQuality.HIGH);
+    }
+
+    private Optional<AudioVisualEventDto> getAudioVisualEventByScheduleItem(ScheduleItem scheduleItem) {
+        List<AudioVisualEventDto> events = getAudioVisualEvents();
+
+        return events.stream()
+                .filter(eventDto -> parseIdFromScheme(eventDto.id()).equals(scheduleItem.providerEventId()))
+                .findFirst();
+    }
+
+    private List<AudioVisualEventDto> getAudioVisualEvents() {
+        // TODO: Implement cache here
+        return betRadarV2Client.getAudioVisualEvents(recommendedStreamStatusIds, recommendedStreamProductIds);
+    }
+
+    private StreamUrlDto getStreamLink(String streamId, String streamType, String userIP) {
+        return betRadarV2Client.getStreamLink(streamId, streamType, userIP);
     }
 
     private StreamDetails convertToStreamDetails(StreamUrlDto response, Map<String, String> requestParams) {
@@ -140,21 +164,7 @@ public class BetradarV2ProviderAdapter implements StreamingProviderPort {
         return new VideoAPIException(ResponseCode.NotFound, errorCode, String.valueOf(scheduleItem.betfairSportsType()));
     }
 
-    private Optional<AudioVisualEventDto> retrieveAudioVisualEventFromCache(ScheduleItem scheduleItem) {
-        List<AudioVisualEventDto> events = betradarV2Adapter.getAudioVisualEvents(
-                new BetradarActiveStreamsSearchKey(scheduleItem.videoChannelType(), scheduleItem.brandId(), recommendedStreamStatusIds, recommendedStreamProductIds)
-        );
-
-        if (events != null) {
-            return events.stream()
-                    .filter(eventDto -> parseIdFromScheme(eventDto.id()).equals(scheduleItem.providerEventId()))
-                    .findFirst();
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public StreamDto findFirstStreamByStatusOrProductName(AudioVisualEventDto event, List<String> streamStatusIds, List<String> streamProductIds) {
+    private StreamDto findFirstStreamByStatusOrProductName(AudioVisualEventDto event, List<String> streamStatusIds, List<String> streamProductIds) {
         if (event == null) {
             return null;
         }
@@ -188,7 +198,7 @@ public class BetradarV2ProviderAdapter implements StreamingProviderPort {
                 .toList();
     }
 
-    public static String parseIdFromScheme(String idScheme) {
+    private static String parseIdFromScheme(String idScheme) {
         if (StringUtils.isBlank(idScheme)) {
             return "";
         }
@@ -212,9 +222,4 @@ public class BetradarV2ProviderAdapter implements StreamingProviderPort {
         return requestParams;
     }
 
-    @Override
-    public Set<VideoQuality> getAvailableVideoQualityValues() {
-        // TODO: implement actual logic to fetch available video quality values
-        return Set.of(VideoQuality.HIGH);
-    }
 }
