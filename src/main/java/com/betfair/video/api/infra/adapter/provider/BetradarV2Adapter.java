@@ -83,11 +83,14 @@ public class BetradarV2Adapter implements StreamingProviderPort {
                         }
                 );
 
-        StreamDto availableStream = findFirstStreamByStatusOrProductName(event, getRecommendedStreamStatusIds(), getRecommendedStreamProductIds());
-        if (availableStream == null) {
+        Optional<StreamDto> availableStream = findFirstStreamByStatusOrProductName(event, getRecommendedStreamStatusIds(), getRecommendedStreamProductIds());
+        if (availableStream.isEmpty()) {
+            final String eventId = parseIdFromScheme(event.id());
+
             logger.error("[{}]: Cannot find suitable stream for event {}. User: {}",
-                    context.uuid(), parseIdFromScheme(event.id()), user.accountId());
-            throw new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, String.valueOf(item.betfairSportsType()));
+                    context.uuid(), eventId, user.accountId());
+
+            throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, String.valueOf(item.betfairSportsType()));
         }
 
         StreamingFormat streamFormat = configurationItemsRepository.findPreferredStreamingFormat(Provider.BETRADAR_V2,
@@ -106,7 +109,7 @@ public class BetradarV2Adapter implements StreamingProviderPort {
             default -> streamFormat.getValue();
         };
 
-        StreamUrlDto streamUrl = getStreamLink(availableStream.id(), providerStreamFormatName, requestParams.get(RequestParams.USER_IP.name()));
+        StreamUrlDto streamUrl = getStreamLink(availableStream.get().id(), providerStreamFormatName, requestParams.get(RequestParams.USER_IP.name()));
 
         return convertToStreamDetails(streamUrl, requestParams);
     }
@@ -164,18 +167,13 @@ public class BetradarV2Adapter implements StreamingProviderPort {
         return new VideoAPIException(ResponseCode.NotFound, errorCode, String.valueOf(scheduleItem.betfairSportsType()));
     }
 
-    private StreamDto findFirstStreamByStatusOrProductName(AudioVisualEventDto event, List<String> streamStatusIds, List<String> streamProductIds) {
-        if (event == null) {
-            return null;
-        }
-
+    private Optional<StreamDto> findFirstStreamByStatusOrProductName(AudioVisualEventDto event, List<String> streamStatusIds, List<String> streamProductIds) {
         return event.contents()
                 .stream()
                 .filter(ContentDto::isMain)
                 .flatMap(content -> content.streams().stream())
                 .filter(stream -> streamHasValidStreamStatusIds(stream, streamStatusIds) && streamHasValidProductIds(stream, streamProductIds))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     private boolean streamHasValidStreamStatusIds(StreamDto stream, List<String> streamStatusIds) {
