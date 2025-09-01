@@ -99,11 +99,11 @@ public class StreamService {
         this.videoStreamInfoMapper = videoStreamInfoMapper;
     }
 
-    public VideoStreamInfo getStreamInfoByExternalId(final VideoStreamInfoByExternalIdSearchKey searchKey, final RequestContext context, final User user, final boolean includeMetadata) {
+    public VideoStreamInfo getStreamInfoByExternalId(final VideoStreamInfoByExternalIdSearchKey searchKey, final RequestContext context, final boolean includeMetadata) {
 
         if (searchKey.getProviderId() != null && referenceTypesPort.findReferenceTypeById(searchKey.getProviderId(), ReferenceTypeId.VIDEO_PROVIDER) == null) {
             logger.error("[{}]: No provider was found for the given provider ID ({}). User country: {},{}.",
-                    context.uuid(), searchKey.getProviderId(), user.geolocation().countryCode(), user.geolocation().subDivisionCode());
+                    context.uuid(), searchKey.getProviderId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
             throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT, null);
         }
 
@@ -116,28 +116,28 @@ public class StreamService {
                 null
         );
 
-        ScheduleItem item = scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, context, user);
+        ScheduleItem item = scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, context);
 
         //try to find leading stream if current is not live yet
-        ScheduleItem paddockItem = tryFindLeadingStream(item, searchKey.getPrimaryId(), videoStreamInfoSearchKeyWrapper, context, user, isArchivedVideo);
+        ScheduleItem paddockItem = tryFindLeadingStream(item, searchKey.getPrimaryId(), videoStreamInfoSearchKeyWrapper, context, isArchivedVideo);
         if (paddockItem != null) {
             logger.info("[{}]: Found leading stream for external id {}. Video id: {}. User country: {},{}",
-                    context.uuid(), searchKey.getPrimaryId(), paddockItem.videoItemId(), user.geolocation().countryCode(), user.geolocation().subDivisionCode());
+                    context.uuid(), searchKey.getPrimaryId(), paddockItem.videoItemId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
 
             item = paddockItem;
         }
 
-        populateCurrentRequestContextParams(user, item, searchKey.getExternalIdSource().getExternalIdDescription(),
+        populateCurrentRequestContextParams(context.user(), item, searchKey.getExternalIdSource().getExternalIdDescription(),
                 searchKey.getPrimaryId(), String.valueOf(item.videoItemId()));
 
         VideoRequestIdentifier identifier = videoStreamInfoSearchKeyWrapper.getVideoRequestIdentifier(item);
 
         // A single video item was found
-        validateScheduleItem(identifier, searchKey.getExternalIdSource(), item, context, user, isArchivedVideo);
+        validateScheduleItem(identifier, searchKey.getExternalIdSource(), item, context, isArchivedVideo);
 
         StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId(), item.videoChannelType());
 
-        VideoStreamInfo streamInfo = getStreamInfoForItem(item, provider, searchKey, context, user, isArchivedVideo, includeMetadata);
+        VideoStreamInfo streamInfo = getStreamInfoForItem(item, provider, searchKey, context, isArchivedVideo, includeMetadata);
 
         if (isArchivedVideo && streamInfo != null) {
             streamInfo.setTimeformRaceId(searchKey.getPrimaryId());
@@ -147,7 +147,7 @@ public class StreamService {
     }
 
     private ScheduleItem tryFindLeadingStream(ScheduleItem item, String externalId, VideoStreamInfoSearchKeyWrapper videoStreamInfoSearchKeyWrapper,
-                                              RequestContext context, User user, boolean isArchivedVideo) throws VideoAPIException {
+                                              RequestContext context, boolean isArchivedVideo) throws VideoAPIException {
 
         boolean isStreamTypeAllowed = configurationItemsPort.isStreamTypeAllowed(item.providerId(),
                 item.videoChannelType(), item.betfairSportsType(), TypeStream.PRE_VID, item.brandId());
@@ -157,14 +157,14 @@ public class StreamService {
 
             VideoStreamState streamState;
             if (Provider.ATR_PROVIDERS.contains(item.providerId())) {
-                streamState = atrScheduleService.getCachedStreamState(item, user);
+                streamState = atrScheduleService.getCachedStreamState(item, context.user());
             } else {
                 streamState = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(item);
             }
 
             if (VideoStreamState.NOT_STARTED.equals(streamState)) {
                 logger.info("[{}]: Stream by externalId {} is not live yet. Trying to find pre-event paddock stream. User country: {},{}",
-                        context.uuid(), externalId, user.geolocation().countryCode(), user.geolocation().subDivisionCode());
+                        context.uuid(), externalId, context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
 
                 videoStreamInfoSearchKeyWrapper.getVideoStreamInfoByExternalIdSearchKey()
                         .setStreamTypeIds(Collections.singleton(TypeStream.PRE_VID.getId()));
@@ -172,11 +172,11 @@ public class StreamService {
                 videoStreamInfoSearchKeyWrapper.getVideoStreamInfoByExternalIdSearchKey().setProviderId(item.providerId());
 
                 try {
-                    return scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, context, user);
+                    return scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, context);
                 } catch (VideoAPIException e) {
                     //if paddock stream doesn't exist or any other error - return null
                     logger.info("[{}]: Got {} error while trying to find paddock stream for externalId {}. Returning null. Parent stream will be processed further. User country: {},{}",
-                            context.uuid(), e.getErrorCode(), externalId, user.geolocation().countryCode(), user.geolocation().subDivisionCode());
+                            context.uuid(), e.getErrorCode(), externalId, context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
 
                     return null;
                 }
@@ -190,7 +190,7 @@ public class StreamService {
                                                      String requestedStreamId, String videoItemId) {
     }
 
-    private void validateScheduleItem(VideoRequestIdentifier identifier, ExternalIdSource externalIdSource, ScheduleItem item, RequestContext context, User user, boolean isArchivedVideo) {
+    private void validateScheduleItem(VideoRequestIdentifier identifier, ExternalIdSource externalIdSource, ScheduleItem item, RequestContext context, boolean isArchivedVideo) {
 
         StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId(), item.videoChannelType());
 
@@ -205,30 +205,30 @@ public class StreamService {
             throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, null);
         }
 
-        boolean userHasPermissionAgainstItem = permissionService.checkUserPermissionsAgainstItem(item, user);
+        boolean userHasPermissionAgainstItem = permissionService.checkUserPermissionsAgainstItem(item, context.user());
 
         if (!userHasPermissionAgainstItem) {
             logger.warn("[{}]: User {} does not have permission to access stream for item with videoItemId {}. User country: {},{}",
-                    context.uuid(), user.accountId(), item.videoItemId(), user.geolocation().countryCode(), user.geolocation().subDivisionCode());
+                    context.uuid(), context.user().accountId(), item.videoItemId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
             throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS, null);
         }
 
         // Make sure that the video is currently showing before proceed
-        checkStreamStatus(item, externalIdSource, context, user, isArchivedVideo);
+        checkStreamStatus(item, externalIdSource, context, isArchivedVideo);
 
         BetsCheckerStatusEnum bbvStatus = scheduleItemService.isItemWatchAndBetSupported(item)
                 ? BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG
-                : betsCheckService.getBBVStatus(identifier, item, user, isArchivedVideo);
+                : betsCheckService.getBBVStatus(identifier, item, context.user(), isArchivedVideo);
 
         // Validate BBV status, if it is not valid an exception is thrown
-        betsCheckService.validateBBVStatus(bbvStatus, item, user, context);
+        betsCheckService.validateBBVStatus(bbvStatus, item, context);
     }
 
-    private void checkStreamStatus(ScheduleItem item, ExternalIdSource externalIdSource, RequestContext context, User user, boolean isArchivedStream) throws VideoAPIException {
+    private void checkStreamStatus(ScheduleItem item, ExternalIdSource externalIdSource, RequestContext context, boolean isArchivedStream) throws VideoAPIException {
         if (!isArchivedStream) {
             VideoStreamState streamState;
             if (Provider.ATR_PROVIDERS.contains(item.providerId())) {
-                streamState = atrScheduleService.getCachedStreamState(item, user);
+                streamState = atrScheduleService.getCachedStreamState(item, context.user());
             } else {
                 streamState = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(item);
             }
@@ -240,12 +240,12 @@ public class StreamService {
                 streamState = VideoStreamState.NOT_STARTED;
             }
 
-            scheduleItemService.checkIsCurrentlyShowingAndThrow(streamState, item.videoItemId(), context, user, item.betfairSportsType());
+            scheduleItemService.checkIsCurrentlyShowingAndThrow(streamState, item.videoItemId(), context, item.betfairSportsType());
         }
     }
 
     private VideoStreamInfo getStreamInfoForItem(ScheduleItem item, StreamingProviderPort provider, VRAStreamSearchKey searchKey, RequestContext context,
-                                                 User user, boolean isArchivedStream, boolean includeMetadata) throws VideoAPIException {
+                                                 boolean isArchivedStream, boolean includeMetadata) throws VideoAPIException {
 
         StreamParams params = new StreamParams(
                 searchKey.getCommentaryLanguage(),
@@ -260,9 +260,9 @@ public class StreamService {
 
         StreamDetails streamDetails;
         if (isArchivedStream) {
-            streamDetails = archivedStreamService.getStreamDetails(item, user, params);
+            streamDetails = archivedStreamService.getStreamDetails(item, context.user(), params);
         } else {
-            streamDetails = provider.getStreamDetails(item, context, user, params);
+            streamDetails = provider.getStreamDetails(item, context, params);
         }
 
         boolean isDirectStream;
@@ -304,7 +304,7 @@ public class StreamService {
                 referenceTypesPort.findReferenceTypeById(item.betfairSportsType(), ReferenceTypeId.SPORTS_TYPE),
                 getDefaultVideoQuality(item),
                 getDefaultBufferingValue(item),
-                user,
+                context.user(),
                 includeMetadata,
                 getVideoPlayerConfig(item, streamDetails),
                 geoRestrictionsService,

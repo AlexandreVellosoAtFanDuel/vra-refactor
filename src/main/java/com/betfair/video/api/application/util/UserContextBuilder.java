@@ -1,11 +1,14 @@
 package com.betfair.video.api.application.util;
 
 import com.betfair.video.api.domain.entity.RequestContext;
+import com.betfair.video.api.domain.service.ContextService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class UserContextBuilder {
 
     private static final String UUID_HEADER = "X-UUID";
@@ -14,10 +17,13 @@ public class UserContextBuilder {
     private static final String ACCOUNT_ID = "accountId";
     private static final String USER_ID = "userId";
 
-    private UserContextBuilder() {
+    private final ContextService contextService;
+
+    public UserContextBuilder(ContextService contextService) {
+        this.contextService = contextService;
     }
 
-    public static RequestContext createContextFromRequest(HttpServletRequest request) {
+    public RequestContext createContextFromRequest(HttpServletRequest request) {
         final String uuid = request.getHeader(UUID_HEADER);
 
         final String xIP = request.getHeader(X_IP);
@@ -29,7 +35,7 @@ public class UserContextBuilder {
         resolvedIps.add(xIP);
         resolvedIps.add(xIPs);
 
-        return new RequestContext(uuid, resolvedIps, accountId, userId);
+        return contextService.createContext(uuid, resolvedIps, accountId, userId);
     }
 
 }

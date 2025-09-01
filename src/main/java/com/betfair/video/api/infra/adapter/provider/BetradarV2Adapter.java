@@ -74,11 +74,11 @@ public class BetradarV2Adapter implements StreamingProviderPort {
     }
 
     @Override
-    public StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, User user, StreamParams streamParams) {
+    public StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, StreamParams streamParams) {
         AudioVisualEventDto event = getAudioVisualEventByScheduleItem(item)
                 .orElseThrow(() -> {
                             VideoAPIException exception = createStreamNotActiveException(item);
-                            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, user, exception, null);
+                            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
                             return exception;
                         }
                 );
@@ -88,7 +88,7 @@ public class BetradarV2Adapter implements StreamingProviderPort {
             final String eventId = parseIdFromScheme(event.id());
 
             logger.error("[{}]: Cannot find suitable stream for event {}. User: {}",
-                    context.uuid(), eventId, user.accountId());
+                    context.uuid(), eventId, context.user().accountId());
 
             throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, String.valueOf(item.betfairSportsType()));
         }
@@ -100,7 +100,7 @@ public class BetradarV2Adapter implements StreamingProviderPort {
             streamFormat = StreamingFormat.RTMP;
         }
 
-        Map<String, String> requestParams = buildRequestParams(user, item, streamFormat);
+        Map<String, String> requestParams = buildRequestParams(context.user(), item, streamFormat);
 
         String providerStreamFormatName = switch (streamFormat) {
             case CMAF_DASH -> "cmaf-manifest";

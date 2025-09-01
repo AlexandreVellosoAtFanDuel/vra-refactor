@@ -44,7 +44,7 @@ class GeolocationAdapterTest {
     @DisplayName("Should return default geolocation for valid IP address")
     void shouldReturnDefaultGeolocationForValidIPAddress() throws IOException, GeoIp2Exception {
         // Given
-        RequestContext requestContext = new RequestContext("uuid", List.of(VALID_IP), "123", "456");
+        RequestContext requestContext = new RequestContext("uuid", List.of(VALID_IP));
 
         CityResponse mockCityResponse = mock(CityResponse.class);
         Country mockCountry = mock(Country.class);

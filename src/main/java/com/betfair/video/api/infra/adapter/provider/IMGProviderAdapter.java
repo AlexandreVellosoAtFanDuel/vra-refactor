@@ -24,7 +24,7 @@ public class IMGProviderAdapter implements StreamingProviderPort {
     }
 
     @Override
-    public StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, User user, StreamParams streamParams) {
+    public StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, StreamParams streamParams) {
         return null;
     }
 

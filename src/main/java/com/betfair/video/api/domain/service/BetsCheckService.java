@@ -29,7 +29,7 @@ public class BetsCheckService {
         return BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG;
     }
 
-    public void validateBBVStatus(BetsCheckerStatusEnum bbvStatus, ScheduleItem item, User user, RequestContext context) {
+    public void validateBBVStatus(BetsCheckerStatusEnum bbvStatus, ScheduleItem item, RequestContext context) {
         if (bbvStatus == BetsCheckerStatusEnum.BBV_PASSED
                 || bbvStatus == BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG
                 || bbvStatus == BetsCheckerStatusEnum.BBV_NOT_REQUIRED_SUPERUSER) {
@@ -39,37 +39,37 @@ public class BetsCheckService {
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_INSUFFICIENT_STAKES) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.BBV_INSUFFICIENT_STAKES, String.valueOf(item.betfairSportsType()));
-            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, exception, null);
             throw exception;
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_NO_BETS) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.BBV_NO_STAKES, String.valueOf(item.betfairSportsType()));
-            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, exception, null);
             throw exception;
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_INSUFFICIENT_FUNDS) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_FUNDING, String.valueOf(item.betfairSportsType()));
-            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, exception, null);
             throw exception;
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_DEPENDENT_SERVICE_ERROR) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, String.valueOf(item.betfairSportsType()));
-            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
             throw exception;
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_TECHNICAL_ERROR) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.GENERIC_ERROR, String.valueOf(item.betfairSportsType()));
-            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
             throw exception;
         }
 
         // If we reach here, it means the status is not recognized
         VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.GENERIC_ERROR, String.valueOf(item.betfairSportsType()));
-        streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, user, exception, null);
+        streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
         throw exception;
     }
 

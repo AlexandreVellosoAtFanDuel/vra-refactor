@@ -18,13 +18,13 @@ public class UserService {
         this.permissionService = permissionService;
     }
 
-    public User createUserFromContext(RequestContext context) {
+    public User createUserFromContext(RequestContext context, String accountId, String userId) {
         Geolocation geolocation = userGeolocationService.getUserGeolocation(context);
         UserPermissions permissions = permissionService.createUserPermissions();
 
         return new User(
-                context.accountId(),
-                context.userId(),
+                accountId,
+                userId,
                 context.resolvedIps().getFirst(),
                 geolocation,
                 permissions

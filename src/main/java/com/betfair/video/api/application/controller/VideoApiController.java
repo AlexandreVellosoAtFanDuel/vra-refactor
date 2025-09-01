@@ -6,12 +6,10 @@ import com.betfair.video.api.application.dto.VideoStreamInfoDto;
 import com.betfair.video.api.application.mapper.UserGeolocationDtoMapper;
 import com.betfair.video.api.application.mapper.VideoStreamInfoDtoMapper;
 import com.betfair.video.api.application.util.UserContextBuilder;
-import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.service.EventService;
-import com.betfair.video.api.domain.service.UserService;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
+import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +25,7 @@ public class VideoApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(VideoApiController.class);
 
-    private final UserService userService;
+    private final UserContextBuilder userContextBuilder;
 
     private final EventService eventService;
 
@@ -35,8 +33,8 @@ public class VideoApiController {
 
     private final UserGeolocationDtoMapper userGeolocationDtoMapper;
 
-    public VideoApiController(UserService userService, EventService eventService, VideoStreamInfoDtoMapper videoStreamInfoDtoMapper, UserGeolocationDtoMapper userGeolocationDtoMapper) {
-        this.userService = userService;
+    public VideoApiController(UserContextBuilder userContextBuilder, EventService eventService, VideoStreamInfoDtoMapper videoStreamInfoDtoMapper, UserGeolocationDtoMapper userGeolocationDtoMapper) {
+        this.userContextBuilder = userContextBuilder;
         this.eventService = eventService;
         this.videoStreamInfoDtoMapper = videoStreamInfoDtoMapper;
         this.userGeolocationDtoMapper = userGeolocationDtoMapper;
@@ -59,17 +57,14 @@ public class VideoApiController {
             @RequestParam(value = "providerId", required = false) Integer providerId,
             @RequestParam(value = "providerParams", required = false) String providerParams
     ) {
-        RequestContext context = UserContextBuilder.createContextFromRequest(request);
+        RequestContext context = userContextBuilder.createContextFromRequest(request);
 
         logger.info("[{}]: Enter retrieveStreamInfoByExternalId, source: {}, id: {}, channelTypeId: {}, mobileDeviceId: {}", context.uuid(), externalIdSource, externalId, channelTypeId, mobileDeviceId);
 
-        User user = userService.createUserFromContext(context);
-
-        logger.info("[{}]: User country sub-division: {}", context.uuid(), user.geolocation().subDivisionCode());
+        logger.info("[{}]: User country sub-division: {}", context.uuid(), context.user().geolocation().subDivisionCode());
 
         VideoStreamInfo item = this.eventService.retrieveScheduleByExternalId(
                 context,
-                user,
                 externalIdSource,
                 externalId,
                 channelTypeId,
@@ -90,12 +85,11 @@ public class VideoApiController {
 
     @RequestMapping("/retrieveUserGeolocation")
     public UserGeolocationDto retrieveUserGeolocation(HttpServletRequest request) {
-        RequestContext context = UserContextBuilder.createContextFromRequest(request);
-        User user = userService.createUserFromContext(context);
+        RequestContext context = userContextBuilder.createContextFromRequest(request);
 
         logger.info("[{}] Enter retrieveUserGeolocation", context.uuid());
 
-        return userGeolocationDtoMapper.mapToDto(user);
+        return userGeolocationDtoMapper.mapToDto(context.user());
     }
 
 }

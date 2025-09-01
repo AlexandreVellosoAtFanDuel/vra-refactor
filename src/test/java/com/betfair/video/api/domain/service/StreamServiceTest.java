@@ -84,8 +84,10 @@ class StreamServiceTest {
     @DisplayName("Should retrieve stream by external ID")
     void shouldRetrieveStreamByExternalId() {
         // Given
-        RequestContext context = mock(RequestContext.class);
         User user = mock(User.class);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.user()).thenReturn(user);
 
         ReferenceType referenceType = mock(ReferenceType.class);
         when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
@@ -99,7 +101,7 @@ class StreamServiceTest {
         Set<ScheduleItemMapper> mappings = Set.of(mapper);
         when(scheduleItem.mappings()).thenReturn(mappings);
 
-        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context)))
                 .thenReturn(scheduleItem);
 
         when(scheduleItemService.getVideoStreamStateBasedOnScheduleItem(any(ScheduleItem.class)))
@@ -109,7 +111,7 @@ class StreamServiceTest {
         when(streamingProvider.isEnabled()).thenReturn(true);
 
         StreamDetails streamDetails = mock(StreamDetails.class);
-        when(streamingProvider.getStreamDetails(any(ScheduleItem.class), eq(context), eq(user), any(StreamParams.class))).thenReturn(streamDetails);
+        when(streamingProvider.getStreamDetails(any(ScheduleItem.class), eq(context), any(StreamParams.class))).thenReturn(streamDetails);
 
         when(directStreamConfigPort.isProviderInList(anyInt(), anyInt()))
                 .thenReturn(true);
@@ -139,7 +141,7 @@ class StreamServiceTest {
                 .providerId(1)
                 .build();
 
-        VideoStreamInfo videoStreamInfo = streamService.getStreamInfoByExternalId(searchKey, context, user, false);
+        VideoStreamInfo videoStreamInfo = streamService.getStreamInfoByExternalId(searchKey, context, false);
 
         // Then
         assertThat(videoStreamInfo).isNotNull();
@@ -149,8 +151,10 @@ class StreamServiceTest {
     @DisplayName("Should fail if no provider exist for video type")
     void shouldFailIfNoProviderExistsForVideoType() {
         // Given
-        RequestContext context = mock(RequestContext.class);
         User user = mock(User.class);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.user()).thenReturn(user);
 
         Geolocation geolocation = mock(Geolocation.class);
         when(user.geolocation()).thenReturn(geolocation);
@@ -162,7 +166,7 @@ class StreamServiceTest {
                 .build();
 
         // When & Then
-        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, user, false))
+        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -190,14 +194,14 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
-        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context)))
                 .thenReturn(scheduleItem);
 
         when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
                 .thenReturn(null);
 
         // When & Then
-        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, user, false))
+        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -225,7 +229,7 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
-        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context)))
                 .thenReturn(scheduleItem);
 
         StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
@@ -235,7 +239,7 @@ class StreamServiceTest {
                 .thenReturn(streamingProvider);
 
         // When & Then
-        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, user, false))
+        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -249,8 +253,10 @@ class StreamServiceTest {
     @DisplayName("Should fail if user does not have permissions")
     void shouldFailIfUserDoesNotHavePermissions() {
         // Given
-        RequestContext context = mock(RequestContext.class);
         User user = mock(User.class);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.user()).thenReturn(user);
 
         Geolocation geolocation = mock(Geolocation.class);
         when(user.geolocation()).thenReturn(geolocation);
@@ -266,7 +272,7 @@ class StreamServiceTest {
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
-        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context), eq(user)))
+        when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context)))
                 .thenReturn(scheduleItem);
 
         StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
@@ -279,7 +285,7 @@ class StreamServiceTest {
                 .thenReturn(false);
 
         // When & Then
-        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, user, false))
+        assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;

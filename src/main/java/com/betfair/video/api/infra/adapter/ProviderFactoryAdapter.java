@@ -25,7 +25,7 @@ public class ProviderFactoryAdapter implements ProviderFactoryPort {
 
     @Override
     public StreamingProviderPort getStreamingProviderByIdAndVideoChannelId(Integer providerId, Integer videoChannelId) {
-        StreamingProviderPort provider = providers.get(Provider.BETRADAR_V2.getId());
+        StreamingProviderPort provider = providers.get(providerId);
 
         if (provider == null) {
             throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, null);

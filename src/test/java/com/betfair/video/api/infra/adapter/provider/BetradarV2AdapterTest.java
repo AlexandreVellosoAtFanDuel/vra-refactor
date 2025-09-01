@@ -102,10 +102,11 @@ class BetradarV2AdapterTest {
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         when(scheduleItem.providerEventId()).thenReturn("event123");
 
-        RequestContext context = mock(RequestContext.class);
-
         User user = mock(User.class);
         when(user.ip()).thenReturn("User IP");
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.user()).thenReturn(user);
 
         StreamParams streamParams = mock(StreamParams.class);
 
@@ -132,7 +133,7 @@ class BetradarV2AdapterTest {
                 .thenReturn(streamUrlDto);
 
         // When
-        StreamDetails streamDetails = betradarV2Adapter.getStreamDetails(scheduleItem, context, user, streamParams);
+        StreamDetails streamDetails = betradarV2Adapter.getStreamDetails(scheduleItem, context, streamParams);
 
         // Then
         assertThat(streamDetails).isNotNull();
@@ -165,7 +166,7 @@ class BetradarV2AdapterTest {
         when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.singletonList(eventDto));
 
         // When & Then
-        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(scheduleItem, context, user, streamParams))
+        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(scheduleItem, context, streamParams))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -185,8 +186,11 @@ class BetradarV2AdapterTest {
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         when(scheduleItem.providerEventId()).thenReturn("event123");
 
-        RequestContext context = mock(RequestContext.class);
         User user = mock(User.class);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.user()).thenReturn(user);
+
         StreamParams streamParams = mock(StreamParams.class);
 
         StreamDto streamDto = mock(StreamDto.class);
@@ -203,7 +207,7 @@ class BetradarV2AdapterTest {
         when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.singletonList(eventDto));
 
         // When & Then
-        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(scheduleItem, context, user, streamParams))
+        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(scheduleItem, context, streamParams))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;

@@ -90,34 +90,34 @@ public class PermissionService {
         return true;
     }
 
-    public ScheduleItem filterScheduleItems(RequestContext context, User user, List<ScheduleItem> items, VideoStreamInfoByExternalIdSearchKey searchKey, VideoRequestIdentifier eventIdentifier) {
+    public ScheduleItem filterScheduleItems(RequestContext context, List<ScheduleItem> items, VideoStreamInfoByExternalIdSearchKey searchKey, VideoRequestIdentifier eventIdentifier) {
         String additionalInfo;
 
         if (items.isEmpty()) {
             additionalInfo = String.format("{No ScheduleItem found by search key: %s}", searchKey);
 
             VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, additionalInfo);
-            streamExceptionLoggingUtils.logException(logger, eventIdentifier, Level.WARN, context, user, exception, items, null);
+            streamExceptionLoggingUtils.logException(logger, eventIdentifier, Level.WARN, context, exception, items, null);
             throw exception;
         }
 
-        checkUserPermissionsAgainstExternalIdProvider(user, searchKey, eventIdentifier);
-        checkUserSession(user, items, eventIdentifier);
-        additionalInfo = checkUserPermissionsAgainstItemStatus(items, searchKey, user);
+        checkUserPermissionsAgainstExternalIdProvider(context.user(), searchKey, eventIdentifier);
+        checkUserSession(context.user(), items, eventIdentifier);
+        additionalInfo = checkUserPermissionsAgainstItemStatus(items, searchKey, context.user());
 
         if (items.size() > 1) {
-            additionalInfo = filterItemsAgainstContentTypesAndProviders(items, searchKey, user);
+            additionalInfo = filterItemsAgainstContentTypesAndProviders(items, searchKey, context.user());
         }
 
         if (items.isEmpty()) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, additionalInfo);
 
-            streamExceptionLoggingUtils.logException(logger, Long.valueOf(eventIdentifier.videoId()), Level.ERROR, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, Long.valueOf(eventIdentifier.videoId()), Level.ERROR, context, exception, null);
             throw exception;
         }
 
         if (items.size() > 1) {
-            return pickScheduleItem(items, searchKey, eventIdentifier, context, user);
+            return pickScheduleItem(items, searchKey, eventIdentifier, context);
         }
 
         return items.getFirst();
@@ -193,7 +193,7 @@ public class PermissionService {
         return true;
     }
 
-    private ScheduleItem pickScheduleItem(List<ScheduleItem> items, VideoStreamInfoByExternalIdSearchKey searchKey, VideoRequestIdentifier eventIdentifier, RequestContext context, User user) {
+    private ScheduleItem pickScheduleItem(List<ScheduleItem> items, VideoStreamInfoByExternalIdSearchKey searchKey, VideoRequestIdentifier eventIdentifier, RequestContext context) {
         ScheduleItem pickedScheduleItem = null;
 
         if (isRacingSport(items.getFirst().betfairSportsType())) {
@@ -203,7 +203,7 @@ public class PermissionService {
                         context.uuid(), eventIdentifier.eventId());
 
                 VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.CANNOT_UNIQUELY_RESOLVE_STREAM, null);
-                streamExceptionLoggingUtils.logException(logger, Long.valueOf(eventIdentifier.videoId()), Level.ERROR, context, user, exception, null);
+                streamExceptionLoggingUtils.logException(logger, Long.valueOf(eventIdentifier.videoId()), Level.ERROR, context, exception, null);
                 throw exception;
             } else {
                 pickedScheduleItem = getItemWithHighestProviderEventId(items);

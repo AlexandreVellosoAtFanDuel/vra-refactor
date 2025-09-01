@@ -48,13 +48,13 @@ public class EventService {
         this.streamService = streamService;
     }
 
-    public VideoStreamInfo retrieveScheduleByExternalId(RequestContext context, User user, String externalIdSource, String externalId,
+    public VideoStreamInfo retrieveScheduleByExternalId(RequestContext context, String externalIdSource, String externalId,
                                                                 Integer channelTypeId, List<Integer> channelSubTypeIds, Integer mobileDeviceId,
                                                                 String mobileOsVersion, Integer mobileScreenDensityDpi, VideoQuality videoQuality,
                                                                 String commentaryLanguage, Integer providerId, ContentTypeDto contentType,
                                                                 Boolean includeMetadata, String providerParams) {
 
-        if (!user.permissions().hasPermission(ServicePermission.VIDEO)) {
+        if (!context.user().permissions().hasPermission(ServicePermission.VIDEO)) {
             logger.error("[{}]: Access permissions are insufficient for the requested operation or data for user (...)", context.uuid());
             throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS, null);
         }
@@ -93,7 +93,7 @@ public class EventService {
 
         validateChannelParams(context.uuid(), searchKey);
 
-        return streamService.getStreamInfoByExternalId(searchKey, context, user, Boolean.TRUE.equals(includeMetadata));
+        return streamService.getStreamInfoByExternalId(searchKey, context, Boolean.TRUE.equals(includeMetadata));
     }
 
     private void validateChannelParams(final String uuid, final VRAStreamSearchKey searchKey) throws VideoAPIException {

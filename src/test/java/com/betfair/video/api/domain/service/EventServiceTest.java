@@ -64,12 +64,13 @@ class EventServiceTest {
     @DisplayName("Should retrieve schedule by external ID")
     void shouldRetrieveScheduleByExternalId() {
         // Given
-        RequestContext context = mock(RequestContext.class);
-        when(context.uuid()).thenReturn("test-uuid");
-
         User user = mock(User.class);
         UserPermissions userPermissions = new UserPermissions(Set.of(ServicePermission.VIDEO.name()), null, null, null, null);
         when(user.permissions()).thenReturn(userPermissions);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.uuid()).thenReturn("test-uuid");
+        when(context.user()).thenReturn(user);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
         when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
@@ -79,12 +80,12 @@ class EventServiceTest {
                 .thenReturn(TypeStream.VID.getId());
 
         VideoStreamInfo videoStreamInfoMock = mock(VideoStreamInfo.class);
-        when(streamService.getStreamInfoByExternalId(any(VideoStreamInfoByExternalIdSearchKey.class), eq(context), eq(user), anyBoolean()))
+        when(streamService.getStreamInfoByExternalId(any(VideoStreamInfoByExternalIdSearchKey.class), eq(context), anyBoolean()))
                 .thenReturn(videoStreamInfoMock);
 
         // When
         VideoStreamInfo result = eventService.retrieveScheduleByExternalId(
-                context, user, "1", "12345", null, null, null, null, null, null, null, null, ContentTypeDto.VID, null, null);
+                context, "1", "12345", null, null, null, null, null, null, null, null, ContentTypeDto.VID, null, null);
 
         // Then
         assertThat(result).isNotNull();
@@ -94,15 +95,16 @@ class EventServiceTest {
     @DisplayName("Should fail when user doesn't have permission")
     void shouldFailWhenUserDoesNotHavePermission() {
         // Given
-        RequestContext context = mock(RequestContext.class);
-        when(context.uuid()).thenReturn("test-uuid");
-
         User user = mock(User.class);
         UserPermissions userPermissions = new UserPermissions(Collections.emptySet(), null, null, null, null);
         when(user.permissions()).thenReturn(userPermissions);
 
+        RequestContext context = mock(RequestContext.class);
+        when(context.uuid()).thenReturn("test-uuid");
+        when(context.user()).thenReturn(user);
+
         // When & Then
-        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(context, user, null, null, null, null, null, null, null, null, null, null, null, null, null))
+        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(context, null, null, null, null, null, null, null, null, null, null, null, null, null))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -116,12 +118,13 @@ class EventServiceTest {
     @DisplayName("Should fail when channel type id is null")
     void shouldFailWhenChannelTypeIdIsNull() {
         // Given
-        RequestContext context = mock(RequestContext.class);
-        when(context.uuid()).thenReturn("test-uuid");
-
         User user = mock(User.class);
         UserPermissions userPermissions = new UserPermissions(Set.of(ServicePermission.VIDEO.name()), null, null, null, null);
         when(user.permissions()).thenReturn(userPermissions);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.uuid()).thenReturn("test-uuid");
+        when(context.user()).thenReturn(user);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
         when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
@@ -132,7 +135,7 @@ class EventServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, user, "1", "12345", TypeChannel.NULL.getId(), null, null, null, null, null, null, null, ContentTypeDto.VID, null, null))
+                context, "1", "12345", TypeChannel.NULL.getId(), null, null, null, null, null, null, null, ContentTypeDto.VID, null, null))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -146,12 +149,13 @@ class EventServiceTest {
     @DisplayName("Should fail when channel type is web and mobile device id is not null")
     void shouldFailWhenChannelTypeIsWebAndMobileDeviceIdIsNotNull() {
         // Given
-        RequestContext context = mock(RequestContext.class);
-        when(context.uuid()).thenReturn("test-uuid");
-
         User user = mock(User.class);
         UserPermissions userPermissions = new UserPermissions(Set.of(ServicePermission.VIDEO.name()), null, null, null, null);
         when(user.permissions()).thenReturn(userPermissions);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.uuid()).thenReturn("test-uuid");
+        when(context.user()).thenReturn(user);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
         when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
@@ -162,7 +166,7 @@ class EventServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, user, "1", "12345", TypeChannel.WEB.getId(), null, TypeMobileDevice.ANDROID_PHONE.getId(), null, null, null, null, null, ContentTypeDto.VID, null, null))
+                context, "1", "12345", TypeChannel.WEB.getId(), null, TypeMobileDevice.ANDROID_PHONE.getId(), null, null, null, null, null, ContentTypeDto.VID, null, null))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -176,12 +180,13 @@ class EventServiceTest {
     @DisplayName("Should fail when channel type is mobile and it's not a valid mobile device")
     void shouldFailWhenChannelTypeIsMobileAndNotValidMobileDevice() {
         // Given
-        RequestContext context = mock(RequestContext.class);
-        when(context.uuid()).thenReturn("test-uuid");
-
         User user = mock(User.class);
         UserPermissions userPermissions = new UserPermissions(Set.of(ServicePermission.VIDEO.name()), null, null, null, null);
         when(user.permissions()).thenReturn(userPermissions);
+
+        RequestContext context = mock(RequestContext.class);
+        when(context.uuid()).thenReturn("test-uuid");
+        when(context.user()).thenReturn(user);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
         when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
@@ -192,7 +197,7 @@ class EventServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, user, "1", "12345", TypeChannel.MOBILE.getId(), null, TypeMobileDevice.NULL.getId(), null, null, null, null, null, ContentTypeDto.VID, null, null))
+                context, "1", "12345", TypeChannel.MOBILE.getId(), null, TypeMobileDevice.NULL.getId(), null, null, null, null, null, ContentTypeDto.VID, null, null))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;

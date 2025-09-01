@@ -22,15 +22,15 @@ public class StreamExceptionLoggingUtils {
     private StreamExceptionLoggingUtils() {
     }
 
-    public void logException(Logger logger, final Long videoId, final Level logLevel, final RequestContext context, final User user,
-                                    final VideoAPIException exception, final String addInfo) throws VideoAPIException {
+    public void logException(Logger logger, final Long videoId, final Level logLevel, final RequestContext context,
+                             final VideoAPIException exception, final String addInfo) throws VideoAPIException {
         VideoRequestIdentifier videoRequestIdentifier = new VideoRequestIdentifier(videoId.toString(), null, null, null, null, null);
 
-        logException(logger, videoRequestIdentifier, logLevel, context, user, exception, Collections.emptyList(), addInfo);
+        logException(logger, videoRequestIdentifier, logLevel, context, exception, Collections.emptyList(), addInfo);
     }
 
     public void logException(Logger logger,
-                                     VideoRequestIdentifier identifier, final Level logLevel, final RequestContext context, final User user,
+                                     VideoRequestIdentifier identifier, final Level logLevel, final RequestContext context,
                                      final VideoAPIException exception, final List<ScheduleItem> items, final String addInfo) {
         String requestedSource = getRequestedSource(identifier);
 
@@ -39,10 +39,10 @@ public class StreamExceptionLoggingUtils {
 
         if (additionalInfoLoggingEnabled && addInfo != null) {
             logger.atLevel(logLevel).log("[{}]: User {} {},{} tried to access a video stream by {} and encountered error: {} [{}]{} [Additional info: {}]",
-                    context.uuid(), user.accountId(), user.geolocation().countryCode(), user.geolocation().subDivisionCode(), requestedSource, exception.getExceptionCode(), exception.getErrorCode(), itemsToLog, addInfo);
+                    context.uuid(), context.user().accountId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode(), requestedSource, exception.getExceptionCode(), exception.getErrorCode(), itemsToLog, addInfo);
         } else {
             logger.atLevel(logLevel).log("[{}]: User {} {},{} tried to access a video stream by {} and encountered error: {} [{}]{}",
-                    context.uuid(), user.accountId(), user.geolocation().countryCode(), user.geolocation().subDivisionCode(), requestedSource, exception.getExceptionCode(), exception.getErrorCode(), itemsToLog);
+                    context.uuid(), context.user().accountId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode(), requestedSource, exception.getExceptionCode(), exception.getErrorCode(), itemsToLog);
         }
     }
 

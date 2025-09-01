@@ -12,7 +12,6 @@ import com.betfair.video.api.domain.port.VideoStreamInfoPort;
 import com.betfair.video.api.domain.utils.DateUtils;
 import com.betfair.video.api.domain.utils.ScheduleItemUtils;
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
-import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.VideoStreamState;
 import com.betfair.video.api.domain.valueobject.search.VideoRequestIdentifier;
 import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
@@ -78,32 +77,32 @@ public class ScheduleItemService {
         return VideoStreamState.STREAM;
     }
 
-    public ScheduleItem getScheduleItemByStreamKey(VideoStreamInfoSearchKeyWrapper wrapper, RequestContext context, User user) {
+    public ScheduleItem getScheduleItemByStreamKey(VideoStreamInfoSearchKeyWrapper wrapper, RequestContext context) {
         final VideoStreamInfoByExternalIdSearchKey searchKey = wrapper.getVideoStreamInfoByExternalIdSearchKey();
 
         if (searchKey != null) {
             logger.info("[{}]: Attempting to retrieve schedule items for accountId={} by externalIdSource={}, primaryId={}, secondaryId={}",
-                    context.uuid(), user.accountId(), searchKey.getExternalIdSource(), searchKey.getPrimaryId(), searchKey.getSecondaryId());
+                    context.uuid(), context.user().accountId(), searchKey.getExternalIdSource(), searchKey.getPrimaryId(), searchKey.getSecondaryId());
         }
 
-        ScheduleItem item = getBetfairEventItem(searchKey, wrapper, context, user);
+        ScheduleItem item = getBetfairEventItem(searchKey, wrapper, context);
 
-        checkItemsProviderAllowedForAppkey(item, user);
-        checkItemsVenueAllowedForAppkey(item, user);
+        checkItemsProviderAllowedForAppkey(item, context.user());
+        checkItemsVenueAllowedForAppkey(item, context.user());
 
         return item;
     }
 
-    public void checkIsCurrentlyShowingAndThrow(VideoStreamState streamState, Long videoItemId, RequestContext context, User user, Integer sportType) {
+    public void checkIsCurrentlyShowingAndThrow(VideoStreamState streamState, Long videoItemId, RequestContext context, Integer sportType) {
         if (VideoStreamState.NOT_STARTED.equals(streamState)) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED, String.valueOf(sportType));
-            streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, exception, null);
             throw exception;
         }
 
         if (VideoStreamState.FINISHED.equals(streamState)) {
             VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_HAS_ENDED, String.valueOf(sportType));
-            streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, user, exception, null);
+            streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, exception, null);
             throw exception;
         }
     }
@@ -122,7 +121,7 @@ public class ScheduleItemService {
                         .contains(scheduleItem.providerData().getVenue().toLowerCase());
     }
 
-    private ScheduleItem getBetfairEventItem(VideoStreamInfoByExternalIdSearchKey searchKey, VideoStreamInfoSearchKeyWrapper wrapper, RequestContext context, User user) {
+    private ScheduleItem getBetfairEventItem(VideoStreamInfoByExternalIdSearchKey searchKey, VideoStreamInfoSearchKeyWrapper wrapper, RequestContext context) {
         VideoRequestIdentifier eventIdentifier = new VideoRequestIdentifier(
                 null,
                 searchKey.getPrimaryId(),
@@ -144,7 +143,7 @@ public class ScheduleItemService {
 
         wrapper.setVideoRequestIdentifier(eventIdentifier);
 
-        ScheduleItem item = permissionService.filterScheduleItems(context, user, items, searchKey, eventIdentifier);
+        ScheduleItem item = permissionService.filterScheduleItems(context, items, searchKey, eventIdentifier);
 
         return item;
     }

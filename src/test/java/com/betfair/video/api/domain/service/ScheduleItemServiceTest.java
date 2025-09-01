@@ -230,7 +230,7 @@ class ScheduleItemServiceTest {
         RequestContext context = mock(RequestContext.class);
 
         // When & Then
-        assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.NOT_STARTED, 123L, context, user, 1))
+        assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.NOT_STARTED, 123L, context, 1))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -249,7 +249,7 @@ class ScheduleItemServiceTest {
         RequestContext context = mock(RequestContext.class);
 
         // When & Then
-        assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.FINISHED, 123L, context, user, 1))
+        assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.FINISHED, 123L, context, 1))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
