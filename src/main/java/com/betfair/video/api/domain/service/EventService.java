@@ -8,7 +8,6 @@ import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.TypeChannel;
 import com.betfair.video.api.domain.entity.TypeMobileDevice;
 import com.betfair.video.api.domain.entity.TypeStream;
-import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.mapper.ExternalIdMapper;
 import com.betfair.video.api.domain.mapper.TypeStreamMapper;
@@ -61,7 +60,7 @@ public class EventService {
 
         ExternalIdSource source = ExternalIdSource.fromExternalIdSource(externalIdSource);
 
-        ExternalId parsedExternalIds = externalIdMapper.map(context, source, Set.of(externalId));
+        ExternalId parsedExternalIds = externalIdMapper.map(source, Set.of(externalId));
 
         String primaryId = null;
         String secondaryId = null;

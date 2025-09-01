@@ -4,12 +4,7 @@ import java.util.Objects;
 
 public enum ExternalIdSource {
 
-    BETFAIR_EVENT(1, "BETFAIR_EVENT", 7),
-    BETFAIR_MARKET(2, "BETFAIR_MARKET", 7),
-    TIMEFORM(3, "TIMEFORM", 8),
-    EXCHANGE_RACE(4, "EXCHANGE_RACE", 7),
-    BETFAIR_VIDEO(5, "BETFAIR_VIDEO", 7),
-    RAMP(6, "RAMP", 7);
+    BETFAIR_EVENT(1, "BETFAIR_EVENT", 7);
 
     private final Integer source;
     private final String externalIdDescription;

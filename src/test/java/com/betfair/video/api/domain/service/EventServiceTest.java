@@ -73,7 +73,7 @@ class EventServiceTest {
         when(context.user()).thenReturn(user);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
-        when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
+        when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
                 .thenReturn(externalId);
 
         when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentTypeDto.VID))
@@ -127,7 +127,7 @@ class EventServiceTest {
         when(context.user()).thenReturn(user);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
-        when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
+        when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
                 .thenReturn(externalId);
 
         when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentTypeDto.VID))
@@ -158,7 +158,7 @@ class EventServiceTest {
         when(context.user()).thenReturn(user);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
-        when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
+        when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
                 .thenReturn(externalId);
 
         when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentTypeDto.VID))
@@ -189,7 +189,7 @@ class EventServiceTest {
         when(context.user()).thenReturn(user);
 
         ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
-        when(externalIdMapper.map(eq(context), eq(ExternalIdSource.BETFAIR_EVENT), any()))
+        when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
                 .thenReturn(externalId);
 
         when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentTypeDto.VID))

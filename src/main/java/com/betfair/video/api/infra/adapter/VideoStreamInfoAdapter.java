@@ -36,20 +36,14 @@ public class VideoStreamInfoAdapter implements VideoStreamInfoPort {
         List<ScheduleItem> cachedItems = cachedScheduleItems.getAllAvailableEvents();
         logger.info("[{}] Retrieved {} cached schedule items", tId, cachedItems.size());
 
-        Stream<ScheduleItem> items = applyCommonFilters(cachedItems.stream(), searchKey)
+        List<ScheduleItem> result = applyCommonFilters(cachedItems.stream(), searchKey)
                 .filter(scheduleItem -> scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey() != null)
                 .filter(scheduleItem -> scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey() != null)
                 .filter(scheduleItem -> searchKey.getSecondaryId() == null || searchKey.getSecondaryId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().secondaryId()))
-                .filter(scheduleItem -> !(searchKey.getExternalIdSource() != null && searchKey.getExternalIdSource().getProviderId() != null) || searchKey.getExternalIdSource().getProviderId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().providerId()));
+                .filter(scheduleItem -> !(searchKey.getExternalIdSource() != null && searchKey.getExternalIdSource().getProviderId() != null) || searchKey.getExternalIdSource().getProviderId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().providerId()))
+                .filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().primaryId()))
+                .toList();
 
-        if (ExternalIdSource.EXCHANGE_RACE.getSource().equals(searchKey.getExternalIdSource().getSource())) {
-            items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().exchangeRaceId()));
-        } else if (ExternalIdSource.RAMP.getSource().equals(searchKey.getExternalIdSource().getSource())) {
-            items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().rampId()));
-        } else {
-            items = items.filter(scheduleItem -> searchKey.getPrimaryId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().primaryId()));
-        }
-        List<ScheduleItem> result = items.toList();
         logger.info("[{}] Found {} cached schedule items", tId, result.size());
         return result;
     }

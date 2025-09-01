@@ -25,7 +25,7 @@ public class BetsCheckService {
         this.streamExceptionLoggingUtils = streamExceptionLoggingUtils;
     }
 
-    public BetsCheckerStatusEnum getBBVStatus(VideoRequestIdentifier identifier, ScheduleItem item, User user, boolean isArchivedStream) {
+    public BetsCheckerStatusEnum getBBVStatus(VideoRequestIdentifier identifier, ScheduleItem item, User user) {
         return BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG;
     }
 

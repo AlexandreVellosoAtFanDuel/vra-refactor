@@ -128,7 +128,7 @@ class StreamServiceTest {
         when(permissionService.checkUserPermissionsAgainstItem(any(ScheduleItem.class), eq(user)))
                 .thenReturn(true);
 
-        when(betsCheckService.getBBVStatus(any(VideoRequestIdentifier.class), any(ScheduleItem.class), eq(user), anyBoolean()))
+        when(betsCheckService.getBBVStatus(any(VideoRequestIdentifier.class), any(ScheduleItem.class), eq(user)))
                 .thenReturn(BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG);
 
         when(videoStreamInfoMapper.map(any(ScheduleItem.class), any(StreamDetails.class), any(), any(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), anyBoolean(), any(), any(), any(), any(), any()))
