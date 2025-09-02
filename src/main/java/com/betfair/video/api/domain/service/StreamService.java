@@ -226,7 +226,7 @@ public class StreamService {
                 searchKey.getChannelTypeId()
         );
 
-        StreamDetails streamDetails = provider.getStreamDetails(item, context, params);
+        StreamDetails streamDetails = provider.getStreamDetails(context, item, params);
 
         boolean isDirectStream = directStreamConfigPort.isProviderInList(item.providerId(), item.videoChannelType());
 

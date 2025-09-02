@@ -6,10 +6,10 @@ import com.betfair.video.api.domain.port.StreamingProviderPort;
 import com.betfair.video.api.domain.valueobject.StreamDetails;
 import com.betfair.video.api.domain.valueobject.StreamParams;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
-import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Set;
 
 @Component
@@ -24,7 +24,7 @@ public class IMGProviderAdapter implements StreamingProviderPort {
     }
 
     @Override
-    public StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, StreamParams streamParams) {
+    public StreamDetails getStreamDetails(RequestContext context, ScheduleItem item, StreamParams streamParams) {
         return null;
     }
 

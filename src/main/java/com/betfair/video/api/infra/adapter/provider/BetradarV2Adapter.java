@@ -20,11 +20,13 @@ import com.betfair.video.api.infra.dto.betradarv2.AudioVisualEventDto;
 import com.betfair.video.api.infra.dto.betradarv2.ContentDto;
 import com.betfair.video.api.infra.dto.betradarv2.StreamDto;
 import com.betfair.video.api.infra.dto.betradarv2.StreamUrlDto;
+import feign.FeignException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -33,7 +35,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -74,24 +75,10 @@ public class BetradarV2Adapter implements StreamingProviderPort {
     }
 
     @Override
-    public StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, StreamParams streamParams) {
-        AudioVisualEventDto event = getAudioVisualEventByScheduleItem(item)
-                .orElseThrow(() -> {
-                            VideoAPIException exception = createStreamNotActiveException(item);
-                            streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
-                            return exception;
-                        }
-                );
+    public StreamDetails getStreamDetails(RequestContext context, ScheduleItem item, StreamParams streamParams) {
+        AudioVisualEventDto event = getAudioVisualEventByScheduleItem(context, item);
 
-        Optional<StreamDto> availableStream = findFirstStreamByStatusOrProductName(event, getRecommendedStreamStatusIds(), getRecommendedStreamProductIds());
-        if (availableStream.isEmpty()) {
-            final String eventId = parseIdFromScheme(event.id());
-
-            logger.error("[{}]: Cannot find suitable stream for event {}. User: {}",
-                    context.uuid(), eventId, context.user().accountId());
-
-            throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, String.valueOf(item.betfairSportsType()));
-        }
+        StreamDto availableStream = findFirstStreamByStatusOrProductName(context, event, getRecommendedStreamStatusIds(), getRecommendedStreamProductIds(), item.betfairSportsType());
 
         StreamingFormat streamFormat = configurationItemsRepository.findPreferredStreamingFormat(Provider.BETRADAR_V2,
                 item.videoChannelType(), item.betfairSportsType(), item.streamTypeId(), item.brandId());
@@ -109,23 +96,28 @@ public class BetradarV2Adapter implements StreamingProviderPort {
             default -> streamFormat.getValue();
         };
 
-        StreamUrlDto streamUrl = getStreamLink(availableStream.get().id(), providerStreamFormatName, requestParams.get(RequestParams.USER_IP.name()));
+        StreamUrlDto streamUrl = getStreamLink(context, availableStream.id(), providerStreamFormatName, requestParams.get(RequestParams.USER_IP.name()));
 
         return convertToStreamDetails(streamUrl, requestParams);
     }
 
     @Override
     public Set<VideoQuality> getAvailableVideoQualityValues() {
-        // TODO: implement actual logic to fetch available video quality values
         return Set.of(VideoQuality.HIGH);
     }
 
-    private Optional<AudioVisualEventDto> getAudioVisualEventByScheduleItem(ScheduleItem scheduleItem) {
+    private AudioVisualEventDto getAudioVisualEventByScheduleItem(RequestContext context, ScheduleItem scheduleItem) {
         List<AudioVisualEventDto> events = getAudioVisualEvents();
 
         return events.stream()
                 .filter(eventDto -> parseIdFromScheme(eventDto.id()).equals(scheduleItem.providerEventId()))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> {
+                            VideoAPIException exception = createStreamNotActiveException(scheduleItem);
+                            streamExceptionLoggingUtils.logException(logger, scheduleItem.videoItemId(), Level.ERROR, context, exception, null);
+                            return exception;
+                        }
+                );
     }
 
     private List<AudioVisualEventDto> getAudioVisualEvents() {
@@ -133,8 +125,20 @@ public class BetradarV2Adapter implements StreamingProviderPort {
         return betRadarV2Client.getAudioVisualEvents(recommendedStreamStatusIds, recommendedStreamProductIds);
     }
 
-    private StreamUrlDto getStreamLink(String streamId, String streamType, String userIP) {
-        return betRadarV2Client.getStreamLink(streamId, streamType, userIP);
+    private StreamUrlDto getStreamLink(RequestContext context, String streamId, String streamType, String userIP) {
+        try {
+            return betRadarV2Client.getStreamLink(streamId, streamType, userIP);
+        } catch (FeignException fe) {
+            if (HttpStatus.NOT_FOUND.value() == fe.status()) {
+                throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, "Stream link not found");
+            }
+
+            logger.error("[{}]: Feign error trying to fetch stream link for httpStatus = {}, streamId {} and streamType {}. Exception: {}", context.uuid(), fe.status(), streamId, streamType, fe.getMessage(), fe);
+        } catch (Exception ex) {
+            logger.error("[{}] General error trying to fetch stream link for streamId {} and streamType {}. Exception: {}", context.uuid(), streamId, streamType, ex.getMessage(), ex);
+        }
+
+        throw new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, "General error trying to fetch stream link");
     }
 
     private StreamDetails convertToStreamDetails(StreamUrlDto response, Map<String, String> requestParams) {
@@ -167,13 +171,21 @@ public class BetradarV2Adapter implements StreamingProviderPort {
         return new VideoAPIException(ResponseCode.NotFound, errorCode, String.valueOf(scheduleItem.betfairSportsType()));
     }
 
-    private Optional<StreamDto> findFirstStreamByStatusOrProductName(AudioVisualEventDto event, List<String> streamStatusIds, List<String> streamProductIds) {
+    private StreamDto findFirstStreamByStatusOrProductName(RequestContext context, AudioVisualEventDto event, List<String> streamStatusIds, List<String> streamProductIds, Integer betfairSportsType) {
         return event.contents()
                 .stream()
                 .filter(ContentDto::isMain)
                 .flatMap(content -> content.streams().stream())
                 .filter(stream -> streamHasValidStreamStatusIds(stream, streamStatusIds) && streamHasValidProductIds(stream, streamProductIds))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> {
+                    final String eventId = parseIdFromScheme(event.id());
+
+                    logger.error("[{}]: Cannot find suitable stream for event {}. User: {}",
+                            context.uuid(), eventId, context.user().accountId());
+
+                    return new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, String.valueOf(betfairSportsType));
+                });
     }
 
     private boolean streamHasValidStreamStatusIds(StreamDto stream, List<String> streamStatusIds) {

@@ -12,7 +12,7 @@ public interface StreamingProviderPort {
 
     boolean isEnabled();
 
-    StreamDetails getStreamDetails(ScheduleItem item, RequestContext context, StreamParams streamParams);
+    StreamDetails getStreamDetails(RequestContext context, ScheduleItem item, StreamParams streamParams);
 
     Set<VideoQuality> getAvailableVideoQualityValues();
 

@@ -111,7 +111,7 @@ class StreamServiceTest {
         when(streamingProvider.isEnabled()).thenReturn(true);
 
         StreamDetails streamDetails = mock(StreamDetails.class);
-        when(streamingProvider.getStreamDetails(any(ScheduleItem.class), eq(context), any(StreamParams.class))).thenReturn(streamDetails);
+        when(streamingProvider.getStreamDetails(eq(context), any(ScheduleItem.class), any(StreamParams.class))).thenReturn(streamDetails);
 
         when(directStreamConfigPort.isProviderInList(anyInt(), anyInt()))
                 .thenReturn(true);
@@ -181,7 +181,6 @@ class StreamServiceTest {
     void shouldFailIfNoProviderFound() {
         // Given
         RequestContext context = mock(RequestContext.class);
-        User user = mock(User.class);
 
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
                 .externalIdSource(ExternalIdSource.BETFAIR_EVENT)
@@ -216,7 +215,6 @@ class StreamServiceTest {
     void shouldFailIfProviderNotEnabled() {
         // Given
         RequestContext context = mock(RequestContext.class);
-        User user = mock(User.class);
 
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
                 .externalIdSource(ExternalIdSource.BETFAIR_EVENT)

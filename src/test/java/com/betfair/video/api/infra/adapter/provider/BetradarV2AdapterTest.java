@@ -6,6 +6,7 @@ import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnu
 import com.betfair.video.api.domain.entity.Provider;
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
+import com.betfair.video.api.domain.entity.ScheduleItemData;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
@@ -28,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,7 +136,7 @@ class BetradarV2AdapterTest {
                 .thenReturn(streamUrlDto);
 
         // When
-        StreamDetails streamDetails = betradarV2Adapter.getStreamDetails(scheduleItem, context, streamParams);
+        StreamDetails streamDetails = betradarV2Adapter.getStreamDetails(context, scheduleItem, streamParams);
 
         // Then
         assertThat(streamDetails).isNotNull();
@@ -167,7 +169,7 @@ class BetradarV2AdapterTest {
         when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.singletonList(eventDto));
 
         // When & Then
-        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(scheduleItem, context, streamParams))
+        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(context, scheduleItem, streamParams))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -208,12 +210,76 @@ class BetradarV2AdapterTest {
         when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.singletonList(eventDto));
 
         // When & Then
-        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(scheduleItem, context, streamParams))
+        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(context, scheduleItem, streamParams))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
                     assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
                     assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND);
+                    assertThat(videoException.getSportType()).isNull();
+                });
+    }
+
+    @Test
+    @DisplayName("Test stream details - error stream not started")
+    void testStreamDetailsErrorStreamNotStarted() {
+        // Given
+        ReflectionTestUtils.setField(betradarV2Adapter, "recommendedStreamStatusIds", "2");
+        ReflectionTestUtils.setField(betradarV2Adapter, "recommendedStreamProductIds", "2");
+
+        Date scheduleItemStartDate = new Date(System.currentTimeMillis() + (3600 * 1000)); // 1 hour in the future
+
+        ScheduleItemData scheduleItemData = mock(ScheduleItemData.class);
+        when(scheduleItemData.getStart()).thenReturn(scheduleItemStartDate);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.videoItemId()).thenReturn(4567L);
+        when(scheduleItem.providerData()).thenReturn(scheduleItemData);
+
+        RequestContext context = mock(RequestContext.class);
+        StreamParams streamParams = mock(StreamParams.class);
+
+        when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.emptyList());
+
+        // When & Then
+        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(context, scheduleItem, streamParams))
+                .isInstanceOf(VideoAPIException.class)
+                .satisfies(exception -> {
+                    VideoAPIException videoException = (VideoAPIException) exception;
+                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
+                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED);
+                    assertThat(videoException.getSportType()).isNull();
+                });
+    }
+
+    @Test
+    @DisplayName("Test stream details - error stream has ended")
+    void testStreamDetailsErrorStreamHasEnded() {
+        // Given
+        ReflectionTestUtils.setField(betradarV2Adapter, "recommendedStreamStatusIds", "2");
+        ReflectionTestUtils.setField(betradarV2Adapter, "recommendedStreamProductIds", "2");
+
+        Date scheduleItemStartDate = new Date(System.currentTimeMillis() - (3600 * 1000)); // 1 hour in the past
+
+        ScheduleItemData scheduleItemData = mock(ScheduleItemData.class);
+        when(scheduleItemData.getStart()).thenReturn(scheduleItemStartDate);
+
+        ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.videoItemId()).thenReturn(4567L);
+        when(scheduleItem.providerData()).thenReturn(scheduleItemData);
+
+        RequestContext context = mock(RequestContext.class);
+        StreamParams streamParams = mock(StreamParams.class);
+
+        when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.emptyList());
+
+        // When & Then
+        assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(context, scheduleItem, streamParams))
+                .isInstanceOf(VideoAPIException.class)
+                .satisfies(exception -> {
+                    VideoAPIException videoException = (VideoAPIException) exception;
+                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
+                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_HAS_ENDED);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }
