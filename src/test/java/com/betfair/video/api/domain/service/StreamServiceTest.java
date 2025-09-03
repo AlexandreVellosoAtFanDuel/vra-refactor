@@ -14,12 +14,10 @@ import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.DirectStreamConfigPort;
 import com.betfair.video.api.domain.port.InlineStreamConfigPort;
 import com.betfair.video.api.domain.port.ProviderFactoryPort;
-import com.betfair.video.api.domain.port.SportsTypePort;
 import com.betfair.video.api.domain.port.StreamingProviderPort;
 import com.betfair.video.api.domain.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.Geolocation;
-import com.betfair.video.api.domain.valueobject.ReferenceType;
 import com.betfair.video.api.domain.valueobject.StreamDetails;
 import com.betfair.video.api.domain.valueobject.StreamParams;
 import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
@@ -53,9 +51,6 @@ class StreamServiceTest {
     private StreamService streamService;
 
     @Mock
-    private SportsTypePort sportsTypePort;
-
-    @Mock
     private ConfigurationItemsPort configurationItemsPort;
 
     @Mock
@@ -87,10 +82,6 @@ class StreamServiceTest {
 
         RequestContext context = mock(RequestContext.class);
         when(context.user()).thenReturn(user);
-
-        ReferenceType referenceType = mock(ReferenceType.class);
-        when(sportsTypePort.findSportTypeByBetfairSportsType(anyInt()))
-                .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
 

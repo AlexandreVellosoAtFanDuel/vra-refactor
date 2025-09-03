@@ -3,10 +3,10 @@ package com.betfair.video.api.domain.mapper;
 import com.betfair.video.api.domain.entity.ConfigurationType;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.ScheduleItemData;
+import com.betfair.video.api.domain.entity.TypeSport;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.service.GeoRestrictionsService;
 import com.betfair.video.api.domain.valueobject.ContentType;
-import com.betfair.video.api.domain.valueobject.ReferenceType;
 import com.betfair.video.api.domain.valueobject.StreamDetails;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
 import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
@@ -34,7 +34,7 @@ public class VideoStreamInfoMapper {
             final boolean isDirectStream,
             final boolean isInlineStream,
             final ContentType contentType,
-            final ReferenceType sportReferenceType,
+            final TypeSport typeSport,
             final VideoQuality defaultVideoQuality,
             final String defaultBufferingValue,
             final User user,
@@ -53,7 +53,7 @@ public class VideoStreamInfoMapper {
                 isDirectStream,
                 isInlineStream,
                 contentType,
-                includeMetadata ? sportReferenceType : null,
+                includeMetadata ? typeSport : null,
                 defaultVideoQuality,
                 defaultBufferingValue,
                 user,
@@ -85,8 +85,8 @@ public class VideoStreamInfoMapper {
                     videoStreamInfo.setStartDateTime(scheduleItemData.getStart());
                 }
             }
-            if (sportReferenceType != null) {
-                videoStreamInfo.setSportName(sportReferenceType.description());
+            if (typeSport != null) {
+                videoStreamInfo.setSportName(typeSport.getDescription());
             }
         }
 

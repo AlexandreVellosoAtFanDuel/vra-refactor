@@ -3,10 +3,10 @@ package com.betfair.video.api.domain.mapper;
 import com.betfair.video.api.domain.entity.ConfigurationType;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.ScheduleItemData;
+import com.betfair.video.api.domain.entity.TypeSport;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.service.GeoRestrictionsService;
 import com.betfair.video.api.domain.valueobject.ContentType;
-import com.betfair.video.api.domain.valueobject.ReferenceType;
 import com.betfair.video.api.domain.valueobject.SizeRestrictions;
 import com.betfair.video.api.domain.valueobject.StreamDetails;
 import com.betfair.video.api.domain.valueobject.VideoQuality;
@@ -51,7 +51,7 @@ public interface VideoStreamInfoMapStruct {
     @Mapping(target = "providerEventName", source = "scheduleItem", qualifiedByName = "mapProviderEventName")
     @Mapping(target = "competition", source = "scheduleItem", qualifiedByName = "mapCompetition")
     @Mapping(target = "startDateTime", source = "scheduleItem", qualifiedByName = "mapStartDateTime")
-    @Mapping(target = "sportName", source = "sportReferenceType", qualifiedByName = "mapSportName")
+    @Mapping(target = "sportName", source = "typeSport", qualifiedByName = "mapSportName")
     @Mapping(target = "eventId", ignore = true) // Set manually in the service
     @Mapping(target = "eventName", ignore = true) // Set manually in the service
     @Mapping(target = "exchangeRaceId", ignore = true) // Set manually in the service
@@ -66,7 +66,7 @@ public interface VideoStreamInfoMapStruct {
             boolean isDirectStream,
             boolean isInlineStream,
             ContentType contentType,
-            ReferenceType sportReferenceType,
+            TypeSport typeSport,
             VideoQuality defaultVideoQuality,
             String defaultBufferingValue,
             User user,
@@ -86,7 +86,7 @@ public interface VideoStreamInfoMapStruct {
                 ? scheduleItem.providerData().getBlockedCountries() : null;
         String overrideBlockedCountries = scheduleItem.overriddenData() != null
                 ? scheduleItem.overriddenData().getBlockedCountries() : null;
-        
+
         return createAggregatedBlockedCountries(defaultBlockedCountries, providerBlockedCountries, overrideBlockedCountries);
     }
 
@@ -149,14 +149,14 @@ public interface VideoStreamInfoMapStruct {
     @Named("mapProviderEventName")
     default String mapProviderEventName(ScheduleItem scheduleItem) {
         ScheduleItemData scheduleItemData = scheduleItem.getActualProviderData();
-        return scheduleItemData != null && StringUtils.isNotEmpty(scheduleItemData.getEventName()) 
+        return scheduleItemData != null && StringUtils.isNotEmpty(scheduleItemData.getEventName())
                 ? scheduleItemData.getEventName() : null;
     }
 
     @Named("mapCompetition")
     default String mapCompetition(ScheduleItem scheduleItem) {
         ScheduleItemData scheduleItemData = scheduleItem.getActualProviderData();
-        return scheduleItemData != null && StringUtils.isNotEmpty(scheduleItemData.getCompetition()) 
+        return scheduleItemData != null && StringUtils.isNotEmpty(scheduleItemData.getCompetition())
                 ? scheduleItemData.getCompetition() : null;
     }
 
@@ -167,8 +167,8 @@ public interface VideoStreamInfoMapStruct {
     }
 
     @Named("mapSportName")
-    default String mapSportName(ReferenceType sportReferenceType) {
-        return sportReferenceType != null ? sportReferenceType.description() : null;
+    default String mapSportName(TypeSport typeSport) {
+        return typeSport != null ? typeSport.getDescription() : null;
     }
 
     default Integer parseInteger(String value) {

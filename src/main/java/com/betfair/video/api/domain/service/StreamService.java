@@ -6,6 +6,7 @@ import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnu
 import com.betfair.video.api.domain.entity.ConfigurationItem;
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
+import com.betfair.video.api.domain.entity.TypeSport;
 import com.betfair.video.api.domain.entity.TypeStream;
 import com.betfair.video.api.domain.entity.User;
 import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
@@ -14,7 +15,6 @@ import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.DirectStreamConfigPort;
 import com.betfair.video.api.domain.port.InlineStreamConfigPort;
 import com.betfair.video.api.domain.port.ProviderFactoryPort;
-import com.betfair.video.api.domain.port.SportsTypePort;
 import com.betfair.video.api.domain.port.StreamingProviderPort;
 import com.betfair.video.api.domain.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.valueobject.ContentType;
@@ -50,8 +50,6 @@ public class StreamService {
 
     public static final Pattern COMMA_PATTERN = Pattern.compile(",");
 
-    private final SportsTypePort sportsTypePort;
-
     private final ConfigurationItemsPort configurationItemsPort;
 
     private final ScheduleItemService scheduleItemService;
@@ -70,12 +68,11 @@ public class StreamService {
 
     private final VideoStreamInfoMapper videoStreamInfoMapper;
 
-    public StreamService(SportsTypePort sportsTypePort, ConfigurationItemsPort configurationItemsPort,
+    public StreamService(ConfigurationItemsPort configurationItemsPort,
                          ScheduleItemService scheduleItemService, ProviderFactoryPort providerFactoryPort,
                          PermissionService permissionService, BetsCheckService betsCheckService,
                          DirectStreamConfigPort directStreamConfigPort, InlineStreamConfigPort inlineStreamConfigPort,
                          GeoRestrictionsService geoRestrictionsService, VideoStreamInfoMapper videoStreamInfoMapper) {
-        this.sportsTypePort = sportsTypePort;
         this.configurationItemsPort = configurationItemsPort;
         this.scheduleItemService = scheduleItemService;
         this.providerFactoryPort = providerFactoryPort;
@@ -253,7 +250,7 @@ public class StreamService {
                 isDirectStream,
                 isInlineStream,
                 convertStreamTypeIdToContentType(item.streamTypeId()),
-                sportsTypePort.findSportTypeByBetfairSportsType(item.betfairSportsType()),
+                TypeSport.getById(item.betfairSportsType()),
                 getDefaultVideoQuality(item),
                 getDefaultBufferingValue(item),
                 context.user(),
