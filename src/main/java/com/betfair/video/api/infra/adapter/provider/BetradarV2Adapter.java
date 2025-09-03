@@ -20,11 +20,13 @@ import com.betfair.video.api.infra.dto.betradarv2.AudioVisualEventDto;
 import com.betfair.video.api.infra.dto.betradarv2.ContentDto;
 import com.betfair.video.api.infra.dto.betradarv2.StreamDto;
 import com.betfair.video.api.infra.dto.betradarv2.StreamUrlDto;
+import com.hazelcast.collection.IList;
 import feign.FeignException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -53,13 +55,17 @@ public class BetradarV2Adapter implements StreamingProviderPort {
     @Value("${provider.betradar.v2.recommended.stream.status.ids}")
     private String recommendedStreamProductIds;
 
+    @Qualifier(value = "betRadarV2AudioVisualEventsList")
+    private final IList<AudioVisualEventDto> audioVisualEvents;
+
     private final BetRadarV2Client betRadarV2Client;
 
     private final ConfigurationItemsPort configurationItemsRepository;
 
     private final StreamExceptionLoggingUtils streamExceptionLoggingUtils;
 
-    public BetradarV2Adapter(BetRadarV2Client betRadarV2Client, ConfigurationItemsPort configurationItemsRepository, StreamExceptionLoggingUtils streamExceptionLoggingUtils) {
+    public BetradarV2Adapter(IList<AudioVisualEventDto> audioVisualEvents, BetRadarV2Client betRadarV2Client, ConfigurationItemsPort configurationItemsRepository, StreamExceptionLoggingUtils streamExceptionLoggingUtils) {
+        this.audioVisualEvents = audioVisualEvents;
         this.betRadarV2Client = betRadarV2Client;
         this.configurationItemsRepository = configurationItemsRepository;
         this.streamExceptionLoggingUtils = streamExceptionLoggingUtils;
@@ -107,7 +113,7 @@ public class BetradarV2Adapter implements StreamingProviderPort {
     }
 
     private AudioVisualEventDto getAudioVisualEventByScheduleItem(RequestContext context, ScheduleItem scheduleItem) {
-        List<AudioVisualEventDto> events = getAudioVisualEvents();
+        List<AudioVisualEventDto> events = getAudioVisualEvents(context);
 
         return events.stream()
                 .filter(eventDto -> parseIdFromScheme(eventDto.id()).equals(scheduleItem.providerEventId()))
@@ -120,9 +126,25 @@ public class BetradarV2Adapter implements StreamingProviderPort {
                 );
     }
 
-    private List<AudioVisualEventDto> getAudioVisualEvents() {
-        // TODO: Implement cache here
-        return betRadarV2Client.getAudioVisualEvents(recommendedStreamStatusIds, recommendedStreamProductIds);
+    private List<AudioVisualEventDto> getAudioVisualEvents(RequestContext context) {
+        List<AudioVisualEventDto> cachedEvents = this.audioVisualEvents.stream().toList();
+
+        if (cachedEvents.isEmpty()) {
+            logger.info("[{}] Betradar V2 AudioVisualEvents cache miss - fetch events from Betradar V2 service", context.uuid());
+
+            try {
+                cachedEvents = betRadarV2Client.getAudioVisualEvents(recommendedStreamStatusIds, recommendedStreamProductIds);
+                this.audioVisualEvents.addAll(cachedEvents);
+            } catch (FeignException fe) {
+                logger.error("[{}]: Feign error trying to fetch audio visual events from provider for httpStatus = {}, recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
+                        context.uuid(), fe.status(), recommendedStreamStatusIds, recommendedStreamProductIds, fe.getMessage(), fe);
+            } catch (Exception ex) {
+                logger.error("[{}] General error trying to fetch audio visual events from provider for recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
+                        context.uuid(), recommendedStreamStatusIds, recommendedStreamProductIds, ex.getMessage(), ex);
+            }
+        }
+
+        return cachedEvents;
     }
 
     private StreamUrlDto getStreamLink(RequestContext context, String streamId, String streamType, String userIP) {

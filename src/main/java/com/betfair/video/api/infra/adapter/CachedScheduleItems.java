@@ -1,6 +1,7 @@
 package com.betfair.video.api.infra.adapter;
 
 import com.betfair.video.api.domain.entity.AuditItem;
+import com.betfair.video.api.domain.entity.Provider;
 import com.betfair.video.api.domain.entity.ProviderEventKey;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.ScheduleItemData;
@@ -60,8 +61,8 @@ public class CachedScheduleItems {
 
         ScheduleItem scheduleItem = new ScheduleItem(
                 103672720L,
-                26,
-                "5509335",
+                Provider.BETRADAR_V2.getId(),
+                "5265131",
                 3,
                 null,
                 null,
