@@ -1,14 +1,16 @@
 package com.betfair.video.api.infra.config;
 
 import com.betfair.video.api.infra.dto.betradarv2.AudioVisualEventDto;
-import com.hazelcast.collection.IList;
 import com.hazelcast.config.Config;
-import com.hazelcast.config.ListConfig;
+import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.map.IMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration(proxyBeanMethods = false)
 public class SpringHazelcastConfiguration {
@@ -20,14 +22,18 @@ public class SpringHazelcastConfiguration {
 
         NetworkConfig networkConfig = config.getNetworkConfig();
         networkConfig.getInterfaces().addInterface("127.0.0.1");
-
-        config.addListConfig(new ListConfig("betRadarV2AudioVisualEventsList").setBackupCount(2));
+        
+        MapConfig mapConfig = new MapConfig("betRadarV2AudioVisualEventsMap")
+                .setTimeToLiveSeconds(30)
+                .setBackupCount(2);
+        config.addMapConfig(mapConfig);
+        
         return Hazelcast.newHazelcastInstance(config);
     }
 
     @Bean
-    public IList<AudioVisualEventDto> betRadarV2AudioVisualEventsList(HazelcastInstance instance) {
-        return instance.getList("betRadarV2AudioVisualEventsList");
+    public IMap<String, List<AudioVisualEventDto>> betRadarV2AudioVisualEventsMap(HazelcastInstance instance) {
+        return instance.getMap("betRadarV2AudioVisualEventsMap");
     }
 
 }

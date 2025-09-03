@@ -20,7 +20,7 @@ import com.betfair.video.api.infra.dto.betradarv2.BaseDto;
 import com.betfair.video.api.infra.dto.betradarv2.ContentDto;
 import com.betfair.video.api.infra.dto.betradarv2.StreamDto;
 import com.betfair.video.api.infra.dto.betradarv2.StreamUrlDto;
-import com.hazelcast.collection.IList;
+import com.hazelcast.map.IMap;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +31,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,7 +50,7 @@ class BetradarV2AdapterTest {
     BetradarV2Adapter betradarV2Adapter;
 
     @Mock
-    IList<AudioVisualEventDto> cache;
+    IMap<String, List<AudioVisualEventDto>> cache;
 
     @Mock
     BetRadarV2Client betRadarV2Client;
@@ -132,7 +132,7 @@ class BetradarV2AdapterTest {
         when(eventDto.contents()).thenReturn(Collections.singletonList(contentDto));
 
         // Test revalidate cache
-        when(cache.stream()).thenReturn(Stream.of());
+        when(cache.get(anyString())).thenReturn(Collections.emptyList());
         when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.singletonList(eventDto));
 
         when(configurationItemsRepository.findPreferredStreamingFormat(eq(Provider.BETRADAR_V2), anyInt(), anyInt(), anyInt(), anyInt()))
@@ -173,7 +173,7 @@ class BetradarV2AdapterTest {
         AudioVisualEventDto eventDto = mock(AudioVisualEventDto.class);
         when(eventDto.id()).thenReturn("av:event:event123");
 
-        when(cache.stream()).thenReturn(Stream.of(eventDto));
+        when(cache.get(anyString())).thenReturn(Collections.singletonList(eventDto));
 
         // When & Then
         assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(context, scheduleItem, streamParams))
@@ -214,7 +214,7 @@ class BetradarV2AdapterTest {
         when(eventDto.id()).thenReturn("av:event:event123");
         when(eventDto.contents()).thenReturn(Collections.singletonList(contentDto));
 
-        when(cache.stream()).thenReturn(Stream.of(eventDto));
+        when(cache.get(anyString())).thenReturn(Collections.singletonList(eventDto));
 
         // When & Then
         assertThatThrownBy(() -> betradarV2Adapter.getStreamDetails(context, scheduleItem, streamParams))
@@ -246,7 +246,7 @@ class BetradarV2AdapterTest {
         RequestContext context = mock(RequestContext.class);
         StreamParams streamParams = mock(StreamParams.class);
 
-        when(cache.stream()).thenReturn(Stream.of());
+        when(cache.get(anyString())).thenReturn(Collections.emptyList());
         when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.emptyList());
 
         // When & Then
@@ -279,7 +279,7 @@ class BetradarV2AdapterTest {
         RequestContext context = mock(RequestContext.class);
         StreamParams streamParams = mock(StreamParams.class);
 
-        when(cache.stream()).thenReturn(Stream.of());
+        when(cache.get(anyString())).thenReturn(Collections.emptyList());
         when(betRadarV2Client.getAudioVisualEvents(anyString(), anyString())).thenReturn(Collections.emptyList());
 
         // When & Then
