@@ -1,17 +1,15 @@
 package com.betfair.video.api.infra.adapter;
 
-import com.betfair.video.api.domain.port.ReferenceTypesPort;
+import com.betfair.video.api.domain.port.SportsTypePort;
 import com.betfair.video.api.domain.valueobject.ReferenceType;
-import com.betfair.video.api.domain.valueobject.ReferenceTypeId;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReferenceTypesAdapter implements ReferenceTypesPort {
+public class SportsTypeAdapter implements SportsTypePort {
 
     @Override
-    public ReferenceType findReferenceTypeById(Integer referenceTypeId, ReferenceTypeId referenceTypeEnum) {
+    public ReferenceType findSportTypeByBetfairSportsType(Integer integer) {
         // TODO: Implement actual caching and fetching logic here
         return new ReferenceType("-1", "Other sports types");
     }
-
 }

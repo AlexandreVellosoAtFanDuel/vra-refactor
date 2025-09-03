@@ -14,11 +14,10 @@ import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.DirectStreamConfigPort;
 import com.betfair.video.api.domain.port.InlineStreamConfigPort;
 import com.betfair.video.api.domain.port.ProviderFactoryPort;
-import com.betfair.video.api.domain.port.ReferenceTypesPort;
+import com.betfair.video.api.domain.port.SportsTypePort;
 import com.betfair.video.api.domain.port.StreamingProviderPort;
 import com.betfair.video.api.domain.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.valueobject.ContentType;
-import com.betfair.video.api.domain.valueobject.ReferenceTypeId;
 import com.betfair.video.api.domain.valueobject.StreamDetails;
 import com.betfair.video.api.domain.valueobject.StreamDetailsParamEnum;
 import com.betfair.video.api.domain.valueobject.StreamParams;
@@ -51,7 +50,7 @@ public class StreamService {
 
     public static final Pattern COMMA_PATTERN = Pattern.compile(",");
 
-    private final ReferenceTypesPort referenceTypesPort;
+    private final SportsTypePort sportsTypePort;
 
     private final ConfigurationItemsPort configurationItemsPort;
 
@@ -71,12 +70,12 @@ public class StreamService {
 
     private final VideoStreamInfoMapper videoStreamInfoMapper;
 
-    public StreamService(ReferenceTypesPort referenceTypesPort, ConfigurationItemsPort configurationItemsPort,
+    public StreamService(SportsTypePort sportsTypePort, ConfigurationItemsPort configurationItemsPort,
                          ScheduleItemService scheduleItemService, ProviderFactoryPort providerFactoryPort,
                          PermissionService permissionService, BetsCheckService betsCheckService,
                          DirectStreamConfigPort directStreamConfigPort, InlineStreamConfigPort inlineStreamConfigPort,
                          GeoRestrictionsService geoRestrictionsService, VideoStreamInfoMapper videoStreamInfoMapper) {
-        this.referenceTypesPort = referenceTypesPort;
+        this.sportsTypePort = sportsTypePort;
         this.configurationItemsPort = configurationItemsPort;
         this.scheduleItemService = scheduleItemService;
         this.providerFactoryPort = providerFactoryPort;
@@ -90,7 +89,7 @@ public class StreamService {
 
     public VideoStreamInfo getStreamInfoByExternalId(final VideoStreamInfoByExternalIdSearchKey searchKey, final RequestContext context, final boolean includeMetadata) {
 
-        if (searchKey.getProviderId() != null && referenceTypesPort.findReferenceTypeById(searchKey.getProviderId(), ReferenceTypeId.VIDEO_PROVIDER) == null) {
+        if (searchKey.getProviderId() != null && providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(searchKey.getProviderId()) == null) {
             logger.error("[{}]: No provider was found for the given provider ID ({}). User country: {},{}.",
                     context.uuid(), searchKey.getProviderId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
             throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT, null);
@@ -122,7 +121,7 @@ public class StreamService {
         // A single video item was found
         validateScheduleItem(identifier, item, context);
 
-        StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId(), item.videoChannelType());
+        StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId());
 
         return getStreamInfoForItem(item, provider, searchKey, context, includeMetadata);
     }
@@ -168,7 +167,7 @@ public class StreamService {
 
     private void validateScheduleItem(VideoRequestIdentifier identifier, ScheduleItem item, RequestContext context) {
 
-        StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId(), item.videoChannelType());
+        StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId());
 
         if (provider == null) {
             logger.error("[{}]: No provider was found for the given provider ID ({}).",
@@ -254,7 +253,7 @@ public class StreamService {
                 isDirectStream,
                 isInlineStream,
                 convertStreamTypeIdToContentType(item.streamTypeId()),
-                referenceTypesPort.findReferenceTypeById(item.betfairSportsType(), ReferenceTypeId.SPORTS_TYPE),
+                sportsTypePort.findSportTypeByBetfairSportsType(item.betfairSportsType()),
                 getDefaultVideoQuality(item),
                 getDefaultBufferingValue(item),
                 context.user(),

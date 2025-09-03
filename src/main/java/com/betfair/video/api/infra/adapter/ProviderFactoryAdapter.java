@@ -1,8 +1,5 @@
 package com.betfair.video.api.infra.adapter;
 
-import com.betfair.video.api.application.exception.ResponseCode;
-import com.betfair.video.api.application.exception.VideoAPIException;
-import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
 import com.betfair.video.api.domain.entity.Provider;
 import com.betfair.video.api.domain.port.ProviderFactoryPort;
 import com.betfair.video.api.domain.port.StreamingProviderPort;
@@ -24,14 +21,8 @@ public class ProviderFactoryAdapter implements ProviderFactoryPort {
     }
 
     @Override
-    public StreamingProviderPort getStreamingProviderByIdAndVideoChannelId(Integer providerId, Integer videoChannelId) {
-        StreamingProviderPort provider = providers.get(providerId);
-
-        if (provider == null) {
-            throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, null);
-        }
-
-        return provider;
+    public StreamingProviderPort getStreamingProviderByIdAndVideoChannelId(Integer providerId) {
+        return providers.get(providerId);
     }
 
 }

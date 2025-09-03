@@ -22,18 +22,22 @@ public class SpringHazelcastConfiguration {
 
         NetworkConfig networkConfig = config.getNetworkConfig();
         networkConfig.getInterfaces().addInterface("127.0.0.1");
-        
-        MapConfig mapConfig = new MapConfig("betRadarV2AudioVisualEventsMap")
-                .setTimeToLiveSeconds(30)
-                .setBackupCount(2);
-        config.addMapConfig(mapConfig);
-        
+
+        config.addMapConfig(buildConfigForBetRadarV2AudioVisualEvents());
+
         return Hazelcast.newHazelcastInstance(config);
     }
 
     @Bean
     public IMap<String, List<AudioVisualEventDto>> betRadarV2AudioVisualEventsMap(HazelcastInstance instance) {
         return instance.getMap("betRadarV2AudioVisualEventsMap");
+    }
+
+    private MapConfig buildConfigForBetRadarV2AudioVisualEvents() {
+        return new MapConfig("betRadarV2AudioVisualEventsMap")
+                .setTimeToLiveSeconds(60)
+                .setMaxIdleSeconds(60)
+                .setBackupCount(2);
     }
 
 }

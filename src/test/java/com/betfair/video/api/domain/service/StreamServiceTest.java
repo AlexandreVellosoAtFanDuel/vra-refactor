@@ -14,13 +14,12 @@ import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.DirectStreamConfigPort;
 import com.betfair.video.api.domain.port.InlineStreamConfigPort;
 import com.betfair.video.api.domain.port.ProviderFactoryPort;
-import com.betfair.video.api.domain.port.ReferenceTypesPort;
+import com.betfair.video.api.domain.port.SportsTypePort;
 import com.betfair.video.api.domain.port.StreamingProviderPort;
 import com.betfair.video.api.domain.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.valueobject.Geolocation;
 import com.betfair.video.api.domain.valueobject.ReferenceType;
-import com.betfair.video.api.domain.valueobject.ReferenceTypeId;
 import com.betfair.video.api.domain.valueobject.StreamDetails;
 import com.betfair.video.api.domain.valueobject.StreamParams;
 import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
@@ -54,7 +53,7 @@ class StreamServiceTest {
     private StreamService streamService;
 
     @Mock
-    private ReferenceTypesPort referenceTypesPort;
+    private SportsTypePort sportsTypePort;
 
     @Mock
     private ConfigurationItemsPort configurationItemsPort;
@@ -90,7 +89,7 @@ class StreamServiceTest {
         when(context.user()).thenReturn(user);
 
         ReferenceType referenceType = mock(ReferenceType.class);
-        when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
+        when(sportsTypePort.findSportTypeByBetfairSportsType(anyInt()))
                 .thenReturn(referenceType);
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
@@ -122,7 +121,7 @@ class StreamServiceTest {
         when(configurationItemsPort.getDefaultVideoQuality(anyInt(), anyInt(), anyInt(), anyInt(), anyInt()))
                 .thenReturn("HIGH");
 
-        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
+        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt()))
                 .thenReturn(streamingProvider);
 
         when(permissionService.checkUserPermissionsAgainstItem(any(ScheduleItem.class), eq(user)))
@@ -185,18 +184,14 @@ class StreamServiceTest {
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
                 .externalIdSource(ExternalIdSource.BETFAIR_EVENT)
                 .primaryId("12345")
-                .providerId(1)
                 .build();
 
-        ReferenceType referenceType = mock(ReferenceType.class);
-        when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
-                .thenReturn(referenceType);
-
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.providerId()).thenReturn(1);
         when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context)))
                 .thenReturn(scheduleItem);
 
-        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
+        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(1))
                 .thenReturn(null);
 
         // When & Then
@@ -222,10 +217,6 @@ class StreamServiceTest {
                 .providerId(1)
                 .build();
 
-        ReferenceType referenceType = mock(ReferenceType.class);
-        when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
-                .thenReturn(referenceType);
-
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
         when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context)))
                 .thenReturn(scheduleItem);
@@ -233,7 +224,7 @@ class StreamServiceTest {
         StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
         when(streamingProvider.isEnabled()).thenReturn(false);
 
-        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
+        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt()))
                 .thenReturn(streamingProvider);
 
         // When & Then
@@ -265,18 +256,15 @@ class StreamServiceTest {
                 .providerId(1)
                 .build();
 
-        ReferenceType referenceType = mock(ReferenceType.class);
-        when(referenceTypesPort.findReferenceTypeById(anyInt(), eq(ReferenceTypeId.VIDEO_PROVIDER)))
-                .thenReturn(referenceType);
-
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
+        when(scheduleItem.providerId()).thenReturn(1);
         when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context)))
                 .thenReturn(scheduleItem);
 
         StreamingProviderPort streamingProvider = mock(StreamingProviderPort.class);
         when(streamingProvider.isEnabled()).thenReturn(true);
 
-        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt(), anyInt()))
+        when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt()))
                 .thenReturn(streamingProvider);
 
         when(permissionService.checkUserPermissionsAgainstItem(any(ScheduleItem.class), eq(user)))
