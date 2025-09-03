@@ -4,6 +4,7 @@ import com.betfair.video.api.application.exception.ResponseCode;
 import com.betfair.video.api.application.exception.VideoAPIException;
 import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
 import com.betfair.video.api.domain.entity.ProviderEventKey;
+import com.betfair.video.api.domain.entity.ReferenceType;
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.ScheduleItemMappingKey;
@@ -14,6 +15,7 @@ import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.DirectStreamConfigPort;
 import com.betfair.video.api.domain.port.InlineStreamConfigPort;
 import com.betfair.video.api.domain.port.ProviderFactoryPort;
+import com.betfair.video.api.domain.port.ReferenceTypePort;
 import com.betfair.video.api.domain.port.StreamingProviderPort;
 import com.betfair.video.api.domain.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.valueobject.ExternalIdSource;
@@ -74,6 +76,9 @@ class StreamServiceTest {
     @Mock
     private VideoStreamInfoMapper videoStreamInfoMapper;
 
+    @Mock
+    private ReferenceTypePort referenceTypePort;
+
     @Test
     @DisplayName("Should retrieve stream by external ID")
     void shouldRetrieveStreamByExternalId() {
@@ -124,6 +129,9 @@ class StreamServiceTest {
         when(videoStreamInfoMapper.map(any(ScheduleItem.class), any(StreamDetails.class), any(), any(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), anyBoolean(), any(), any(), any(), any(), any()))
                 .thenReturn(mock(VideoStreamInfo.class));
 
+        when(referenceTypePort.findReferenceTypeById(any(), any()))
+                .thenReturn(mock(ReferenceType.class));
+
         // When
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
                 .externalIdSource(ExternalIdSource.BETFAIR_EVENT)
@@ -154,6 +162,9 @@ class StreamServiceTest {
                 .primaryId("12345")
                 .providerId(1)
                 .build();
+
+        when(referenceTypePort.findReferenceTypeById(any(), any()))
+                .thenReturn(null);
 
         // When & Then
         assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
@@ -218,6 +229,9 @@ class StreamServiceTest {
         when(providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(anyInt()))
                 .thenReturn(streamingProvider);
 
+        when(referenceTypePort.findReferenceTypeById(any(), any()))
+                .thenReturn(mock(ReferenceType.class));
+
         // When & Then
         assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
                 .isInstanceOf(VideoAPIException.class)
@@ -260,6 +274,9 @@ class StreamServiceTest {
 
         when(permissionService.checkUserPermissionsAgainstItem(any(ScheduleItem.class), eq(user)))
                 .thenReturn(false);
+
+        when(referenceTypePort.findReferenceTypeById(any(), any()))
+                .thenReturn(mock(ReferenceType.class));
 
         // When & Then
         assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))

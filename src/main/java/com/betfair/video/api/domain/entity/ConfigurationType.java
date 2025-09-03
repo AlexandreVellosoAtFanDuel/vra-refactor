@@ -93,8 +93,18 @@ public enum ConfigurationType {
 
     private final String type;
 
-    private ConfigurationType(String s) {
+    ConfigurationType(String s) {
         this.type = s;
+    }
+
+    public static ConfigurationType fromString(String text) {
+        for (ConfigurationType configurationType : ConfigurationType.values()) {
+            if (configurationType.type.equalsIgnoreCase(text)) {
+                return configurationType;
+            }
+        }
+
+        return null;
     }
 
 }

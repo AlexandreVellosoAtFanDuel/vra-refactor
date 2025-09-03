@@ -1,7 +1,17 @@
 package com.betfair.video.api.infra.kafka;
 
+import com.betfair.video.api.domain.entity.ConfigurationItem;
+import com.betfair.video.api.domain.valueobject.DomainReferenceType;
+import com.betfair.video.api.domain.valueobject.ReferenceTypeEnum;
+import com.betfair.video.api.domain.valueobject.search.ConfigurationSearchKey;
+import com.betfair.video.api.domain.valueobject.search.ReferenceTypeInfoByIdSearchKey;
+import com.betfair.video.api.infra.adapter.ConfigurationItemsAdapter;
+import com.betfair.video.api.infra.adapter.ReferenceTypeAdapter;
 import com.betfair.video.api.infra.kafka.dto.DbConfigDto;
 import com.betfair.video.api.infra.kafka.dto.LiveVideoConfigMessageDto;
+import com.betfair.video.api.infra.kafka.dto.SportItemDto;
+import com.betfair.video.api.infra.mapper.ConfigurationItemMapper;
+import com.betfair.video.api.infra.mapper.ConfigurationSearchKeyMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,6 +23,7 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +31,23 @@ import java.util.Map;
 public class LiveVideoConfigKafkaConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(LiveVideoConfigKafkaConsumer.class);
+
+    private final ConfigurationItemsAdapter configurationItemsAdapter;
+
+    private final ReferenceTypeAdapter referenceTypeAdapter;
+
+    private final ConfigurationItemMapper configurationItemMapper;
+
+    private final ConfigurationSearchKeyMapper configurationSearchKeyMapper;
+
+    public LiveVideoConfigKafkaConsumer(ConfigurationItemsAdapter configurationItemsAdapter, ReferenceTypeAdapter referenceTypeAdapter,
+                                        ConfigurationItemMapper configurationItemMapper,
+                                        ConfigurationSearchKeyMapper configurationSearchKeyMapper) {
+        this.configurationItemsAdapter = configurationItemsAdapter;
+        this.referenceTypeAdapter = referenceTypeAdapter;
+        this.configurationItemMapper = configurationItemMapper;
+        this.configurationSearchKeyMapper = configurationSearchKeyMapper;
+    }
 
     @KafkaListener(topics = "${kafka.topic.livevideo-config}",
             groupId = "${spring.kafka.consumer.group-id}",
@@ -30,21 +58,45 @@ public class LiveVideoConfigKafkaConsumer {
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset) {
 
-        logger.info("Received live video config message from topic: {}, partition: {}, offset: {}",
-                topic, partition, offset);
-        logger.info("Message ID: {}, Publish Time: {}",
-                configMessage.msgId(),
-                formatTimestamp(configMessage.publishTime()));
+        logger.info("Received live video config message from topic: {}, partition: {}, offset: {}", topic, partition, offset);
 
-        // TODO: Send this response to ConfigurationItemCacheManager
-        List<DbConfigDto> dbConfigs = configMessage.dbConfigs();
+        final String timestamp = formatTimestamp(configMessage.publishTime());
+        logger.info("Message ID: {}, Publish Time: {}", configMessage.msgId(), timestamp);
 
-        // TODO: Use this reference types to set the cache instead of TypeReference
-        Map<String, Object> referenceTypes = configMessage.referenceTypes();
+        updateConfigurationItemCache(configMessage.dbConfigs());
+        updateReferenceTypeCache(configMessage.referenceTypes());
     }
 
     private String formatTimestamp(Long timestamp) {
         LocalDateTime dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
         return dateTime.toString();
+    }
+
+    private void updateConfigurationItemCache(List<DbConfigDto> dbConfigs) {
+        Map<ConfigurationSearchKey, ConfigurationItem> items = new HashMap<>();
+
+        dbConfigs.forEach(dbConfigDto -> {
+            ConfigurationSearchKey key = configurationSearchKeyMapper.map(dbConfigDto);
+            ConfigurationItem value = configurationItemMapper.map(dbConfigDto);
+
+            items.put(key, value);
+        });
+
+        configurationItemsAdapter.revalidateCache(items);
+    }
+
+    private void updateReferenceTypeCache(Map<String, List<SportItemDto>> typesDto) {
+        Map<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> items = new HashMap<>();
+
+        typesDto.forEach((key, value) -> {
+            ReferenceTypeInfoByIdSearchKey searchKey = new ReferenceTypeInfoByIdSearchKey(ReferenceTypeEnum.fromValue(key), null);
+            List<DomainReferenceType> domainReferenceTypes = value.stream()
+                    .map(sportItemDto -> new DomainReferenceType(sportItemDto.type(), sportItemDto.id(), sportItemDto.description()))
+                    .toList();
+
+            items.put(searchKey, domainReferenceTypes);
+        });
+
+        referenceTypeAdapter.revalidateCache(items);
     }
 }

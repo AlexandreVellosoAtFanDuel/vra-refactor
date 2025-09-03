@@ -7,6 +7,6 @@ public record LiveVideoConfigMessageDto(
         Long msgId,
         Long publishTime,
         List<DbConfigDto> dbConfigs,
-        Map<String, Object> referenceTypes
+        Map<String, List<SportItemDto>> referenceTypes
 ) {
 }
