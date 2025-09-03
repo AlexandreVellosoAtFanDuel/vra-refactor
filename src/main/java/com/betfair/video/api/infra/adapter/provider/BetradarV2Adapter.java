@@ -113,7 +113,7 @@ public class BetradarV2Adapter implements StreamingProviderPort {
     }
 
     private AudioVisualEventDto getAudioVisualEventByScheduleItem(RequestContext context, ScheduleItem scheduleItem) {
-        List<AudioVisualEventDto> events = getAudioVisualEvents(context);
+        List<AudioVisualEventDto> events = fetchAudioVisualEvents(context);
 
         return events.stream()
                 .filter(eventDto -> parseIdFromScheme(eventDto.id()).equals(scheduleItem.providerEventId()))
@@ -126,7 +126,7 @@ public class BetradarV2Adapter implements StreamingProviderPort {
                 );
     }
 
-    private List<AudioVisualEventDto> getAudioVisualEvents(RequestContext context) {
+    private List<AudioVisualEventDto> fetchAudioVisualEvents(RequestContext context) {
         List<AudioVisualEventDto> cachedEvents = this.audioVisualEvents.get("audioVisualEvents");
 
         if (cachedEvents == null || cachedEvents.isEmpty()) {
@@ -138,9 +138,11 @@ public class BetradarV2Adapter implements StreamingProviderPort {
             } catch (FeignException fe) {
                 logger.error("[{}]: Feign error trying to fetch audio visual events from provider for httpStatus = {}, recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
                         context.uuid(), fe.status(), recommendedStreamStatusIds, recommendedStreamProductIds, fe.getMessage(), fe);
+                throw new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, "General error trying to fetch audio visual events from provider");
             } catch (Exception ex) {
                 logger.error("[{}] General error trying to fetch audio visual events from provider for recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
                         context.uuid(), recommendedStreamStatusIds, recommendedStreamProductIds, ex.getMessage(), ex);
+                throw new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, "General error trying to fetch audio visual events from provider");
             }
         }
 
