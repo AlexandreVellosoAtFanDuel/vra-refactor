@@ -6,7 +6,7 @@ import com.betfair.video.api.domain.valueobject.ReferenceTypeId;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CachedReferenceTypesAdapter implements ReferenceTypesPort {
+public class ReferenceTypesAdapter implements ReferenceTypesPort {
 
     @Override
     public ReferenceType findReferenceTypeById(Integer referenceTypeId, ReferenceTypeId referenceTypeEnum) {

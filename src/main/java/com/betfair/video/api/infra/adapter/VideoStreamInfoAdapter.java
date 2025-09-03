@@ -1,6 +1,7 @@
 package com.betfair.video.api.infra.adapter;
 
 import com.betfair.video.api.domain.entity.ScheduleItem;
+import com.betfair.video.api.domain.port.ScheduleItemPort;
 import com.betfair.video.api.domain.port.VideoStreamInfoPort;
 import com.betfair.video.api.domain.valueobject.ImportStatus;
 import com.betfair.video.api.domain.valueobject.search.VRAStreamSearchKey;
@@ -23,19 +24,19 @@ public class VideoStreamInfoAdapter implements VideoStreamInfoPort {
 
     private static final Set<ImportStatus> ALLOWED_MAPPING_STATUSES = EnumSet.of(ImportStatus.NEW, ImportStatus.UPDATED, ImportStatus.OVERRIDDEN);
 
-    private final CachedScheduleItems cachedScheduleItems;
+    private final ScheduleItemPort scheduleItemPort;
 
-    public VideoStreamInfoAdapter(CachedScheduleItems cachedScheduleItems) {
-        this.cachedScheduleItems = cachedScheduleItems;
+    public VideoStreamInfoAdapter(ScheduleItemPort scheduleItemPort) {
+        this.scheduleItemPort = scheduleItemPort;
     }
 
     @Override
     public List<ScheduleItem> getVideoStreamInfoByExternalId(VideoStreamInfoByExternalIdSearchKey searchKey) {
         UUID tId = UUID.randomUUID();
-        List<ScheduleItem> cachedItems = cachedScheduleItems.getAllAvailableEvents();
-        logger.info("[{}] Retrieved {} cached schedule items", tId, cachedItems.size());
+        List<ScheduleItem> availableEvents = scheduleItemPort.getAllAvailableEvents();
+        logger.info("[{}] Retrieved {} cached schedule items", tId, availableEvents.size());
 
-        List<ScheduleItem> result = applyCommonFilters(cachedItems.stream(), searchKey)
+        List<ScheduleItem> result = applyCommonFilters(availableEvents.stream(), searchKey)
                 .filter(scheduleItem -> scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey() != null)
                 .filter(scheduleItem -> scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey() != null)
                 .filter(scheduleItem -> searchKey.getSecondaryId() == null || searchKey.getSecondaryId().equals(scheduleItem.mappings().stream().findFirst().get().scheduleItemMappingKey().providerEventKey().secondaryId()))
