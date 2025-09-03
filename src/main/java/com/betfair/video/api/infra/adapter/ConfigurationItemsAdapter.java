@@ -6,6 +6,8 @@ import com.betfair.video.api.domain.entity.Provider;
 import com.betfair.video.api.domain.entity.TypeStream;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.valueobject.StreamingFormat;
+import com.betfair.video.api.domain.valueobject.search.ConfigurationSearchKey;
+import com.hazelcast.map.IMap;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -13,9 +15,16 @@ import java.util.Map;
 @Component
 public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
 
+    private final IMap<ConfigurationSearchKey, ConfigurationItem> configurationItemsMap;
+
+    public ConfigurationItemsAdapter(IMap<ConfigurationSearchKey, ConfigurationItem> configurationItemsMap) {
+        this.configurationItemsMap = configurationItemsMap;
+    }
+
     @Override
     public boolean isStreamTypeAllowed(Integer providerId, Integer videoChannelType, Integer betfairSportsType, TypeStream typeStream, Integer brandId) {
-        return true;
+        ConfigurationItem value = find(ConfigurationType.STREAM_TYPE_ENABLED, providerId, videoChannelType, betfairSportsType != null ? betfairSportsType : -1, -1, typeStream.getId(), brandId);
+        return value != null && Boolean.parseBoolean(value.value());
     }
 
     @Override
@@ -49,6 +58,7 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
 
     @Override
     public String findProviderWatchAndBetVenues(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
+        // TODO: Fetch from configuration
         return null;
     }
 
@@ -57,4 +67,25 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
         // TODO: Fetch from configuration
         return StreamingFormat.HLS;
     }
+
+    private ConfigurationItem find(ConfigurationType configType, Integer providerId, Integer channelType, Integer sportType, Integer mappingProviderId, Integer streamType, Integer brandId) {
+        ConfigurationSearchKey key = new ConfigurationSearchKey(
+                configType,
+                providerId,
+                channelType,
+                sportType,
+                mappingProviderId,
+                false,
+                streamType,
+                brandId
+        );
+
+        return configurationItemsMap.get(key);
+    }
+
+    public void revalidateCache(Map<ConfigurationSearchKey, ConfigurationItem> newItems) {
+        configurationItemsMap.clear();
+        configurationItemsMap.putAll(newItems);
+    }
+
 }

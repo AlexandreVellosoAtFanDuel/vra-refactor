@@ -1,5 +1,7 @@
 package com.betfair.video.api.infra.config;
 
+import com.betfair.video.api.domain.entity.ConfigurationItem;
+import com.betfair.video.api.domain.valueobject.search.ConfigurationSearchKey;
 import com.betfair.video.api.infra.dto.betradarv2.AudioVisualEventDto;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
@@ -12,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class SpringHazelcastConfiguration {
 
     @Bean
@@ -24,6 +26,7 @@ public class SpringHazelcastConfiguration {
         networkConfig.getInterfaces().addInterface("127.0.0.1");
 
         config.addMapConfig(buildConfigForBetRadarV2AudioVisualEvents());
+        config.addMapConfig(buildConfigForConfigurationItems());
 
         return Hazelcast.newHazelcastInstance(config);
     }
@@ -33,10 +36,22 @@ public class SpringHazelcastConfiguration {
         return instance.getMap("betRadarV2AudioVisualEventsMap");
     }
 
+    @Bean
+    public IMap<ConfigurationSearchKey, ConfigurationItem> configurationItemsMap(HazelcastInstance instance) {
+        return instance.getMap("configurationItemsMap");
+    }
+
     private MapConfig buildConfigForBetRadarV2AudioVisualEvents() {
         return new MapConfig("betRadarV2AudioVisualEventsMap")
                 .setTimeToLiveSeconds(60)
                 .setMaxIdleSeconds(60)
+                .setBackupCount(2);
+    }
+
+    private MapConfig buildConfigForConfigurationItems() {
+        return new MapConfig("configurationItemsMap")
+                .setTimeToLiveSeconds(300)
+                .setMaxIdleSeconds(300)
                 .setBackupCount(2);
     }
 
