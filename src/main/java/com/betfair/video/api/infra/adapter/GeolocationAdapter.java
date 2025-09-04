@@ -2,6 +2,7 @@ package com.betfair.video.api.infra.adapter;
 
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.port.GeolocationPort;
+import com.betfair.video.api.domain.port.SuspectNetworkPort;
 import com.betfair.video.api.domain.valueobject.CountryAndSubdivisions;
 import com.betfair.video.api.domain.valueobject.Geolocation;
 import com.maxmind.geoip2.DatabaseReader;
@@ -34,11 +35,11 @@ public class GeolocationAdapter implements GeolocationPort {
 
     private final DatabaseReader cityReader;
 
-    private final SuspectNetworkAdapter suspectNetworkAdapter;
+    private final SuspectNetworkPort suspectNetworkPort;
 
-    public GeolocationAdapter(DatabaseReader cityReader, SuspectNetworkAdapter suspectNetworkAdapter) {
+    public GeolocationAdapter(DatabaseReader cityReader, SuspectNetworkAdapter suspectNetworkPort) {
         this.cityReader = cityReader;
-        this.suspectNetworkAdapter = suspectNetworkAdapter;
+        this.suspectNetworkPort = suspectNetworkPort;
     }
 
     @Override
@@ -52,7 +53,7 @@ public class GeolocationAdapter implements GeolocationPort {
             Validate.isTrue(StringUtils.isNotBlank(clientIp));
             InetAddress clientAddress = InetAddress.getByName(clientIp);
             CountryAndSubdivisions car = this.getCountryAndSubdivisions(clientAddress, cityReader);
-            boolean isSuspect = suspectNetworkAdapter.isSuspectNetwork(clientIp);
+            boolean isSuspect = suspectNetworkPort.isSuspectNetwork(clientIp);
 
             return new Geolocation(car.countryCode(), car.getRegionCode(), metroCode, isSuspect);
         } catch (GeoIp2Exception | IllegalArgumentException | IOException ex) {

@@ -1,5 +1,6 @@
 package com.betfair.video.api.infra.adapter;
 
+import com.betfair.video.api.domain.port.SuspectNetworkPort;
 import com.betfair.video.api.domain.valueobject.NetworkAddress;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,11 +10,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Component
-public class SuspectNetworkAdapter {
+public class SuspectNetworkAdapter implements SuspectNetworkPort {
 
     @Value("${geoip.suspect-networks}")
     private String suspectNetworksConfig;
     private Set<NetworkAddress> suspectNetworks;
+
+    @Override
+    public boolean isSuspectNetwork(String ipAddress) {
+        if (suspectNetworks == null) {
+            suspectNetworks = buildSuspectNetworks();
+        }
+
+        return suspectNetworks.stream()
+                .anyMatch(network -> network.ip().equals(ipAddress));
+    }
 
     private Set<NetworkAddress> buildSuspectNetworks() {
         if (Strings.isEmpty(suspectNetworksConfig)) {
@@ -28,15 +39,6 @@ public class SuspectNetworkAdapter {
         }
 
         return suspected;
-    }
-
-    public boolean isSuspectNetwork(String ipAddress) {
-        if (suspectNetworks == null) {
-            suspectNetworks = buildSuspectNetworks();
-        }
-
-        return suspectNetworks.stream()
-                .anyMatch(network -> network.ip().equals(ipAddress));
     }
 
 }
