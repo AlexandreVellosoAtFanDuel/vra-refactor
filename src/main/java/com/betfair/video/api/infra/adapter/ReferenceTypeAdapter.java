@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ReferenceTypeAdapter implements ReferenceTypePort {
+public class ReferenceTypeAdapter implements ReferenceTypePort, RefreshCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> {
 
     private static final Logger logger = LoggerFactory.getLogger(ReferenceTypeAdapter.class);
 
@@ -30,7 +30,8 @@ public class ReferenceTypeAdapter implements ReferenceTypePort {
         return null;
     }
 
-    public void revalidateCache(Map<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> newItems) {
+    @Override
+    public void insertItemsToCache(Map<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> newItems) {
         if (referenceTypesMap.isEmpty()) {
             logger.info("Revalidating reference types cache with {} items", newItems.size());
             referenceTypesMap.putAll(newItems);

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
+public class ConfigurationItemsAdapter implements ConfigurationItemsPort, RefreshCache<ConfigurationSearchKey, ConfigurationItem> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationItemsAdapter.class);
 
@@ -97,7 +97,8 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort {
         return configurationItemsMap.get(key);
     }
 
-    public void revalidateCache(Map<ConfigurationSearchKey, ConfigurationItem> newItems) {
+    @Override
+    public void insertItemsToCache(Map<ConfigurationSearchKey, ConfigurationItem> newItems) {
         if (configurationItemsMap.isEmpty()) {
             logger.info("Revalidating configuration cache with {} items", newItems.size());
             configurationItemsMap.putAll(newItems);

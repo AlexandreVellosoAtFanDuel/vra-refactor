@@ -5,8 +5,7 @@ import com.betfair.video.api.domain.valueobject.DomainReferenceType;
 import com.betfair.video.api.domain.valueobject.ReferenceTypeEnum;
 import com.betfair.video.api.domain.valueobject.search.ConfigurationSearchKey;
 import com.betfair.video.api.domain.valueobject.search.ReferenceTypeInfoByIdSearchKey;
-import com.betfair.video.api.infra.adapter.ConfigurationItemsAdapter;
-import com.betfair.video.api.infra.adapter.ReferenceTypeAdapter;
+import com.betfair.video.api.infra.adapter.RefreshCache;
 import com.betfair.video.api.infra.kafka.dto.DbConfigDto;
 import com.betfair.video.api.infra.kafka.dto.LiveVideoConfigMessageDto;
 import com.betfair.video.api.infra.kafka.dto.SportItemDto;
@@ -32,19 +31,20 @@ public class LiveVideoConfigKafkaConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(LiveVideoConfigKafkaConsumer.class);
 
-    private final ConfigurationItemsAdapter configurationItemsAdapter;
+    private final RefreshCache<ConfigurationSearchKey, ConfigurationItem> configurationItemsRefreshCache;
 
-    private final ReferenceTypeAdapter referenceTypeAdapter;
+    private final RefreshCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache;
 
     private final ConfigurationItemMapper configurationItemMapper;
 
     private final ConfigurationSearchKeyMapper configurationSearchKeyMapper;
 
-    public LiveVideoConfigKafkaConsumer(ConfigurationItemsAdapter configurationItemsAdapter, ReferenceTypeAdapter referenceTypeAdapter,
+    public LiveVideoConfigKafkaConsumer(RefreshCache<ConfigurationSearchKey, ConfigurationItem> configurationItemsRefreshCache,
+                                        RefreshCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache,
                                         ConfigurationItemMapper configurationItemMapper,
                                         ConfigurationSearchKeyMapper configurationSearchKeyMapper) {
-        this.configurationItemsAdapter = configurationItemsAdapter;
-        this.referenceTypeAdapter = referenceTypeAdapter;
+        this.configurationItemsRefreshCache = configurationItemsRefreshCache;
+        this.referenceTypeRefreshCache = referenceTypeRefreshCache;
         this.configurationItemMapper = configurationItemMapper;
         this.configurationSearchKeyMapper = configurationSearchKeyMapper;
     }
@@ -82,7 +82,7 @@ public class LiveVideoConfigKafkaConsumer {
             items.put(key, value);
         });
 
-        configurationItemsAdapter.revalidateCache(items);
+        configurationItemsRefreshCache.insertItemsToCache(items);
     }
 
     private void updateReferenceTypeCache(Map<String, List<SportItemDto>> typesDto) {
@@ -97,6 +97,6 @@ public class LiveVideoConfigKafkaConsumer {
             items.put(searchKey, domainReferenceTypes);
         });
 
-        referenceTypeAdapter.revalidateCache(items);
+        referenceTypeRefreshCache.insertItemsToCache(items);
     }
 }
