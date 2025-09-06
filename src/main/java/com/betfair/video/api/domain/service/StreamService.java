@@ -19,7 +19,7 @@ import com.betfair.video.api.domain.dto.valueobject.search.VRAStreamSearchKey;
 import com.betfair.video.api.domain.dto.valueobject.search.VideoRequestIdentifier;
 import com.betfair.video.api.domain.dto.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.dto.valueobject.search.VideoStreamInfoSearchKeyWrapper;
-import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
+import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
 import com.betfair.video.api.domain.mapper.VideoStreamInfoMapper;
 import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.output.DirectStreamConfigPort;

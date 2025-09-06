@@ -1,7 +1,7 @@
 package com.betfair.video.api.domain.dto.entity;
 
 import com.betfair.video.api.domain.dto.valueobject.ImportStatus;
-import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
+import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
 
 import java.util.Date;
 import java.util.Set;

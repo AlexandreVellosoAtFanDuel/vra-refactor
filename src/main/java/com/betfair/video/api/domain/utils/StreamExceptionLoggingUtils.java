@@ -6,19 +6,16 @@ import com.betfair.video.api.domain.dto.valueobject.search.VideoRequestIdentifie
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 
-@Component
 public class StreamExceptionLoggingUtils {
 
-    @Value("${videoapi.additional.info.enabled}")
-    private boolean additionalInfoLoggingEnabled;
+    private final boolean additionalInfoLoggingEnabled;
 
-    private StreamExceptionLoggingUtils() {
+    public StreamExceptionLoggingUtils(boolean additionalInfoLoggingEnabled) {
+        this.additionalInfoLoggingEnabled = additionalInfoLoggingEnabled;
     }
 
     public void logException(Logger logger, final Long videoId, final Level logLevel, final RequestContext context,

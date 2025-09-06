@@ -9,7 +9,7 @@ import com.betfair.video.api.domain.dto.entity.ScheduleItemMappingKey;
 import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.valueobject.ImportStatus;
 import com.betfair.video.api.domain.dto.valueobject.search.VideoStreamInfoSearchKeyWrapper;
-import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
+import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
 import com.betfair.video.api.domain.port.output.ScheduleItemPort;
 import com.betfair.video.api.domain.utils.DateUtils;
 import org.springframework.stereotype.Component;

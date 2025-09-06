@@ -1,4 +1,4 @@
-package com.betfair.video.api.domain.mapper;
+package com.betfair.video.api.domain.dto.valueobject;
 
 import com.betfair.video.api.domain.dto.entity.ScheduleItemMappingKey;
 import com.betfair.video.api.domain.dto.valueobject.ImportStatus;

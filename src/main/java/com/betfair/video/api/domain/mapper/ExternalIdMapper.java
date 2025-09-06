@@ -3,7 +3,6 @@ package com.betfair.video.api.domain.mapper;
 import com.betfair.video.api.domain.dto.valueobject.ExternalId;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Component
 public class ExternalIdMapper {
 
     private static final String PRIMARY_SECONDARY_IDS_SEPARATOR = "@";
