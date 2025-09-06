@@ -3,6 +3,7 @@ package com.betfair.video.api.infra.input.rest;
 import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
+import com.betfair.video.api.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
 import com.betfair.video.api.domain.service.EventService;
 import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.infra.input.rest.dto.UserGeolocationDto;
@@ -27,15 +28,15 @@ public class VideoApiController {
 
     private final UserContextBuilder userContextBuilder;
 
-    private final EventService eventService;
+    private final RetrieveStreamInfoByExternalIdUseCase retrieveStreamInfoByExternalIdUseCase;
 
     private final VideoStreamInfoDtoMapper videoStreamInfoDtoMapper;
 
     private final UserGeolocationDtoMapper userGeolocationDtoMapper;
 
-    public VideoApiController(UserContextBuilder userContextBuilder, EventService eventService, VideoStreamInfoDtoMapper videoStreamInfoDtoMapper, UserGeolocationDtoMapper userGeolocationDtoMapper) {
+    public VideoApiController(UserContextBuilder userContextBuilder, EventService retrieveStreamInfoByExternalIdUseCase, VideoStreamInfoDtoMapper videoStreamInfoDtoMapper, UserGeolocationDtoMapper userGeolocationDtoMapper) {
         this.userContextBuilder = userContextBuilder;
-        this.eventService = eventService;
+        this.retrieveStreamInfoByExternalIdUseCase = retrieveStreamInfoByExternalIdUseCase;
         this.videoStreamInfoDtoMapper = videoStreamInfoDtoMapper;
         this.userGeolocationDtoMapper = userGeolocationDtoMapper;
     }
@@ -63,7 +64,7 @@ public class VideoApiController {
 
         logger.info("[{}]: User country sub-division: {}", context.uuid(), context.user().geolocation().subDivisionCode());
 
-        VideoStreamInfo item = this.eventService.retrieveScheduleByExternalId(
+        VideoStreamInfo item = this.retrieveStreamInfoByExternalIdUseCase.retrieveScheduleByExternalId(
                 context,
                 externalIdSource,
                 externalId,
