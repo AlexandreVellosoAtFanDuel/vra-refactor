@@ -25,7 +25,17 @@ public class BetsCheckService {
         this.streamExceptionLoggingUtils = streamExceptionLoggingUtils;
     }
 
-    public BetsCheckerStatusEnum getBBVStatus(VideoRequestIdentifier identifier, ScheduleItem item, User user) {
+    public BetsCheckerStatusEnum getBBVStatus(VideoRequestIdentifier identifier, ScheduleItem item, RequestContext context) {
+
+        if (context.user().isSuperUser()) {
+            // Check if a user is a superuser
+            logger.info("getBBVStatus: the user is a superUser, userId={}, item={}", context.user().userId(), item.videoItemId());
+
+            final BetsCheckerStatusEnum status = BetsCheckerStatusEnum.BBV_NOT_REQUIRED_SUPERUSER;
+            writeBBVLog(context, item, identifier, status);
+            return status;
+        }
+
         return BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG;
     }
 
@@ -71,6 +81,28 @@ public class BetsCheckService {
         VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.GENERIC_ERROR, String.valueOf(item.betfairSportsType()));
         streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
         throw exception;
+    }
+
+    private void writeBBVLog(RequestContext context, ScheduleItem item, VideoRequestIdentifier identifier, BetsCheckerStatusEnum status) {
+        writeLogWithBbvStatusInfo(context, item, identifier, status);
+
+        final User user = context.user();
+
+        // TODO: Implement the missing fields
+        logger.info("{}, {}, {}, {}, {}, {}, {}, {}, {}",
+                user.accountId(), "user.applicationKey()", item.providerId(), item.providerEventId(),
+                item.betfairSportsType(), item.videoChannelType(), "identifier.getBBVLogString()",
+                user.geolocation().countryCode(), status);
+    }
+
+    private void writeLogWithBbvStatusInfo(RequestContext context, ScheduleItem item, VideoRequestIdentifier identifier, BetsCheckerStatusEnum status) {
+        final User user = context.user();
+
+        // TODO: Implement the missing fields
+        logger.info("uuid - {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                context.uuid(), user.accountId(), "user.getApplicationKey()", item.providerId(), item.providerEventId(),
+                item.betfairSportsType(), item.videoChannelType(), "identifier.getBBVLogString()",
+                user.geolocation().countryCode(), user.geolocation().subDivisionCode(), status);
     }
 
 }

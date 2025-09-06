@@ -3,6 +3,7 @@ package com.betfair.video.api.infra.adapter;
 import com.betfair.video.api.domain.entity.ConfigurationItem;
 import com.betfair.video.api.domain.entity.ConfigurationType;
 import com.betfair.video.api.domain.entity.Provider;
+import com.betfair.video.api.domain.entity.TypeSport;
 import com.betfair.video.api.domain.entity.TypeStream;
 import com.betfair.video.api.domain.port.ConfigurationItemsPort;
 import com.betfair.video.api.domain.valueobject.StreamingFormat;
@@ -83,15 +84,19 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort, Refres
     }
 
     private ConfigurationItem find(ConfigurationType configType, Integer providerId, Integer channelType, Integer sportType, Integer mappingProviderId, Integer streamType, Integer brandId) {
+        if (configType == null) {
+            throw new IllegalArgumentException("Config Type must be specified");
+        }
+
         ConfigurationSearchKey key = new ConfigurationSearchKey(
                 configType,
-                providerId,
-                channelType,
-                sportType,
-                mappingProviderId,
+                providerId != null ? providerId : Provider.NULL.getId(),
+                channelType != null ? channelType : TypeStream.NULL.getId(),
+                sportType != null ? sportType : TypeSport.NULL.getSportId(),
+                mappingProviderId != null ? mappingProviderId : Provider.NULL.getId(),
                 false,
-                streamType,
-                brandId
+                streamType != null ? streamType : TypeStream.NULL.getId(),
+                brandId != null ? brandId : -1
         );
 
         return configurationItemsMap.get(key);

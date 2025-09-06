@@ -37,4 +37,8 @@ public enum TypeSport {
     public String getDescription() {
         return description;
     }
+
+    public Integer getSportId() {
+        return sportId;
+    }
 }

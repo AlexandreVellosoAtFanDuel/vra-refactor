@@ -10,4 +10,10 @@ public record User(
         Geolocation geolocation,
         UserPermissions permissions
 ) {
+
+    public boolean isSuperUser() {
+        // TODO: Implement actual logic
+        return true;
+    }
+
 }
