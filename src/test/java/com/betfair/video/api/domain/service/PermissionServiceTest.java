@@ -1,7 +1,7 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.domain.valueobject.ServicePermission;
-import com.betfair.video.api.domain.valueobject.UserPermissions;
+import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
+import com.betfair.video.api.domain.dto.valueobject.UserPermissions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

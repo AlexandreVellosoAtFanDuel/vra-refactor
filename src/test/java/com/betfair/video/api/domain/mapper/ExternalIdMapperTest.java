@@ -1,7 +1,7 @@
 package com.betfair.video.api.domain.mapper;
 
-import com.betfair.video.api.domain.valueobject.ExternalId;
-import com.betfair.video.api.domain.valueobject.ExternalIdSource;
+import com.betfair.video.api.domain.dto.valueobject.ExternalId;
+import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
