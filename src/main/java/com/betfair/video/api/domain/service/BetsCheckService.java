@@ -12,9 +12,7 @@ import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCo
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
-import org.springframework.stereotype.Service;
 
-@Service
 public class BetsCheckService {
 
     private static final Logger logger = LoggerFactory.getLogger(BetsCheckService.class);

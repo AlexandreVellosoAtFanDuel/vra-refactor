@@ -5,9 +5,8 @@ import com.betfair.video.api.domain.dto.valueobject.Geolocation;
 import com.betfair.video.api.domain.port.output.GeolocationPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
-@Service
+
 public class UserGeolocationService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserGeolocationService.class);

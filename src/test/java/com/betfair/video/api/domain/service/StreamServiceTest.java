@@ -65,7 +65,7 @@ class StreamServiceTest {
     private ScheduleItemService scheduleItemService;
 
     @Mock
-    private BetsCheckService betsCheckService;
+    private BetsCheckV2Service betsCheckService;
 
     @Mock
     private DirectStreamConfigPort directStreamConfigPort;

@@ -34,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,7 +42,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-@Service
 public class StreamService {
 
     private static final Logger logger = LoggerFactory.getLogger(StreamService.class);
@@ -76,7 +74,8 @@ public class StreamService {
                          ScheduleItemService scheduleItemService, ProviderFactoryPort providerFactoryPort,
                          PermissionService permissionService, BetsCheckService betsCheckService,
                          DirectStreamConfigPort directStreamConfigPort, InlineStreamConfigPort inlineStreamConfigPort,
-                         GeoRestrictionsService geoRestrictionsService, VideoStreamInfoMapper videoStreamInfoMapper, ReferenceTypePort referenceTypePort) {
+                         GeoRestrictionsService geoRestrictionsService, VideoStreamInfoMapper videoStreamInfoMapper,
+                         ReferenceTypePort referenceTypePort) {
         this.configurationItemsPort = configurationItemsPort;
         this.scheduleItemService = scheduleItemService;
         this.providerFactoryPort = providerFactoryPort;

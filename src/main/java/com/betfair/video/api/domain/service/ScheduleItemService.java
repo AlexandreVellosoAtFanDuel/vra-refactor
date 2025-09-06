@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-@Service
 public class ScheduleItemService {
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduleItemService.class);
@@ -43,7 +41,8 @@ public class ScheduleItemService {
 
     private final ConfigurationItemsPort configurationItemsPort;
 
-    public ScheduleItemService(StreamExceptionLoggingUtils streamExceptionLoggingUtils, VideoStreamInfoPort videoStreamInfoPort, PermissionService permissionService, ConfigurationItemsPort configurationItemsPort) {
+    public ScheduleItemService(StreamExceptionLoggingUtils streamExceptionLoggingUtils, VideoStreamInfoPort videoStreamInfoPort,
+                               PermissionService permissionService, ConfigurationItemsPort configurationItemsPort) {
         this.streamExceptionLoggingUtils = streamExceptionLoggingUtils;
         this.videoStreamInfoPort = videoStreamInfoPort;
         this.permissionService = permissionService;

@@ -16,8 +16,6 @@ import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCo
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,18 +25,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
-@Service
 public class PermissionService {
 
     private static final Logger logger = LoggerFactory.getLogger(PermissionService.class);
 
-    @Value("${user.permissions.services}")
-    private String userPermissionsServices;
+    private final String userPermissionsServices;
 
     private final StreamExceptionLoggingUtils streamExceptionLoggingUtils;
 
-    public PermissionService(StreamExceptionLoggingUtils streamExceptionLoggingUtils) {
+    public PermissionService(String userPermissionsServices, StreamExceptionLoggingUtils streamExceptionLoggingUtils) {
+        this.userPermissionsServices = userPermissionsServices;
         this.streamExceptionLoggingUtils = streamExceptionLoggingUtils;
     }
 

@@ -20,21 +20,17 @@ import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Service
 public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
-    @Value("${streaming.brand.id}")
-    private Integer streamingBrandId;
+    private final Integer streamingBrandId;
 
     private final ExternalIdMapper externalIdMapper;
 
@@ -42,7 +38,8 @@ public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
 
     private final StreamService streamService;
 
-    public EventService(ExternalIdMapper externalIdMapper, TypeStreamMapper typeStreamMapper, StreamService streamService) {
+    public EventService(Integer streamingBrandId, ExternalIdMapper externalIdMapper, TypeStreamMapper typeStreamMapper, StreamService streamService) {
+        this.streamingBrandId = streamingBrandId;
         this.externalIdMapper = externalIdMapper;
         this.typeStreamMapper = typeStreamMapper;
         this.streamService = streamService;
