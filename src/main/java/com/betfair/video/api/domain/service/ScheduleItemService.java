@@ -1,8 +1,8 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.application.exception.ResponseCode;
-import com.betfair.video.api.application.exception.VideoAPIException;
-import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
+import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
+import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
 import com.betfair.video.api.domain.entity.User;
@@ -95,6 +95,9 @@ public class ScheduleItemService {
 
     public void checkIsCurrentlyShowingAndThrow(VideoStreamState streamState, Long videoItemId, RequestContext context, Integer sportType) {
         if (VideoStreamState.NOT_STARTED.equals(streamState)) {
+            // TODO: Handle StreamNotStartedException
+            //StreamNotStartedException snte = new StreamNotStartedException(String.valueOf(sportType));
+
             VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED, String.valueOf(sportType));
             streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, exception, null);
             throw exception;

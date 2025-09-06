@@ -1,5 +1,6 @@
 package com.betfair.video.api.infra.adapter.provider;
 
+import com.betfair.video.api.infra.output.adapter.provider.IMGProviderAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

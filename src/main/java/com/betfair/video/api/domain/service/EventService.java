@@ -1,9 +1,9 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.application.dto.ContentTypeDto;
-import com.betfair.video.api.application.exception.ResponseCode;
-import com.betfair.video.api.application.exception.VideoAPIException;
-import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
+import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
+import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
+import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.TypeChannel;
 import com.betfair.video.api.domain.entity.TypeMobileDevice;

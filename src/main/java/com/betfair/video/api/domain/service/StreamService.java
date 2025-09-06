@@ -1,8 +1,8 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.application.exception.ResponseCode;
-import com.betfair.video.api.application.exception.VideoAPIException;
-import com.betfair.video.api.application.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
+import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
+import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import com.betfair.video.api.domain.entity.ConfigurationItem;
 import com.betfair.video.api.domain.entity.RequestContext;
 import com.betfair.video.api.domain.entity.ScheduleItem;
@@ -195,7 +195,7 @@ public class StreamService {
 
         BetsCheckerStatusEnum bbvStatus = scheduleItemService.isItemWatchAndBetSupported(item)
                 ? BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG
-                : betsCheckService.getBBVStatus(identifier, item, context.user());
+                : betsCheckService.getBBVStatus(identifier, item, context);
 
         // Validate BBV status, if it is not valid an exception is thrown
         betsCheckService.validateBBVStatus(bbvStatus, item, context);

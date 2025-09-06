@@ -1,6 +1,6 @@
 package com.betfair.video.api.domain.mapper;
 
-import com.betfair.video.api.application.dto.ContentTypeDto;
+import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.domain.entity.TypeStream;
 import org.springframework.stereotype.Component;
 
