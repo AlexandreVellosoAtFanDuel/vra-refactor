@@ -1,14 +1,14 @@
 package com.betfair.video.api.domain.service;
 
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.User;
+import com.betfair.video.api.domain.dto.valueobject.BetsCheckerStatusEnum;
+import com.betfair.video.api.domain.dto.valueobject.search.VideoRequestIdentifier;
+import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
 import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.entity.ScheduleItem;
-import com.betfair.video.api.domain.entity.User;
-import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
-import com.betfair.video.api.domain.valueobject.BetsCheckerStatusEnum;
-import com.betfair.video.api.domain.valueobject.search.VideoRequestIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;

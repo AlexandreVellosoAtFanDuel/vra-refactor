@@ -1,11 +1,11 @@
 package com.betfair.video.api.infra.output.adapter.provider;
 
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.entity.ScheduleItem;
-import com.betfair.video.api.domain.port.StreamingProviderPort;
-import com.betfair.video.api.domain.valueobject.StreamDetails;
-import com.betfair.video.api.domain.valueobject.StreamParams;
-import com.betfair.video.api.domain.valueobject.VideoQuality;
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.valueobject.StreamDetails;
+import com.betfair.video.api.domain.dto.valueobject.StreamParams;
+import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
+import com.betfair.video.api.domain.port.output.StreamingProviderPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

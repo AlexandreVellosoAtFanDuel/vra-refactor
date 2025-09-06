@@ -1,8 +1,8 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.port.GeolocationPort;
-import com.betfair.video.api.domain.valueobject.Geolocation;
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.valueobject.Geolocation;
+import com.betfair.video.api.domain.port.output.GeolocationPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

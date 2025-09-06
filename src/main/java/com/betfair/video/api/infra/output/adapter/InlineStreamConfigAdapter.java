@@ -1,6 +1,6 @@
 package com.betfair.video.api.infra.output.adapter;
 
-import com.betfair.video.api.domain.port.InlineStreamConfigPort;
+import com.betfair.video.api.domain.port.output.InlineStreamConfigPort;
 import org.springframework.stereotype.Component;
 
 @Component

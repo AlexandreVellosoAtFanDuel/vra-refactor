@@ -1,7 +1,7 @@
 package com.betfair.video.api.infra.adapter;
 
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.valueobject.Geolocation;
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.valueobject.Geolocation;
 import com.betfair.video.api.infra.output.adapter.GeolocationAdapter;
 import com.betfair.video.api.infra.output.adapter.SuspectNetworkAdapter;
 import com.maxmind.geoip2.DatabaseReader;

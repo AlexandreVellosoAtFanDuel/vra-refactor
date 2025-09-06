@@ -1,17 +1,17 @@
 package com.betfair.video.api.infra.output.adapter;
 
-import com.betfair.video.api.domain.entity.AuditItem;
-import com.betfair.video.api.domain.entity.Provider;
-import com.betfair.video.api.domain.entity.ProviderEventKey;
-import com.betfair.video.api.domain.entity.ScheduleItem;
-import com.betfair.video.api.domain.entity.ScheduleItemData;
-import com.betfair.video.api.domain.entity.ScheduleItemMappingKey;
-import com.betfair.video.api.domain.entity.User;
+import com.betfair.video.api.domain.dto.entity.AuditItem;
+import com.betfair.video.api.domain.dto.entity.Provider;
+import com.betfair.video.api.domain.dto.entity.ProviderEventKey;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemData;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemMappingKey;
+import com.betfair.video.api.domain.dto.entity.User;
+import com.betfair.video.api.domain.dto.valueobject.ImportStatus;
+import com.betfair.video.api.domain.dto.valueobject.search.VideoStreamInfoSearchKeyWrapper;
 import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
-import com.betfair.video.api.domain.port.ScheduleItemPort;
+import com.betfair.video.api.domain.port.output.ScheduleItemPort;
 import com.betfair.video.api.domain.utils.DateUtils;
-import com.betfair.video.api.domain.valueobject.ImportStatus;
-import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoSearchKeyWrapper;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;

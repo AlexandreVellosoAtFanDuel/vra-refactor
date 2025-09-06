@@ -1,15 +1,15 @@
 package com.betfair.video.api.infra.input.rest;
 
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
+import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
+import com.betfair.video.api.domain.service.EventService;
 import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.infra.input.rest.dto.UserGeolocationDto;
 import com.betfair.video.api.infra.input.rest.dto.VideoStreamInfoDto;
 import com.betfair.video.api.infra.input.rest.mapper.UserGeolocationDtoMapper;
 import com.betfair.video.api.infra.input.rest.mapper.VideoStreamInfoDtoMapper;
 import com.betfair.video.api.infra.input.rest.util.UserContextBuilder;
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.service.EventService;
-import com.betfair.video.api.domain.valueobject.VideoQuality;
-import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

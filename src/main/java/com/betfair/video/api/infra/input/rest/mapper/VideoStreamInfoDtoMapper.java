@@ -1,13 +1,13 @@
 package com.betfair.video.api.infra.input.rest.mapper;
 
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
+import com.betfair.video.api.domain.dto.valueobject.SizeRestrictions;
+import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
+import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
 import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.infra.input.rest.dto.SizeRestrictionsDto;
 import com.betfair.video.api.infra.input.rest.dto.VideoQualityDto;
 import com.betfair.video.api.infra.input.rest.dto.VideoStreamInfoDto;
-import com.betfair.video.api.domain.valueobject.ContentType;
-import com.betfair.video.api.domain.valueobject.SizeRestrictions;
-import com.betfair.video.api.domain.valueobject.VideoQuality;
-import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

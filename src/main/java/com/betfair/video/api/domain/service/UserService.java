@@ -1,9 +1,9 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.domain.entity.User;
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.valueobject.Geolocation;
-import com.betfair.video.api.domain.valueobject.UserPermissions;
+import com.betfair.video.api.domain.dto.entity.User;
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.valueobject.Geolocation;
+import com.betfair.video.api.domain.dto.valueobject.UserPermissions;
 import org.springframework.stereotype.Service;
 
 @Service

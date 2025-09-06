@@ -1,7 +1,7 @@
 package com.betfair.video.api.infra.output.adapter;
 
-import com.betfair.video.api.domain.port.SuspectNetworkPort;
-import com.betfair.video.api.domain.valueobject.NetworkAddress;
+import com.betfair.video.api.domain.dto.valueobject.NetworkAddress;
+import com.betfair.video.api.domain.port.output.SuspectNetworkPort;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

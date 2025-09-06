@@ -1,16 +1,16 @@
 package com.betfair.video.api.domain.service;
 
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemData;
+import com.betfair.video.api.domain.dto.valueobject.VideoStreamState;
+import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
+import com.betfair.video.api.domain.port.output.VideoStreamInfoPort;
+import com.betfair.video.api.domain.utils.DateUtils;
+import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
 import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.entity.ScheduleItem;
-import com.betfair.video.api.domain.entity.ScheduleItemData;
-import com.betfair.video.api.domain.port.ConfigurationItemsPort;
-import com.betfair.video.api.domain.port.VideoStreamInfoPort;
-import com.betfair.video.api.domain.utils.DateUtils;
-import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
-import com.betfair.video.api.domain.valueobject.VideoStreamState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

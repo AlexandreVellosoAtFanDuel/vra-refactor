@@ -1,6 +1,6 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.domain.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import org.springframework.stereotype.Service;
 
 @Service

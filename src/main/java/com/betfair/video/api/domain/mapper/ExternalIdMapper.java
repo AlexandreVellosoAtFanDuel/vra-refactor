@@ -1,7 +1,7 @@
 package com.betfair.video.api.domain.mapper;
 
-import com.betfair.video.api.domain.valueobject.ExternalId;
-import com.betfair.video.api.domain.valueobject.ExternalIdSource;
+import com.betfair.video.api.domain.dto.valueobject.ExternalId;
+import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

@@ -1,0 +1,44 @@
+package com.betfair.video.api.domain.dto.entity;
+
+import com.betfair.video.api.domain.dto.valueobject.ImportStatus;
+import com.betfair.video.api.domain.mapper.ScheduleItemMapper;
+
+import java.util.Date;
+import java.util.Set;
+
+public record ScheduleItem(
+        Long videoItemId,
+        Integer providerId,
+        String providerEventId,
+        Integer providerSportsType,
+        String providerLanguage,
+        Boolean providerChargeableFlag,
+        String providerStreamingUrl,
+        Boolean providerFinished,
+        Integer betfairSportsType,
+        Integer leadTime,
+        Integer trailTime,
+        Integer videoChannelType,
+        Integer videoChanelSubType,
+        ImportStatus importStatus,
+        AuditItem auditItem,
+        Character approvalStatus,
+        Boolean reviewStatus,
+        Integer streamTypeId,
+        Boolean isExtractedFromMultiMatchStream,
+        Date createdDate,
+        Integer brandId,
+        ScheduleItemData providerData,
+        ScheduleItemData overriddenData,
+        Set<ScheduleItemMapper> mappings
+) {
+    public ScheduleItemData getActualProviderData() {
+        if (this.providerData == null) {
+            return null;
+        }
+
+        ScheduleItemData result = this.providerData.clone();
+        result.override(this.overriddenData);
+        return result;
+    }
+}

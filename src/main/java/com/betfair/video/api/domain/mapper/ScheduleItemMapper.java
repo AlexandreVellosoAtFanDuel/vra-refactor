@@ -1,7 +1,7 @@
 package com.betfair.video.api.domain.mapper;
 
-import com.betfair.video.api.domain.entity.ScheduleItemMappingKey;
-import com.betfair.video.api.domain.valueobject.ImportStatus;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemMappingKey;
+import com.betfair.video.api.domain.dto.valueobject.ImportStatus;
 
 public record ScheduleItemMapper(
         String exchangeRaceId,

@@ -1,15 +1,15 @@
 package com.betfair.video.api.domain.mapper;
 
-import com.betfair.video.api.domain.entity.ConfigurationType;
-import com.betfair.video.api.domain.entity.ScheduleItem;
-import com.betfair.video.api.domain.entity.ScheduleItemData;
-import com.betfair.video.api.domain.entity.TypeSport;
-import com.betfair.video.api.domain.entity.User;
+import com.betfair.video.api.domain.dto.entity.ConfigurationType;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemData;
+import com.betfair.video.api.domain.dto.entity.TypeSport;
+import com.betfair.video.api.domain.dto.entity.User;
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
+import com.betfair.video.api.domain.dto.valueobject.StreamDetails;
+import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
+import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.service.GeoRestrictionsService;
-import com.betfair.video.api.domain.valueobject.ContentType;
-import com.betfair.video.api.domain.valueobject.StreamDetails;
-import com.betfair.video.api.domain.valueobject.VideoQuality;
-import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;

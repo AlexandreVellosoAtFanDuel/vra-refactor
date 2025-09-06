@@ -1,13 +1,13 @@
 package com.betfair.video.api.infra.output.adapter;
 
-import com.betfair.video.api.domain.entity.ConfigurationItem;
-import com.betfair.video.api.domain.entity.ConfigurationType;
-import com.betfair.video.api.domain.entity.Provider;
-import com.betfair.video.api.domain.entity.TypeSport;
-import com.betfair.video.api.domain.entity.TypeStream;
-import com.betfair.video.api.domain.port.ConfigurationItemsPort;
-import com.betfair.video.api.domain.valueobject.StreamingFormat;
-import com.betfair.video.api.domain.valueobject.search.ConfigurationSearchKey;
+import com.betfair.video.api.domain.dto.entity.ConfigurationItem;
+import com.betfair.video.api.domain.dto.entity.ConfigurationType;
+import com.betfair.video.api.domain.dto.entity.Provider;
+import com.betfair.video.api.domain.dto.entity.TypeSport;
+import com.betfair.video.api.domain.dto.entity.TypeStream;
+import com.betfair.video.api.domain.dto.valueobject.StreamingFormat;
+import com.betfair.video.api.domain.dto.valueobject.search.ConfigurationSearchKey;
+import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
 import com.hazelcast.map.IMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

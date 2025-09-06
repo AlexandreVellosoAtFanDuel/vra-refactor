@@ -1,6 +1,6 @@
 package com.betfair.video.api.infra.input.rest.util;
 
-import com.betfair.video.api.domain.entity.RequestContext;
+import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.service.ContextService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;

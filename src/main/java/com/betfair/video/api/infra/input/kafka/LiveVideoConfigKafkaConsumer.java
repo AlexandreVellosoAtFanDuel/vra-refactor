@@ -1,16 +1,16 @@
 package com.betfair.video.api.infra.input.kafka;
 
-import com.betfair.video.api.domain.entity.ConfigurationItem;
-import com.betfair.video.api.domain.valueobject.DomainReferenceType;
-import com.betfair.video.api.domain.valueobject.ReferenceTypeEnum;
-import com.betfair.video.api.domain.valueobject.search.ConfigurationSearchKey;
-import com.betfair.video.api.domain.valueobject.search.ReferenceTypeInfoByIdSearchKey;
-import com.betfair.video.api.infra.output.adapter.RefreshCache;
+import com.betfair.video.api.domain.dto.entity.ConfigurationItem;
+import com.betfair.video.api.domain.dto.valueobject.DomainReferenceType;
+import com.betfair.video.api.domain.dto.valueobject.ReferenceTypeEnum;
+import com.betfair.video.api.domain.dto.valueobject.search.ConfigurationSearchKey;
+import com.betfair.video.api.domain.dto.valueobject.search.ReferenceTypeInfoByIdSearchKey;
 import com.betfair.video.api.infra.input.kafka.dto.DbConfigDto;
 import com.betfair.video.api.infra.input.kafka.dto.LiveVideoConfigMessageDto;
 import com.betfair.video.api.infra.input.kafka.dto.SportItemDto;
 import com.betfair.video.api.infra.input.kafka.mapper.ConfigurationItemMapper;
 import com.betfair.video.api.infra.input.kafka.mapper.ConfigurationSearchKeyMapper;
+import com.betfair.video.api.infra.output.adapter.RefreshCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;

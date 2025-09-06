@@ -1,6 +1,6 @@
 package com.betfair.video.api.domain.utils;
 
-import com.betfair.video.api.domain.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 
 import java.util.List;
 

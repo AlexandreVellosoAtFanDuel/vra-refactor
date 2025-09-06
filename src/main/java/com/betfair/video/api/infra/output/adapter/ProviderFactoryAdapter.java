@@ -1,8 +1,8 @@
 package com.betfair.video.api.infra.output.adapter;
 
-import com.betfair.video.api.domain.entity.Provider;
-import com.betfair.video.api.domain.port.ProviderFactoryPort;
-import com.betfair.video.api.domain.port.StreamingProviderPort;
+import com.betfair.video.api.domain.dto.entity.Provider;
+import com.betfair.video.api.domain.port.output.ProviderFactoryPort;
+import com.betfair.video.api.domain.port.output.StreamingProviderPort;
 import com.betfair.video.api.infra.output.adapter.provider.BetradarV2Adapter;
 import com.betfair.video.api.infra.output.adapter.provider.IMGProviderAdapter;
 import org.springframework.stereotype.Component;

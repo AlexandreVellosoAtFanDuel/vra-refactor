@@ -1,10 +1,10 @@
 package com.betfair.video.api.infra.output.adapter;
 
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.port.GeolocationPort;
-import com.betfair.video.api.domain.port.SuspectNetworkPort;
-import com.betfair.video.api.domain.valueobject.CountryAndSubdivisions;
-import com.betfair.video.api.domain.valueobject.Geolocation;
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.valueobject.CountryAndSubdivisions;
+import com.betfair.video.api.domain.dto.valueobject.Geolocation;
+import com.betfair.video.api.domain.port.output.GeolocationPort;
+import com.betfair.video.api.domain.port.output.SuspectNetworkPort;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.AbstractCityResponse;

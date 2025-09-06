@@ -6,7 +6,7 @@ import com.betfair.video.api.infra.input.rest.dto.cro.SessionToken;
 import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
-import com.betfair.video.api.domain.port.AuthenticationPort;
+import com.betfair.video.api.domain.port.output.AuthenticationPort;
 import com.betfair.video.api.infra.output.client.CROClient;
 import feign.FeignException;
 import org.slf4j.Logger;

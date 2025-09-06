@@ -1,22 +1,23 @@
 package com.betfair.video.api.domain.service;
 
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.entity.TypeChannel;
+import com.betfair.video.api.domain.dto.entity.TypeMobileDevice;
+import com.betfair.video.api.domain.dto.entity.TypeStream;
+import com.betfair.video.api.domain.dto.valueobject.ExternalId;
+import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
+import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
+import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
+import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
+import com.betfair.video.api.domain.dto.valueobject.search.VRAStreamSearchKey;
+import com.betfair.video.api.domain.dto.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.mapper.ExternalIdMapper;
+import com.betfair.video.api.domain.mapper.TypeStreamMapper;
+import com.betfair.video.api.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
 import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
-import com.betfair.video.api.domain.entity.RequestContext;
-import com.betfair.video.api.domain.entity.TypeChannel;
-import com.betfair.video.api.domain.entity.TypeMobileDevice;
-import com.betfair.video.api.domain.entity.TypeStream;
-import com.betfair.video.api.domain.valueobject.VideoStreamInfo;
-import com.betfair.video.api.domain.mapper.ExternalIdMapper;
-import com.betfair.video.api.domain.mapper.TypeStreamMapper;
-import com.betfair.video.api.domain.valueobject.ExternalId;
-import com.betfair.video.api.domain.valueobject.ExternalIdSource;
-import com.betfair.video.api.domain.valueobject.ServicePermission;
-import com.betfair.video.api.domain.valueobject.VideoQuality;
-import com.betfair.video.api.domain.valueobject.search.VRAStreamSearchKey;
-import com.betfair.video.api.domain.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class EventService {
+public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
 
     private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
@@ -47,11 +48,12 @@ public class EventService {
         this.streamService = streamService;
     }
 
+    @Override
     public VideoStreamInfo retrieveScheduleByExternalId(RequestContext context, String externalIdSource, String externalId,
-                                                                Integer channelTypeId, List<Integer> channelSubTypeIds, Integer mobileDeviceId,
-                                                                String mobileOsVersion, Integer mobileScreenDensityDpi, VideoQuality videoQuality,
-                                                                String commentaryLanguage, Integer providerId, ContentTypeDto contentType,
-                                                                Boolean includeMetadata, String providerParams) {
+                                                        Integer channelTypeId, List<Integer> channelSubTypeIds, Integer mobileDeviceId,
+                                                        String mobileOsVersion, Integer mobileScreenDensityDpi, VideoQuality videoQuality,
+                                                        String commentaryLanguage, Integer providerId, ContentTypeDto contentType,
+                                                        Boolean includeMetadata, String providerParams) {
 
         if (!context.user().permissions().hasPermission(ServicePermission.VIDEO)) {
             logger.error("[{}]: Access permissions are insufficient for the requested operation or data for user (...)", context.uuid());
