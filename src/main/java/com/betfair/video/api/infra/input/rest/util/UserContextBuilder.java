@@ -1,6 +1,7 @@
 package com.betfair.video.api.infra.input.rest.util;
 
 import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.port.input.CreateUserContextUseCase;
 import com.betfair.video.api.domain.service.ContextService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
@@ -17,10 +18,10 @@ public class UserContextBuilder {
     private static final String ACCOUNT_ID = "accountId";
     private static final String USER_ID = "userId";
 
-    private final ContextService contextService;
+    private final CreateUserContextUseCase createUserContextUseCase;
 
-    public UserContextBuilder(ContextService contextService) {
-        this.contextService = contextService;
+    public UserContextBuilder(ContextService createUserContextUseCase) {
+        this.createUserContextUseCase = createUserContextUseCase;
     }
 
     public RequestContext createContextFromRequest(HttpServletRequest request) {
@@ -35,7 +36,7 @@ public class UserContextBuilder {
         resolvedIps.add(xIP);
         resolvedIps.add(xIPs);
 
-        return contextService.createContext(uuid, resolvedIps, accountId, userId);
+        return createUserContextUseCase.createContext(uuid, resolvedIps, accountId, userId);
     }
 
 }

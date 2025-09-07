@@ -1,9 +1,10 @@
 package com.betfair.video.api.domain.service;
 
+import com.betfair.video.api.domain.dto.valueobject.UserSessionDto;
+import com.betfair.video.api.domain.port.input.VerifySessionUseCase;
 import com.betfair.video.api.domain.port.output.AuthenticationPort;
-import com.betfair.video.api.infra.output.dto.ResponseVerifySession;
 
-public class AuthenticationService {
+public class AuthenticationService implements VerifySessionUseCase {
 
     private final AuthenticationPort authentication;
 
@@ -11,7 +12,7 @@ public class AuthenticationService {
         this.authentication = authentication;
     }
 
-    public ResponseVerifySession verifySession(String sessionToken) {
+    public UserSessionDto verifySession(String sessionToken) {
         return authentication.verifySession(sessionToken);
     }
 

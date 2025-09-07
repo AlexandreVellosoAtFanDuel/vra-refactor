@@ -11,7 +11,7 @@ import com.betfair.video.api.domain.dto.valueobject.StreamDetails;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamEndpoint;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.api.domain.service.GeoRestrictionsService;
+import com.betfair.video.api.domain.port.input.GeoRestrictionsUseCase;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -19,6 +19,7 @@ import org.mapstruct.Context;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,113 +41,90 @@ public class VideoStreamInfoMapper {
             final User user,
             final boolean includeMetadata,
             final String videoPlayerConfig,
-            final GeoRestrictionsService geoRestrictionsService,
+            final GeoRestrictionsUseCase geoRestrictionsUseCase,
             final String eventId,
             final String eventName,
             final String exchangeRaceId
     ) {
-        VideoStreamInfo videoStreamInfo = mapToVideoStreamInfo(
-                scheduleItem,
-                streamDetails,
-                availableVideoQualityValues,
-                sizeRestrictions,
+        Long uniqueVideoId = null;
+        Integer providerId = null;
+        String commentaryLanguages = null;
+        String blockedCountries = null;
+        String sportId = null;
+        String providerEventId = null;
+        String providerEventName = null;
+        String competition = null;
+        Date startDateTime = null;
+
+        if (scheduleItem != null) {
+            uniqueVideoId = scheduleItem.videoItemId();
+            providerId = scheduleItem.providerId();
+            commentaryLanguages = scheduleItem.providerLanguage();
+            blockedCountries = mapBlockedCountries(scheduleItem, geoRestrictionsUseCase);
+            sportId = mapSportId(scheduleItem);
+            providerEventId = mapProviderEventId(scheduleItem);
+            providerEventName = mapProviderEventName(scheduleItem);
+            competition = mapCompetition(scheduleItem);
+            startDateTime = mapStartDateTime(scheduleItem);
+        }
+
+        if (includeMetadata) {
+            ScheduleItemData overridenScheduleItemData = scheduleItem.getActualProviderData();
+
+            if (scheduleItem.betfairSportsType() != null) {
+                sportId = String.valueOf(scheduleItem.betfairSportsType());
+            }
+
+            if (StringUtils.isNotEmpty(scheduleItem.providerEventId())) {
+                providerEventId = scheduleItem.providerEventId();
+            }
+
+            if (overridenScheduleItemData != null) {
+                if (StringUtils.isNotEmpty(overridenScheduleItemData.getEventName())) {
+                    providerEventName = overridenScheduleItemData.getEventName();
+                }
+                if (StringUtils.isNotEmpty(overridenScheduleItemData.getCompetition())) {
+                    competition = overridenScheduleItemData.getCompetition();
+                }
+                if (overridenScheduleItemData.getStart() != null) {
+                    startDateTime = overridenScheduleItemData.getStart();
+                }
+            }
+        }
+
+        return new VideoStreamInfo(
+                uniqueVideoId,
+                providerId,
+                commentaryLanguages,
+                blockedCountries,
+                mapVideoQualityList(availableVideoQualityValues),
+                defaultVideoQuality != null ? defaultVideoQuality.name() : null,
+                defaultBufferingValue,
+                mapSizeRestrictions(sizeRestrictions),
                 isDirectStream,
                 isInlineStream,
                 contentType,
-                includeMetadata ? typeSport : null,
-                defaultVideoQuality,
-                defaultBufferingValue,
-                user,
-                videoPlayerConfig,
-                geoRestrictionsService,
+                mapVideoStreamEndpoint(streamDetails),
                 eventId,
                 eventName,
-                exchangeRaceId
+                sportId,
+                mapSportName(typeSport),
+                providerEventId,
+                providerEventName,
+                null,
+                mapAccountId(user),
+                exchangeRaceId,
+                videoPlayerConfig,
+                startDateTime,
+                competition,
+                null,
+                null
         );
-
-        if (includeMetadata) {
-            ScheduleItemData scheduleItemData = scheduleItem.getActualProviderData();
-            //for GA. Note - some metadata is returned unconditionally (eventId).
-            if (scheduleItem.betfairSportsType() != null) {
-                videoStreamInfo.setSportId(String.valueOf(scheduleItem.betfairSportsType()));
-            }
-            if (StringUtils.isNotEmpty(scheduleItem.providerEventId())) {
-                videoStreamInfo.setProviderEventId(scheduleItem.providerEventId());
-            }
-            if (scheduleItemData != null) {
-                if (StringUtils.isNotEmpty(scheduleItemData.getEventName())) {
-                    videoStreamInfo.setProviderEventName(scheduleItemData.getEventName());
-                }
-                if (StringUtils.isNotEmpty(scheduleItemData.getCompetition())) {
-                    videoStreamInfo.setCompetition(scheduleItemData.getCompetition());
-                }
-                if (scheduleItemData.getStart() != null) {
-                    videoStreamInfo.setStartDateTime(scheduleItemData.getStart());
-                }
-            }
-            if (typeSport != null) {
-                videoStreamInfo.setSportName(typeSport.getDescription());
-            }
-        }
-
-        return videoStreamInfo;
     }
 
-    private VideoStreamInfo mapToVideoStreamInfo(
-            ScheduleItem scheduleItem,
-            StreamDetails streamDetails,
-            Set<VideoQuality> availableVideoQualityValues,
-            Map<ConfigurationType, String> sizeRestrictions,
-            boolean isDirectStream,
-            boolean isInlineStream,
-            ContentType contentType,
-            TypeSport typeSport,
-            VideoQuality defaultVideoQuality,
-            String defaultBufferingValue,
-            User user,
-            String videoPlayerConfig,
-            GeoRestrictionsService geoRestrictionsService,
-            String eventId,
-            String eventName,
-            String exchangeRaceId
-    ) {
-        if ( scheduleItem == null && streamDetails == null && availableVideoQualityValues == null && sizeRestrictions == null && contentType == null && typeSport == null && defaultVideoQuality == null && defaultBufferingValue == null && user == null && videoPlayerConfig == null && eventId == null && eventName == null && exchangeRaceId == null ) {
-            return null;
-        }
-
-        VideoStreamInfo videoStreamInfo = new VideoStreamInfo();
-
-        if ( scheduleItem != null ) {
-            videoStreamInfo.setUniqueVideoId( scheduleItem.videoItemId() );
-            videoStreamInfo.setProviderId( scheduleItem.providerId() );
-            videoStreamInfo.setCommentaryLanguages( scheduleItem.providerLanguage() );
-            videoStreamInfo.setBlockedCountries( mapBlockedCountries( scheduleItem, geoRestrictionsService ) );
-            videoStreamInfo.setSportId( mapSportId( scheduleItem ) );
-            videoStreamInfo.setProviderEventId( mapProviderEventId( scheduleItem ) );
-            videoStreamInfo.setProviderEventName( mapProviderEventName( scheduleItem ) );
-            videoStreamInfo.setCompetition( mapCompetition( scheduleItem ) );
-            videoStreamInfo.setStartDateTime( mapStartDateTime( scheduleItem ) );
-        }
-        videoStreamInfo.setVideoStreamEndpoint( mapVideoStreamEndpoint( streamDetails ) );
-        videoStreamInfo.setVideoQuality( mapVideoQualityList( availableVideoQualityValues ) );
-        videoStreamInfo.setSizeRestrictions( mapSizeRestrictions( sizeRestrictions ) );
-        videoStreamInfo.setDirectStream( isDirectStream );
-        videoStreamInfo.setInlineStream( isInlineStream );
-        videoStreamInfo.setContentType( contentType );
-        videoStreamInfo.setSportName( mapSportName( typeSport ) );
-        if ( defaultVideoQuality != null ) {
-            videoStreamInfo.setDefaultVideoQuality( defaultVideoQuality.name() );
-        }
-        videoStreamInfo.setDefaultBufferInterval( defaultBufferingValue );
-        videoStreamInfo.setAccountId( mapAccountId( user ) );
-        videoStreamInfo.setVideoPlayerConfig( videoPlayerConfig );
-
-        return videoStreamInfo;
-    }
-
-    private String mapBlockedCountries(ScheduleItem scheduleItem, @Context GeoRestrictionsService geoRestrictionsService) {
-        String defaultBlockedCountries = geoRestrictionsService != null
-                ? geoRestrictionsService.getProviderBlockedCountries(scheduleItem) : null;
+    private String mapBlockedCountries(ScheduleItem scheduleItem, @Context GeoRestrictionsUseCase geoRestrictionsUseCase) {
+        String defaultBlockedCountries = geoRestrictionsUseCase != null
+                ? geoRestrictionsUseCase.getProviderBlockedCountries(scheduleItem) : null;
         String providerBlockedCountries = scheduleItem.providerData() != null
                 ? scheduleItem.providerData().getBlockedCountries() : null;
         String overrideBlockedCountries = scheduleItem.overriddenData() != null
@@ -156,41 +134,51 @@ public class VideoStreamInfoMapper {
     }
 
     private List<VideoQuality> mapVideoQualityList(Set<VideoQuality> availableVideoQualityValues) {
-        if (availableVideoQualityValues != null) {
-            return new ArrayList<>(availableVideoQualityValues);
+        if (availableVideoQualityValues == null) {
+            return null;
         }
-        return null;
+
+        return new ArrayList<>(availableVideoQualityValues);
     }
 
     private VideoStreamEndpoint mapVideoStreamEndpoint(StreamDetails streamDetails) {
-        VideoStreamEndpoint streamEndpoint = new VideoStreamEndpoint();
+
+        String videoQuality = null;
+        String videoEndpoint = null;
+        Map<String, String> playerControlParams = null;
 
         if (streamDetails != null) {
-            streamEndpoint.setVideoEndpoint(streamDetails.endpoint());
-            streamEndpoint.setVideoQuality(streamDetails.quality() != null ? streamDetails.quality().getValue() : null);
-            streamEndpoint.setPlayerControlParams(streamDetails.params());
+            videoQuality = streamDetails.quality() != null ? streamDetails.quality().getValue() : null;
+            videoEndpoint = streamDetails.endpoint();
+            playerControlParams = streamDetails.params();
         }
 
-        return streamEndpoint;
+        return new VideoStreamEndpoint(
+                null,
+                videoQuality,
+                videoEndpoint,
+                playerControlParams
+        );
     }
 
     private SizeRestrictions mapSizeRestrictions(Map<ConfigurationType, String> sizeRestrictions) {
-        if (sizeRestrictions != null && !sizeRestrictions.isEmpty()) {
-            return new SizeRestrictions(
-                    parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_WIDTH_PERCENTAGE)),
-                    parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_HEIGHT_PERCENTAGE)),
-                    parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_WIDTH_PIXEL)),
-                    parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_HEIGHT_PIXEL)),
-                    parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_WIDTH_CENTIMETER)),
-                    parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_HEIGHT_CENTIMETER)),
-                    BooleanUtils.toBoolean(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_FULLSCREEN_ALLOWED)),
-                    BooleanUtils.toBoolean(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_AIRPLAY_ALLOWED)),
-                    sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_ASPECT_RATIO),
-                    parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_MAX_WIDTH)),
-                    parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_DEAFULT_WIDTH))
-            );
+        if (sizeRestrictions == null || sizeRestrictions.isEmpty()) {
+            return null;
         }
-        return null;
+
+        return new SizeRestrictions(
+                parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_WIDTH_PERCENTAGE)),
+                parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_HEIGHT_PERCENTAGE)),
+                parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_WIDTH_PIXEL)),
+                parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_HEIGHT_PIXEL)),
+                parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_WIDTH_CENTIMETER)),
+                parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_HEIGHT_CENTIMETER)),
+                BooleanUtils.toBoolean(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_FULLSCREEN_ALLOWED)),
+                BooleanUtils.toBoolean(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_AIRPLAY_ALLOWED)),
+                sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_ASPECT_RATIO),
+                parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_MAX_WIDTH)),
+                parseInteger(sizeRestrictions.get(ConfigurationType.SIZE_RESTRICTION_DEAFULT_WIDTH))
+        );
     }
 
     private Long mapAccountId(User user) {
@@ -217,7 +205,7 @@ public class VideoStreamInfoMapper {
                 ? scheduleItemData.getCompetition() : null;
     }
 
-    private java.util.Date mapStartDateTime(ScheduleItem scheduleItem) {
+    private Date mapStartDateTime(ScheduleItem scheduleItem) {
         ScheduleItemData scheduleItemData = scheduleItem.getActualProviderData();
         return scheduleItemData != null ? scheduleItemData.getStart() : null;
     }

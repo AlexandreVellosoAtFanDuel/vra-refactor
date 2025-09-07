@@ -1,6 +1,7 @@
 package com.betfair.video.api.infra.input.rest.interceptor;
 
-import com.betfair.video.api.infra.output.dto.ResponseVerifySession;
+import com.betfair.video.api.domain.dto.valueobject.UserSessionDto;
+import com.betfair.video.api.domain.port.input.VerifySessionUseCase;
 import com.betfair.video.api.domain.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,10 +18,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     private static final String X_UUID = "X-UUID";
     private static final String X_AUTHENTICATION = "X-Authentication";
 
-    private final AuthenticationService authenticationService;
+    private final VerifySessionUseCase verifySessionUseCase;
 
-    public AuthenticationInterceptor(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
+    public AuthenticationInterceptor(AuthenticationService verifySessionUseCase) {
+        this.verifySessionUseCase = verifySessionUseCase;
     }
 
     @Override
@@ -30,7 +31,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         logger.info("[{}]: Enter AuthenticationInterceptor", uuid);
 
-        ResponseVerifySession session = authenticationService.verifySession(xAuthentication);
+        UserSessionDto session = verifySessionUseCase.verifySession(xAuthentication);
 
         request.setAttribute("accountId", session.accountId());
         request.setAttribute("userId", session.userId());
