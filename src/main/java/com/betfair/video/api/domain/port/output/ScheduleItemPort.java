@@ -2,7 +2,7 @@ package com.betfair.video.api.domain.port.output;
 
 import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import com.betfair.video.api.domain.dto.entity.User;
-import com.betfair.video.api.domain.dto.valueobject.search.VideoStreamInfoSearchKeyWrapper;
+import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
 
 import java.util.List;
 

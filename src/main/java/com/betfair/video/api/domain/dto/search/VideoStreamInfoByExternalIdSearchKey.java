@@ -1,26 +1,26 @@
-package com.betfair.video.api.domain.dto.valueobject.search;
+package com.betfair.video.api.domain.dto.search;
 
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
-import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 
 import java.util.List;
 import java.util.Set;
 
 public class VideoStreamInfoByExternalIdSearchKey extends VRAStreamSearchKey {
 
-    private ExternalIdSource externalIdSource;
-    private String primaryId;
-    private String secondaryId;
+    private final ExternalIdSource externalIdSource;
+    private final String primaryId;
+    private final String secondaryId;
 
     public VideoStreamInfoByExternalIdSearchKey(Integer channelTypeId, List<Integer> channelSubTypeIds,
-                                               Integer mobileDeviceId, String mobileOsVersion, 
-                                               Integer mobileScreenDensityDpi, VideoQuality videoQuality,
-                                               String commentaryLanguage, Integer providerId, 
-                                               ContentTypeDto contentType, Set<Integer> streamTypeIds, 
-                                               Set<Integer> brandIds, String providerParams,
-                                               ExternalIdSource externalIdSource, String primaryId, 
-                                               String secondaryId) {
+                                                Integer mobileDeviceId, String mobileOsVersion,
+                                                Integer mobileScreenDensityDpi, VideoQuality videoQuality,
+                                                String commentaryLanguage, Integer providerId,
+                                                ContentType contentType, Set<Integer> streamTypeIds,
+                                                Set<Integer> brandIds, String providerParams,
+                                                ExternalIdSource externalIdSource, String primaryId,
+                                                String secondaryId) {
         super(channelTypeId, channelSubTypeIds, mobileDeviceId, mobileOsVersion, mobileScreenDensityDpi,
               videoQuality, commentaryLanguage, providerId, contentType, streamTypeIds, brandIds, providerParams);
         this.externalIdSource = externalIdSource;
@@ -38,18 +38,6 @@ public class VideoStreamInfoByExternalIdSearchKey extends VRAStreamSearchKey {
 
     public String getSecondaryId() {
         return secondaryId;
-    }
-
-    public void setExternalIdSource(ExternalIdSource externalIdSource) {
-        this.externalIdSource = externalIdSource;
-    }
-
-    public void setPrimaryId(String primaryId) {
-        this.primaryId = primaryId;
-    }
-
-    public void setSecondaryId(String secondaryId) {
-        this.secondaryId = secondaryId;
     }
 
     public static class Builder extends VRAStreamSearchKey.Builder {
@@ -110,7 +98,7 @@ public class VideoStreamInfoByExternalIdSearchKey extends VRAStreamSearchKey {
         }
 
         @Override
-        public Builder contentType(ContentTypeDto contentType) {
+        public Builder contentType(ContentType contentType) {
             super.contentType(contentType);
             return this;
         }

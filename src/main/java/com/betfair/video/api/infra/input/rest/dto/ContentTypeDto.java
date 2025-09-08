@@ -7,9 +7,13 @@ public enum ContentTypeDto {
     PRE_VID("PRE_VID"),
     UNRECOGNIZED_VALUE(null);
 
-    private String value;
+    private final String value;
 
     ContentTypeDto(String value) {
         this.value = value;
+    }
+
+    public String getValue() {
+        return value;
     }
 }

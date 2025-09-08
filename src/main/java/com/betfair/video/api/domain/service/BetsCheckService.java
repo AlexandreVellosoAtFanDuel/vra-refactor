@@ -4,7 +4,7 @@ import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.valueobject.BetsCheckerStatusEnum;
-import com.betfair.video.api.domain.dto.valueobject.search.VideoRequestIdentifier;
+import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
 import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;

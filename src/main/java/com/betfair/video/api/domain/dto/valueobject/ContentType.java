@@ -13,4 +13,14 @@ public enum ContentType {
         this.value = value;
     }
 
+    public static ContentType fromValue(String v) {
+        for (ContentType c : ContentType.values()) {
+            if (c.value != null && c.value.equals(v)) {
+                return c;
+            }
+        }
+
+        return UNRECOGNIZED_VALUE;
+    }
+
 }

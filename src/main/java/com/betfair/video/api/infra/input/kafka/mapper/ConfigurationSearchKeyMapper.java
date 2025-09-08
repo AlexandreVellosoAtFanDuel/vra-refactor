@@ -1,7 +1,7 @@
 package com.betfair.video.api.infra.input.kafka.mapper;
 
 import com.betfair.video.api.domain.dto.entity.ConfigurationType;
-import com.betfair.video.api.domain.dto.valueobject.search.ConfigurationSearchKey;
+import com.betfair.video.api.domain.dto.search.ConfigurationSearchKey;
 import com.betfair.video.api.infra.input.kafka.dto.DbConfigDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,4 +1,4 @@
-package com.betfair.video.api.domain.dto.valueobject.search;
+package com.betfair.video.api.domain.dto.search;
 
 public record VideoRequestIdentifier(
         String videoId,

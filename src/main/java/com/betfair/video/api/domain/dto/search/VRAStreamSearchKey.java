@@ -1,7 +1,7 @@
-package com.betfair.video.api.domain.dto.valueobject.search;
+package com.betfair.video.api.domain.dto.search;
 
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
-import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 
 import java.util.List;
 import java.util.Set;
@@ -16,14 +16,14 @@ public class VRAStreamSearchKey {
     protected VideoQuality videoQuality;
     protected String commentaryLanguage;
     protected Integer providerId;
-    protected ContentTypeDto contentType;
+    protected ContentType contentType;
     protected Set<Integer> streamTypeIds;
     protected Set<Integer> brandIds;
     protected String providerParams;
 
     public VRAStreamSearchKey(Integer channelTypeId, List<Integer> channelSubTypeIds, Integer mobileDeviceId,
                               String mobileOsVersion, Integer mobileScreenDensityDpi, VideoQuality videoQuality,
-                              String commentaryLanguage, Integer providerId, ContentTypeDto contentType,
+                              String commentaryLanguage, Integer providerId, ContentType contentType,
                               Set<Integer> streamTypeIds, Set<Integer> brandIds, String providerParams) {
         this.channelTypeId = channelTypeId;
         this.channelSubTypeIds = channelSubTypeIds;
@@ -71,7 +71,7 @@ public class VRAStreamSearchKey {
         return providerId;
     }
 
-    public ContentTypeDto getContentType() {
+    public ContentType getContentType() {
         return contentType;
     }
 
@@ -87,52 +87,12 @@ public class VRAStreamSearchKey {
         return providerParams;
     }
 
-    public void setChannelTypeId(Integer channelTypeId) {
-        this.channelTypeId = channelTypeId;
-    }
-
-    public void setChannelSubTypeIds(List<Integer> channelSubTypeIds) {
-        this.channelSubTypeIds = channelSubTypeIds;
-    }
-
-    public void setMobileDeviceId(Integer mobileDeviceId) {
-        this.mobileDeviceId = mobileDeviceId;
-    }
-
-    public void setMobileOsVersion(String mobileOsVersion) {
-        this.mobileOsVersion = mobileOsVersion;
-    }
-
-    public void setMobileScreenDensityDpi(Integer mobileScreenDensityDpi) {
-        this.mobileScreenDensityDpi = mobileScreenDensityDpi;
-    }
-
-    public void setVideoQuality(VideoQuality videoQuality) {
-        this.videoQuality = videoQuality;
-    }
-
-    public void setCommentaryLanguage(String commentaryLanguage) {
-        this.commentaryLanguage = commentaryLanguage;
-    }
-
     public void setProviderId(Integer providerId) {
         this.providerId = providerId;
     }
 
-    public void setContentType(ContentTypeDto contentType) {
-        this.contentType = contentType;
-    }
-
     public void setStreamTypeIds(Set<Integer> streamTypeIds) {
         this.streamTypeIds = streamTypeIds;
-    }
-
-    public void setBrandIds(Set<Integer> brandIds) {
-        this.brandIds = brandIds;
-    }
-
-    public void setProviderParams(String providerParams) {
-        this.providerParams = providerParams;
     }
 
     public static class Builder {
@@ -144,7 +104,7 @@ public class VRAStreamSearchKey {
         protected VideoQuality videoQuality;
         protected String commentaryLanguage;
         protected Integer providerId;
-        protected ContentTypeDto contentType;
+        protected ContentType contentType;
         protected Set<Integer> streamTypeIds;
         protected Set<Integer> brandIds;
         protected String providerParams;
@@ -192,7 +152,7 @@ public class VRAStreamSearchKey {
             return this;
         }
 
-        public Builder contentType(ContentTypeDto contentType) {
+        public Builder contentType(ContentType contentType) {
             this.contentType = contentType;
             return this;
         }

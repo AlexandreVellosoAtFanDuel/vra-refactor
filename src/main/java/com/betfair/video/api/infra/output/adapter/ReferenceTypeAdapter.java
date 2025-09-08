@@ -3,7 +3,7 @@ package com.betfair.video.api.infra.output.adapter;
 import com.betfair.video.api.domain.dto.entity.ReferenceType;
 import com.betfair.video.api.domain.dto.valueobject.DomainReferenceType;
 import com.betfair.video.api.domain.dto.valueobject.ReferenceTypeEnum;
-import com.betfair.video.api.domain.dto.valueobject.search.ReferenceTypeInfoByIdSearchKey;
+import com.betfair.video.api.domain.dto.search.ReferenceTypeInfoByIdSearchKey;
 import com.betfair.video.api.domain.port.output.ReferenceTypePort;
 import com.hazelcast.map.IMap;
 import org.slf4j.Logger;

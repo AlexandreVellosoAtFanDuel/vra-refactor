@@ -1,12 +1,14 @@
 package com.betfair.video.api.infra.input.rest;
 
 import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
 import com.betfair.video.api.domain.service.EventService;
 import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.infra.input.rest.dto.UserGeolocationDto;
+import com.betfair.video.api.infra.input.rest.dto.VideoQualityDto;
 import com.betfair.video.api.infra.input.rest.dto.VideoStreamInfoDto;
 import com.betfair.video.api.infra.input.rest.mapper.UserGeolocationDtoMapper;
 import com.betfair.video.api.infra.input.rest.mapper.VideoStreamInfoDtoMapper;
@@ -53,7 +55,7 @@ public class VideoApiController {
             @RequestParam(value = "mobileDeviceId", required = false) final Integer mobileDeviceId,
             @RequestParam(value = "mobileOsVersion", required = false) String mobileOsVersion,
             @RequestParam(value = "mobileScreenDensityDpi", required = false) Integer mobileScreenDensityDpi,
-            @RequestParam(value = "videoQuality", required = false) VideoQuality videoQuality,
+            @RequestParam(value = "videoQuality", required = false) VideoQualityDto videoQuality,
             @RequestParam(value = "commentaryLanguage", required = false) String commentaryLanguage,
             @RequestParam(value = "providerId", required = false) Integer providerId,
             @RequestParam(value = "providerParams", required = false) String providerParams
@@ -73,10 +75,10 @@ public class VideoApiController {
                 mobileDeviceId,
                 mobileOsVersion,
                 mobileScreenDensityDpi,
-                videoQuality,
+                VideoQuality.fromValue(videoQuality.getValue()),
                 commentaryLanguage,
                 providerId,
-                contentType,
+                ContentType.fromValue(contentType.getValue()),
                 includeMetadata,
                 providerParams
         );

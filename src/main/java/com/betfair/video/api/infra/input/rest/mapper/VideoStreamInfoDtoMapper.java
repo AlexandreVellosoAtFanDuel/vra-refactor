@@ -1,6 +1,5 @@
 package com.betfair.video.api.infra.input.rest.mapper;
 
-import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.SizeRestrictions;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
@@ -57,7 +56,7 @@ public interface VideoStreamInfoDtoMapper {
     }
 
     @Named("mapContentType")
-    default ContentTypeDto mapContentType(ContentType contentType) {
+    default ContentTypeDto mapContentType(com.betfair.video.api.domain.dto.valueobject.ContentType contentType) {
         if (contentType == null) {
             return null;
         }

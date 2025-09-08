@@ -4,17 +4,17 @@ import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.TypeChannel;
 import com.betfair.video.api.domain.dto.entity.TypeMobileDevice;
 import com.betfair.video.api.domain.dto.entity.TypeStream;
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.ExternalId;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.api.domain.dto.valueobject.search.VRAStreamSearchKey;
-import com.betfair.video.api.domain.dto.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
+import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.mapper.ExternalIdMapper;
 import com.betfair.video.api.domain.mapper.TypeStreamMapper;
 import com.betfair.video.api.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
-import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
@@ -49,7 +49,7 @@ public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
     public VideoStreamInfo retrieveScheduleByExternalId(RequestContext context, String externalIdSource, String externalId,
                                                         Integer channelTypeId, List<Integer> channelSubTypeIds, Integer mobileDeviceId,
                                                         String mobileOsVersion, Integer mobileScreenDensityDpi, VideoQuality videoQuality,
-                                                        String commentaryLanguage, Integer providerId, ContentTypeDto contentType,
+                                                        String commentaryLanguage, Integer providerId, ContentType contentType,
                                                         Boolean includeMetadata, String providerParams) {
 
         if (!context.user().permissions().hasPermission(ServicePermission.VIDEO)) {

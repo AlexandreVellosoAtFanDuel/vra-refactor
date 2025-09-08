@@ -1,13 +1,13 @@
-package com.betfair.video.api.domain.dto.valueobject.search;
+package com.betfair.video.api.domain.dto.search;
 
 import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 
 public class VideoStreamInfoSearchKeyWrapper {
-    ExternalIdSource externalIdSource;
-    VideoStreamInfoByExternalIdSearchKey videoStreamInfoByExternalIdSearchKey;
-    VideoStreamInfoByIdSearchKey videoStreamInfoByIdSearchKey;
-    VideoRequestIdentifier videoRequestIdentifier;
+    private ExternalIdSource externalIdSource;
+    private VideoStreamInfoByExternalIdSearchKey videoStreamInfoByExternalIdSearchKey;
+    private VideoStreamInfoByIdSearchKey videoStreamInfoByIdSearchKey;
+    private VideoRequestIdentifier videoRequestIdentifier;
 
     public VideoStreamInfoSearchKeyWrapper(ExternalIdSource externalIdSource,
                                            VideoStreamInfoByExternalIdSearchKey videoStreamInfoByExternalIdSearchKey,

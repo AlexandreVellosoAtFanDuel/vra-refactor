@@ -1,7 +1,7 @@
 package com.betfair.video.api.domain.mapper;
 
 import com.betfair.video.api.domain.dto.entity.TypeStream;
-import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,13 +18,13 @@ class TypeStreamMapperTest {
     TypeStreamMapper typeStreamMapper;
 
     @Test
-    @DisplayName("Should convert ContentTypeDto to TypeStream ID")
+    @DisplayName("Should convert ContentType to TypeStream ID")
     void shouldConvertContentTypeToStreamTypeId() {
         // Given
-        ContentTypeDto vid = ContentTypeDto.VID;
-        ContentTypeDto viz = ContentTypeDto.VIZ;
-        ContentTypeDto preViz = ContentTypeDto.PRE_VID;
-        ContentTypeDto unrecognized = ContentTypeDto.UNRECOGNIZED_VALUE;
+        ContentType vid = ContentType.VID;
+        ContentType viz = ContentType.VIZ;
+        ContentType preViz = ContentType.PRE_VID;
+        ContentType unrecognized = ContentType.UNRECOGNIZED_VALUE;
 
         // When
         Integer vidStreamType = typeStreamMapper.convertContentTypeToStreamTypeId(vid);

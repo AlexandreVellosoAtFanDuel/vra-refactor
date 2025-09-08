@@ -5,15 +5,15 @@ import com.betfair.video.api.domain.dto.entity.TypeChannel;
 import com.betfair.video.api.domain.dto.entity.TypeMobileDevice;
 import com.betfair.video.api.domain.dto.entity.TypeStream;
 import com.betfair.video.api.domain.dto.entity.User;
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.ExternalId;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
 import com.betfair.video.api.domain.dto.valueobject.UserPermissions;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.api.domain.dto.valueobject.search.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.mapper.ExternalIdMapper;
 import com.betfair.video.api.domain.mapper.TypeStreamMapper;
-import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
 import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
@@ -76,7 +76,7 @@ class EventServiceTest {
         when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
                 .thenReturn(externalId);
 
-        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentTypeDto.VID))
+        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentType.VID))
                 .thenReturn(TypeStream.VID.getId());
 
         VideoStreamInfo videoStreamInfoMock = mock(VideoStreamInfo.class);
@@ -85,7 +85,7 @@ class EventServiceTest {
 
         // When
         VideoStreamInfo result = eventService.retrieveScheduleByExternalId(
-                context, "1", "12345", null, null, null, null, null, null, null, null, ContentTypeDto.VID, null, null);
+                context, "1", "12345", null, null, null, null, null, null, null, null, ContentType.VID, null, null);
 
         // Then
         assertThat(result).isNotNull();
@@ -130,12 +130,12 @@ class EventServiceTest {
         when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
                 .thenReturn(externalId);
 
-        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentTypeDto.VID))
+        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentType.VID))
                 .thenReturn(TypeStream.VID.getId());
 
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, "1", "12345", TypeChannel.NULL.getId(), null, null, null, null, null, null, null, ContentTypeDto.VID, null, null))
+                context, "1", "12345", TypeChannel.NULL.getId(), null, null, null, null, null, null, null, ContentType.VID, null, null))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -161,12 +161,12 @@ class EventServiceTest {
         when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
                 .thenReturn(externalId);
 
-        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentTypeDto.VID))
+        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentType.VID))
                 .thenReturn(TypeStream.VID.getId());
 
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, "1", "12345", TypeChannel.WEB.getId(), null, TypeMobileDevice.ANDROID_PHONE.getId(), null, null, null, null, null, ContentTypeDto.VID, null, null))
+                context, "1", "12345", TypeChannel.WEB.getId(), null, TypeMobileDevice.ANDROID_PHONE.getId(), null, null, null, null, null, ContentType.VID, null, null))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
@@ -192,12 +192,12 @@ class EventServiceTest {
         when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
                 .thenReturn(externalId);
 
-        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentTypeDto.VID))
+        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentType.VID))
                 .thenReturn(TypeStream.VID.getId());
 
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, "1", "12345", TypeChannel.MOBILE.getId(), null, TypeMobileDevice.NULL.getId(), null, null, null, null, null, ContentTypeDto.VID, null, null))
+                context, "1", "12345", TypeChannel.MOBILE.getId(), null, TypeMobileDevice.NULL.getId(), null, null, null, null, null, ContentType.VID, null, null))
                 .isInstanceOf(VideoAPIException.class)
                 .satisfies(exception -> {
                     VideoAPIException videoException = (VideoAPIException) exception;
