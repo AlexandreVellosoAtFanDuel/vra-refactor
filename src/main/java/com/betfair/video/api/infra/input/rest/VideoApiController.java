@@ -4,6 +4,8 @@ import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
+import com.betfair.video.api.domain.exception.StreamNotStartedException;
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
 import com.betfair.video.api.domain.service.EventService;
 import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
@@ -93,6 +95,11 @@ public class VideoApiController {
         logger.info("[{}] Enter retrieveUserGeolocation", context.uuid());
 
         return userGeolocationDtoMapper.mapToDto(context.user());
+    }
+
+    @RequestMapping("/testError")
+    public void testError() {
+        throw new StreamNotStartedException(null);
     }
 
 }

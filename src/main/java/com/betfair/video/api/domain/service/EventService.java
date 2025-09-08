@@ -12,12 +12,13 @@ import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.exception.InsufficientAccessException;
+import com.betfair.video.api.domain.exception.InvalidInputException;
+import com.betfair.video.api.domain.exception.StreamNotFoundException;
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.domain.mapper.ExternalIdMapper;
 import com.betfair.video.api.domain.mapper.TypeStreamMapper;
 import com.betfair.video.api.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
 
         if (!context.user().permissions().hasPermission(ServicePermission.VIDEO)) {
             logger.error("[{}]: Access permissions are insufficient for the requested operation or data for user (...)", context.uuid());
-            throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS, null);
+            throw new InsufficientAccessException();
         }
 
         ExternalIdSource source = ExternalIdSource.fromExternalIdSource(externalIdSource);
@@ -94,16 +95,18 @@ public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
         return streamService.getStreamInfoByExternalId(searchKey, context, Boolean.TRUE.equals(includeMetadata));
     }
 
-    private void validateChannelParams(final String uuid, final VRAStreamSearchKey searchKey) throws VideoAPIException {
+    private void validateChannelParams(final String uuid, final VRAStreamSearchKey searchKey) throws VideoException {
         if (TypeChannel.NULL.getId().equals(searchKey.getChannelTypeId())) {
             // There are no items with such a channel type in the database
-            throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, null);
+            throw new StreamNotFoundException();
         }
 
         if (TypeChannel.WEB.getId().equals(searchKey.getChannelTypeId()) && searchKey.getMobileDeviceId() != null) {
             logger.warn("[{}]: Invalid combination of a channel type ({}) and a mobile device ID ({})",
                     uuid, searchKey.getChannelTypeId(), searchKey.getMobileDeviceId());
-            throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT, null);
+
+            final String errorMessage = String.format("Invalid combination of a channel type (%s) and a mobile device ID (%s)", searchKey.getChannelTypeId(), searchKey.getMobileDeviceId());
+            throw new InvalidInputException(errorMessage, null);
         }
 
         if (TypeChannel.MOBILE.getId().equals(searchKey.getChannelTypeId())) {
@@ -115,7 +118,9 @@ public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
             if (!isValidDeviceId) {
                 logger.warn("[{}]: Invalid combination of a channel type ({}) and a mobile device ID ({})",
                         uuid, searchKey.getChannelTypeId(), searchKey.getMobileDeviceId());
-                throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT, null);
+
+                final String errorMessage = String.format("Invalid combination of a channel type (%s) and a mobile device ID (%s)", searchKey.getChannelTypeId(), searchKey.getMobileDeviceId());
+                throw new InvalidInputException(errorMessage, null);
             }
         }
     }

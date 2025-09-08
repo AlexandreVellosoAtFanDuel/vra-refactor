@@ -7,15 +7,15 @@ import com.betfair.video.api.domain.dto.valueobject.VideoStreamState;
 import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
+import com.betfair.video.api.domain.exception.ColdStateException;
 import com.betfair.video.api.domain.exception.DataIsNotReadyException;
+import com.betfair.video.api.domain.exception.StreamHasEndedException;
+import com.betfair.video.api.domain.exception.StreamNotStartedException;
 import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.output.VideoStreamInfoPort;
 import com.betfair.video.api.domain.utils.DateUtils;
 import com.betfair.video.api.domain.utils.ScheduleItemUtils;
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,16 +94,13 @@ public class ScheduleItemService {
 
     public void checkIsCurrentlyShowingAndThrow(VideoStreamState streamState, Long videoItemId, RequestContext context, Integer sportType) {
         if (VideoStreamState.NOT_STARTED.equals(streamState)) {
-            // TODO: Handle StreamNotStartedException
-            //StreamNotStartedException snte = new StreamNotStartedException(String.valueOf(sportType));
-
-            VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED, String.valueOf(sportType));
+            StreamNotStartedException exception = new StreamNotStartedException(String.valueOf(sportType));
             streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, exception, null);
             throw exception;
         }
 
         if (VideoStreamState.FINISHED.equals(streamState)) {
-            VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_HAS_ENDED, String.valueOf(sportType));
+            StreamHasEndedException exception = new StreamHasEndedException(String.valueOf(sportType));
             streamExceptionLoggingUtils.logException(logger, videoItemId, Level.WARN, context, exception, null);
             throw exception;
         }
@@ -138,7 +135,7 @@ public class ScheduleItemService {
             items = videoStreamInfoPort.getVideoStreamInfoByExternalId(searchKey);
         } catch (final DataIsNotReadyException e) {
             logger.error("[{}]: {}", context.uuid(), e.getMessage());
-            throw new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.COLD_STATE, null);
+            throw new ColdStateException();
         }
 
         logger.info("[{}]: found  [{}] items - {}", context.uuid(), items.size(), ScheduleItemUtils.getItemsForLog(items));

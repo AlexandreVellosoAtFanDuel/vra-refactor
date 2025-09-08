@@ -5,4 +5,5 @@ public class DataIsNotReadyException extends Exception {
     public DataIsNotReadyException(String message) {
         super(message);
     }
+
 }

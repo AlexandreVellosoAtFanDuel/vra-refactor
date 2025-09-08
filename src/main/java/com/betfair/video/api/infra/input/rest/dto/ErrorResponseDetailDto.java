@@ -1,9 +1,14 @@
 package com.betfair.video.api.infra.input.rest.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record ErrorResponseDetailDto(
-        VideoApiExceptionDto VideoAPIException,
+        @JsonProperty("VideoAPIException")
+        VideoExceptionDto VideoException,
+        String trace,
+        String message,
         @JsonProperty("exceptionname")
         String exceptionName
 ) {

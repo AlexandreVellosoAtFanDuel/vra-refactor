@@ -1,10 +1,8 @@
 package com.betfair.video.api.infra.adapter;
 
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.infra.input.rest.dto.cro.RequestVerifySession;
 import com.betfair.video.api.infra.output.dto.ResponseVerifySession;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import com.betfair.video.api.infra.output.client.CROClient;
 import com.betfair.video.api.infra.output.adapter.AuthenticationAdapter;
 import feign.FeignException;
@@ -16,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE;
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.INSUFFICIENT_ACCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -58,11 +58,10 @@ class AuthenticationAdapterTest {
 
         // When & Then
         assertThatThrownBy(() -> authenticationAdapter.verifySession(INVALID_SESSION_TOKEN))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.Unauthorised);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS);
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(INSUFFICIENT_ACCESS);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }
@@ -77,11 +76,10 @@ class AuthenticationAdapterTest {
 
         // When & Then
         assertThatThrownBy(() -> authenticationAdapter.verifySession(INVALID_SESSION_TOKEN))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.Unauthorised);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE);
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(ERROR_IN_DEPENDENT_SERVICE);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }
@@ -95,11 +93,10 @@ class AuthenticationAdapterTest {
 
         // When & Then
         assertThatThrownBy(() -> authenticationAdapter.verifySession(INVALID_SESSION_TOKEN))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.InternalError);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE);
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(ERROR_IN_DEPENDENT_SERVICE);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }

@@ -6,17 +6,18 @@ import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import com.betfair.video.api.domain.dto.entity.ScheduleItemMappingKey;
 import com.betfair.video.api.domain.dto.entity.User;
+import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
+import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
 import com.betfair.video.api.domain.dto.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.Geolocation;
+import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
 import com.betfair.video.api.domain.dto.valueobject.StreamDetails;
 import com.betfair.video.api.domain.dto.valueobject.StreamParams;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamState;
-import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
-import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
-import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
-import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.domain.mapper.VideoStreamInfoMapper;
 import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.output.DirectStreamConfigPort;
@@ -24,9 +25,6 @@ import com.betfair.video.api.domain.port.output.InlineStreamConfigPort;
 import com.betfair.video.api.domain.port.output.ProviderFactoryPort;
 import com.betfair.video.api.domain.port.output.ReferenceTypePort;
 import com.betfair.video.api.domain.port.output.StreamingProviderPort;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +34,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Set;
 
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.INSUFFICIENT_ACCESS;
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.INVALID_INPUT;
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.STREAM_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -168,11 +169,10 @@ class StreamServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.BadRequest);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.INVALID_INPUT);
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(INVALID_INPUT);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }
@@ -198,11 +198,10 @@ class StreamServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.BadRequest);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.INVALID_INPUT);
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(INVALID_INPUT);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }
@@ -234,11 +233,10 @@ class StreamServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND);
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(STREAM_NOT_FOUND);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }
@@ -280,11 +278,10 @@ class StreamServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> streamService.getStreamInfoByExternalId(searchKey, context, false))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.Forbidden);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS);
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(INSUFFICIENT_ACCESS);
                     assertThat(videoException.getSportType()).isNull();
                 });
     }

@@ -5,10 +5,12 @@ import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
+import com.betfair.video.api.domain.exception.BBVInsufficientStakesException;
+import com.betfair.video.api.domain.exception.BBVNoStakesException;
+import com.betfair.video.api.domain.exception.ErrorInDependentServiceException;
+import com.betfair.video.api.domain.exception.InsufficientFundingException;
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -46,37 +48,37 @@ public class BetsCheckService {
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_INSUFFICIENT_STAKES) {
-            VideoAPIException exception = new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.BBV_INSUFFICIENT_STAKES, String.valueOf(item.betfairSportsType()));
+            BBVInsufficientStakesException exception = new BBVInsufficientStakesException(String.valueOf(item.betfairSportsType()));
             streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, exception, null);
             throw exception;
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_NO_BETS) {
-            VideoAPIException exception = new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.BBV_NO_STAKES, String.valueOf(item.betfairSportsType()));
+            BBVNoStakesException exception = new BBVNoStakesException(String.valueOf(item.betfairSportsType()));
             streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, exception, null);
             throw exception;
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_INSUFFICIENT_FUNDS) {
-            VideoAPIException exception = new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_FUNDING, String.valueOf(item.betfairSportsType()));
+            InsufficientFundingException exception = new InsufficientFundingException(String.valueOf(item.betfairSportsType()));
             streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.WARN, context, exception, null);
             throw exception;
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_DEPENDENT_SERVICE_ERROR) {
-            VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, String.valueOf(item.betfairSportsType()));
+            ErrorInDependentServiceException exception = new ErrorInDependentServiceException(String.valueOf(item.betfairSportsType()));
             streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
             throw exception;
         }
 
         if (bbvStatus == BetsCheckerStatusEnum.BBV_FAILED_TECHNICAL_ERROR) {
-            VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.GENERIC_ERROR, String.valueOf(item.betfairSportsType()));
+            VideoException exception = new VideoException(VideoException.ErrorCodeEnum.GENERIC_ERROR, String.valueOf(item.betfairSportsType()));
             streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
             throw exception;
         }
 
         // If we reach here, it means the status is not recognized
-        VideoAPIException exception = new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.GENERIC_ERROR, String.valueOf(item.betfairSportsType()));
+        VideoException exception = new VideoException(VideoException.ErrorCodeEnum.GENERIC_ERROR, String.valueOf(item.betfairSportsType()));
         streamExceptionLoggingUtils.logException(logger, item.videoItemId(), Level.ERROR, context, exception, null);
         throw exception;
     }

@@ -8,11 +8,11 @@ import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
 import com.betfair.video.api.domain.dto.valueobject.UserPermissions;
 import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.exception.CannotUniquelyResolveStreamException;
+import com.betfair.video.api.domain.exception.StreamNotFoundException;
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.domain.utils.ScheduleItemUtils;
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -92,7 +92,7 @@ public class PermissionService {
         if (items.isEmpty()) {
             additionalInfo = String.format("{No ScheduleItem found by search key: %s}", searchKey);
 
-            VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, additionalInfo);
+            StreamNotFoundException exception = new StreamNotFoundException(additionalInfo, null);
             streamExceptionLoggingUtils.logException(logger, eventIdentifier, Level.WARN, context, exception, items, null);
             throw exception;
         }
@@ -106,8 +106,8 @@ public class PermissionService {
         }
 
         if (items.isEmpty()) {
-            VideoAPIException exception = new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, additionalInfo);
-
+            // TODO: Validate what should be returned here
+            StreamNotFoundException exception = new StreamNotFoundException(additionalInfo, null);
             streamExceptionLoggingUtils.logException(logger, Long.valueOf(eventIdentifier.videoId()), Level.ERROR, context, exception, null);
             throw exception;
         }
@@ -198,7 +198,7 @@ public class PermissionService {
                 logger.error("[{}]: Got racing stream request by event id {}! Cannot uniquely resolve stream.",
                         context.uuid(), eventIdentifier.eventId());
 
-                VideoAPIException exception = new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.CANNOT_UNIQUELY_RESOLVE_STREAM, null);
+                CannotUniquelyResolveStreamException exception = new CannotUniquelyResolveStreamException();
                 streamExceptionLoggingUtils.logException(logger, Long.valueOf(eventIdentifier.videoId()), Level.ERROR, context, exception, null);
                 throw exception;
             } else {

@@ -4,13 +4,11 @@ import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import com.betfair.video.api.domain.dto.entity.ScheduleItemData;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamState;
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.output.VideoStreamInfoPort;
 import com.betfair.video.api.domain.utils.DateUtils;
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.STREAM_HAS_ENDED;
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.STREAM_NOT_STARTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -228,12 +228,11 @@ class ScheduleItemServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.NOT_STARTED, 123L, context, 1))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_NOT_STARTED);
-                    assertThat(videoException.getSportType()).isNull();
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(STREAM_NOT_STARTED);
+                    assertThat(videoException.getSportType()).isEqualTo("1");
                 });
     }
 
@@ -245,12 +244,11 @@ class ScheduleItemServiceTest {
 
         // When & Then
         assertThatThrownBy(() -> scheduleItemService.checkIsCurrentlyShowingAndThrow(VideoStreamState.FINISHED, 123L, context, 1))
-                .isInstanceOf(VideoAPIException.class)
+                .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
-                    VideoAPIException videoException = (VideoAPIException) exception;
-                    assertThat(videoException.getResponseCode()).isEqualTo(ResponseCode.NotFound);
-                    assertThat(videoException.getErrorCode()).isEqualTo(VideoAPIExceptionErrorCodeEnum.STREAM_HAS_ENDED);
-                    assertThat(videoException.getSportType()).isNull();
+                    VideoException videoException = (VideoException) exception;
+                    assertThat(videoException.getErrorCode()).isEqualTo(STREAM_HAS_ENDED);
+                    assertThat(videoException.getSportType()).isEqualTo("1");
                 });
     }
 

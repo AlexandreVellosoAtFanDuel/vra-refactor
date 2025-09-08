@@ -1,14 +1,13 @@
 package com.betfair.video.api.infra.output.adapter;
 
 import com.betfair.video.api.domain.dto.valueobject.UserSessionDto;
-import com.betfair.video.api.infra.input.rest.dto.cro.RequestVerifySession;
-import com.betfair.video.api.infra.output.dto.ResponseVerifySession;
-import com.betfair.video.api.infra.input.rest.dto.cro.SessionToken;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.domain.exception.ErrorInDependentServiceException;
+import com.betfair.video.api.domain.exception.InsufficientAccessException;
 import com.betfair.video.api.domain.port.output.AuthenticationPort;
+import com.betfair.video.api.infra.input.rest.dto.cro.RequestVerifySession;
+import com.betfair.video.api.infra.input.rest.dto.cro.SessionToken;
 import com.betfair.video.api.infra.output.client.CROClient;
+import com.betfair.video.api.infra.output.dto.ResponseVerifySession;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,14 +35,14 @@ public class AuthenticationAdapter implements AuthenticationPort {
         } catch (FeignException fe) {
             if (HttpStatus.UNAUTHORIZED.value() == fe.status()) {
                 logger.warn("Session verification failed with status: {}", fe.status());
-                throw new VideoAPIException(ResponseCode.Unauthorised, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS, null);
+                throw new InsufficientAccessException();
             }
 
             logger.warn("Error when verifying session: {}", fe.getMessage());
-            throw new VideoAPIException(ResponseCode.Unauthorised, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, null);
+            throw new ErrorInDependentServiceException();
         } catch (Exception e) {
             logger.error("Error verifying session", e);
-            throw new VideoAPIException(ResponseCode.InternalError, VideoAPIExceptionErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE, null);
+            throw new ErrorInDependentServiceException();
         }
     }
 

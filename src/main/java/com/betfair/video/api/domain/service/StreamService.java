@@ -20,6 +20,10 @@ import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
 import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
+import com.betfair.video.api.domain.exception.InsufficientAccessException;
+import com.betfair.video.api.domain.exception.InvalidInputException;
+import com.betfair.video.api.domain.exception.StreamNotFoundException;
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.domain.mapper.VideoStreamInfoMapper;
 import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.output.DirectStreamConfigPort;
@@ -27,9 +31,6 @@ import com.betfair.video.api.domain.port.output.InlineStreamConfigPort;
 import com.betfair.video.api.domain.port.output.ProviderFactoryPort;
 import com.betfair.video.api.domain.port.output.ReferenceTypePort;
 import com.betfair.video.api.domain.port.output.StreamingProviderPort;
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
@@ -93,7 +94,10 @@ public class StreamService {
         if (searchKey.getProviderId() != null && referenceTypePort.findReferenceTypeById(searchKey.getProviderId(), ReferenceTypeEnum.VIDEO_PROVIDER) == null) {
             logger.error("[{}]: No provider was found for the given provider ID ({}). User country: {},{}.",
                     context.uuid(), searchKey.getProviderId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
-            throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT, null);
+
+            final String message = String.format("No provider was found for the given provider ID (%s). User country: %s,%s.",
+                    searchKey.getProviderId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
+            throw new InvalidInputException(message, null);
         }
 
         VideoStreamInfoSearchKeyWrapper videoStreamInfoSearchKeyWrapper = new VideoStreamInfoSearchKeyWrapper(
@@ -128,7 +132,7 @@ public class StreamService {
     }
 
     private ScheduleItem tryFindLeadingStream(ScheduleItem item, String externalId, VideoStreamInfoSearchKeyWrapper videoStreamInfoSearchKeyWrapper,
-                                              RequestContext context) throws VideoAPIException {
+                                              RequestContext context) throws VideoException {
 
         boolean isStreamTypeAllowed = configurationItemsPort.isStreamTypeAllowed(item.providerId(),
                 item.videoChannelType(), item.betfairSportsType(), TypeStream.PRE_VID, item.brandId());
@@ -150,7 +154,7 @@ public class StreamService {
 
             try {
                 return scheduleItemService.getScheduleItemByStreamKey(videoStreamInfoSearchKeyWrapper, context);
-            } catch (VideoAPIException e) {
+            } catch (VideoException e) {
                 //if paddock stream doesn't exist or any other error - return null
                 logger.info("[{}]: Got {} error while trying to find paddock stream for externalId {}. Returning null. Parent stream will be processed further. User country: {},{}",
                         context.uuid(), e.getErrorCode(), externalId, context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
@@ -173,12 +177,12 @@ public class StreamService {
         if (provider == null) {
             logger.error("[{}]: No provider was found for the given provider ID ({}).",
                     context.uuid(), item.providerId());
-            throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.INVALID_INPUT, null);
+            throw new InvalidInputException();
         }
 
         if (!provider.isEnabled()) {
             logger.error("[{}]: Provider with ID {} is not enabled.", context.uuid(), item.providerId());
-            throw new VideoAPIException(ResponseCode.NotFound, VideoAPIExceptionErrorCodeEnum.STREAM_NOT_FOUND, null);
+            throw new StreamNotFoundException();
         }
 
         boolean userHasPermissionAgainstItem = permissionService.checkUserPermissionsAgainstItem(item, context.user());
@@ -186,7 +190,7 @@ public class StreamService {
         if (!userHasPermissionAgainstItem) {
             logger.warn("[{}]: User {} does not have permission to access stream for item with videoItemId {}. User country: {},{}",
                     context.uuid(), context.user().accountId(), item.videoItemId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
-            throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.INSUFFICIENT_ACCESS, null);
+            throw new InsufficientAccessException();
         }
 
         // Make sure that the video is currently showing before proceed
@@ -200,7 +204,7 @@ public class StreamService {
         betsCheckService.validateBBVStatus(bbvStatus, item, context);
     }
 
-    private void checkStreamStatus(ScheduleItem item, RequestContext context) throws VideoAPIException {
+    private void checkStreamStatus(ScheduleItem item, RequestContext context) throws VideoException {
         VideoStreamState streamState = scheduleItemService.getVideoStreamStateBasedOnScheduleItem(item);
 
         if (item.streamTypeId().equals(TypeStream.PRE_VID.getId()) && VideoStreamState.FINISHED.equals(streamState)) {
@@ -213,7 +217,7 @@ public class StreamService {
     }
 
     private VideoStreamInfo getStreamInfoForItem(ScheduleItem item, StreamingProviderPort provider, VRAStreamSearchKey searchKey, RequestContext context,
-                                                 boolean includeMetadata) throws VideoAPIException {
+                                                 boolean includeMetadata) throws VideoException {
 
         StreamParams params = new StreamParams(
                 searchKey.getCommentaryLanguage(),

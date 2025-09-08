@@ -1,8 +1,7 @@
 package com.betfair.video.api.infra.input.rest.interceptor;
 
-import com.betfair.video.api.infra.input.rest.exception.ResponseCode;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIException;
-import com.betfair.video.api.infra.input.rest.exception.VideoAPIExceptionErrorCodeEnum;
+import com.betfair.video.api.domain.exception.RestrictedCountryException;
+import com.betfair.video.api.domain.exception.UnknownConsumerException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.util.Strings;
@@ -34,13 +33,13 @@ public class AccessControlInterceptor implements HandlerInterceptor {
         if (!isAppKeyValid(request.getHeader(X_APPLICATION_KEY))) {
             logger.error("[{}]: Valid application key is required for operation", uuid);
 
-            throw new VideoAPIException(ResponseCode.BadRequest, VideoAPIExceptionErrorCodeEnum.UNKNOWN_CONSUMER, null);
+            throw new UnknownConsumerException("Valid application key is required for operation");
         }
 
         if (!isUserIpAddressValid(request.getHeader(X_IP))) {
             logger.error("[{}]: An IP address is required for operation", uuid);
 
-            throw new VideoAPIException(ResponseCode.Forbidden, VideoAPIExceptionErrorCodeEnum.RESTRICTED_COUNTRY, null);
+            throw new RestrictedCountryException("An IP address is required for operation");
         }
 
         return true;

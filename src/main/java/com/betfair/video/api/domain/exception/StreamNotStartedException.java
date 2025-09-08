@@ -1,22 +1,20 @@
 package com.betfair.video.api.domain.exception;
 
-public class StreamNotStartedException extends RuntimeException {
+public class StreamNotStartedException extends VideoException {
 
-    private static final String DEFAULT_MESSAGE = "Stream has not started yet. ";
-
-    private final String sportType;
+    private static final ErrorCodeEnum ERROR_CODE = ErrorCodeEnum.STREAM_NOT_STARTED;
+    private static final String DEFAULT_MESSAGE = "Stream has not started yet";
 
     public StreamNotStartedException() {
-        super(DEFAULT_MESSAGE);
-        this.sportType = null;
+        super(ERROR_CODE, DEFAULT_MESSAGE, null);
     }
 
     public StreamNotStartedException(String sportType) {
-        super(DEFAULT_MESSAGE);
-        this.sportType = sportType;
+        super(ERROR_CODE, DEFAULT_MESSAGE, sportType);
     }
 
-    public String getSportType() {
-        return sportType;
+    public StreamNotStartedException(String message, String sportType) {
+        super(ERROR_CODE, message, sportType);
     }
+
 }
