@@ -135,7 +135,7 @@ public class ScheduleItemService {
             items = videoStreamInfoPort.getVideoStreamInfoByExternalId(searchKey);
         } catch (final DataIsNotReadyException e) {
             logger.error("[{}]: {}", context.uuid(), e.getMessage());
-            throw new ColdStateException();
+            throw new ColdStateException("There are no video stream available at the moment. Please try later.");
         }
 
         logger.info("[{}]: found  [{}] items - {}", context.uuid(), items.size(), ScheduleItemUtils.getItemsForLog(items));

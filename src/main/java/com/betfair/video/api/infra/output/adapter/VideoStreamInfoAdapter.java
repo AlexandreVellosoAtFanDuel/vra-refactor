@@ -4,6 +4,7 @@ import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import com.betfair.video.api.domain.dto.valueobject.ImportStatus;
 import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.exception.DataIsNotReadyException;
 import com.betfair.video.api.domain.port.output.ScheduleItemPort;
 import com.betfair.video.api.domain.port.output.VideoStreamInfoPort;
 import org.slf4j.Logger;
@@ -31,9 +32,14 @@ public class VideoStreamInfoAdapter implements VideoStreamInfoPort {
     }
 
     @Override
-    public List<ScheduleItem> getVideoStreamInfoByExternalId(VideoStreamInfoByExternalIdSearchKey searchKey) {
+    public List<ScheduleItem> getVideoStreamInfoByExternalId(VideoStreamInfoByExternalIdSearchKey searchKey) throws DataIsNotReadyException {
         UUID tId = UUID.randomUUID();
         List<ScheduleItem> availableEvents = scheduleItemPort.getAllAvailableEvents();
+
+        if (CollectionUtils.isEmpty(availableEvents)) {
+            throw new DataIsNotReadyException("No data available in cache. Probably VRA didn't receive schedule message or it was empty.");
+        }
+
         logger.info("[{}] Retrieved {} cached schedule items", tId, availableEvents.size());
 
         List<ScheduleItem> result = applyCommonFilters(availableEvents.stream(), searchKey)

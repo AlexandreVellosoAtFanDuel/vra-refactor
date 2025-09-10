@@ -90,7 +90,7 @@ public class PermissionService {
         String additionalInfo;
 
         if (items.isEmpty()) {
-            additionalInfo = String.format("{No ScheduleItem found by search key: %s}", searchKey);
+            additionalInfo = "No ScheduleItem found by search key: ExternalId";
 
             StreamNotFoundException exception = new StreamNotFoundException(additionalInfo, null);
             streamExceptionLoggingUtils.logException(logger, eventIdentifier, Level.WARN, context, exception, items, null);
@@ -133,8 +133,8 @@ public class PermissionService {
     }
 
     private String checkUserPermissionsAgainstItemStatus(List<ScheduleItem> items, VideoStreamInfoByExternalIdSearchKey searchKey, User user) {
-        StringBuilder additionalInfo = new StringBuilder(String.format("Method: checkUserPermissionsAgainstItemStatus, SearchKey: %s, AccountId: %s, "
-                        + "ScheduleItems to be filtered list size: %s ", searchKey, user.accountId(),
+        StringBuilder additionalInfo = new StringBuilder(String.format("Method: checkUserPermissionsAgainstItemStatus, SearchKey: ExternalId, AccountId: %s, "
+                        + "ScheduleItems to be filtered list size: %s ", user.accountId(),
                 items.size()));
 
         if (user.permissions() == null) {

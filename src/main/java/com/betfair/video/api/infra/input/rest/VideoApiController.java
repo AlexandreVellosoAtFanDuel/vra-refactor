@@ -77,10 +77,10 @@ public class VideoApiController {
                 mobileDeviceId,
                 mobileOsVersion,
                 mobileScreenDensityDpi,
-                VideoQuality.fromValue(videoQuality.getValue()),
+                videoQuality != null ? VideoQuality.fromValue(videoQuality.getValue()) : null,
                 commentaryLanguage,
                 providerId,
-                ContentType.fromValue(contentType.getValue()),
+                contentType != null ? ContentType.fromValue(contentType.getValue()) : null,
                 includeMetadata,
                 providerParams
         );
