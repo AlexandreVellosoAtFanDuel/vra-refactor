@@ -1,16 +1,16 @@
 package com.betfair.video.api.infra.input.kafka;
 
 import com.betfair.video.api.domain.dto.entity.ConfigurationItem;
-import com.betfair.video.api.domain.dto.valueobject.DomainReferenceType;
-import com.betfair.video.api.domain.dto.valueobject.ReferenceTypeEnum;
 import com.betfair.video.api.domain.dto.search.ConfigurationSearchKey;
 import com.betfair.video.api.domain.dto.search.ReferenceTypeInfoByIdSearchKey;
+import com.betfair.video.api.domain.dto.valueobject.DomainReferenceType;
+import com.betfair.video.api.domain.dto.valueobject.ReferenceTypeEnum;
 import com.betfair.video.api.infra.input.kafka.dto.DbConfigDto;
 import com.betfair.video.api.infra.input.kafka.dto.LiveVideoConfigMessageDto;
 import com.betfair.video.api.infra.input.kafka.dto.SportItemDto;
 import com.betfair.video.api.infra.input.kafka.mapper.ConfigurationItemMapper;
 import com.betfair.video.api.infra.input.kafka.mapper.ConfigurationSearchKeyMapper;
-import com.betfair.video.api.infra.output.adapter.RefreshCache;
+import com.betfair.video.api.infra.output.adapter.RefreshMapCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -31,16 +31,16 @@ public class LiveVideoConfigKafkaConsumer {
 
     private static final Logger logger = LoggerFactory.getLogger(LiveVideoConfigKafkaConsumer.class);
 
-    private final RefreshCache<ConfigurationSearchKey, ConfigurationItem> configurationItemsRefreshCache;
+    private final RefreshMapCache<ConfigurationSearchKey, ConfigurationItem> configurationItemsRefreshCache;
 
-    private final RefreshCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache;
+    private final RefreshMapCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache;
 
     private final ConfigurationItemMapper configurationItemMapper;
 
     private final ConfigurationSearchKeyMapper configurationSearchKeyMapper;
 
-    public LiveVideoConfigKafkaConsumer(RefreshCache<ConfigurationSearchKey, ConfigurationItem> configurationItemsRefreshCache,
-                                        RefreshCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache,
+    public LiveVideoConfigKafkaConsumer(RefreshMapCache<ConfigurationSearchKey, ConfigurationItem> configurationItemsRefreshCache,
+                                        RefreshMapCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache,
                                         ConfigurationItemMapper configurationItemMapper,
                                         ConfigurationSearchKeyMapper configurationSearchKeyMapper) {
         this.configurationItemsRefreshCache = configurationItemsRefreshCache;
@@ -63,6 +63,7 @@ public class LiveVideoConfigKafkaConsumer {
         final String timestamp = formatTimestamp(configMessage.publishTime());
         logger.info("Message ID: {}, Publish Time: {}", configMessage.msgId(), timestamp);
 
+        // TODO: Add error handling
         updateConfigurationItemCache(configMessage.dbConfigs());
         updateReferenceTypeCache(configMessage.referenceTypes());
     }

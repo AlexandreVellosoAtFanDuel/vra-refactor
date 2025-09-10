@@ -1,6 +1,7 @@
 package com.betfair.video.api.config.beans;
 
 import com.betfair.video.api.infra.input.kafka.dto.LiveVideoConfigMessageDto;
+import com.betfair.video.api.infra.input.kafka.dto.ScheduleVideoMessageDto;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -36,11 +37,7 @@ public class KafkaConsumerConfig {
 
     @Bean
     public ConsumerFactory<String, LiveVideoConfigMessageDto> liveVideoConfigConsumerFactory() {
-        Map<String, Object> configProps = new HashMap<>();
-        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServers);
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupName + "_" + getNodeInstanceName());
-        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        Map<String, Object> configProps = getCommonConfigProps();
         configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, LiveVideoConfigMessageDto.class.getName());
 
         return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(),
@@ -56,6 +53,35 @@ public class KafkaConsumerConfig {
         factory.setCommonErrorHandler(new org.springframework.kafka.listener.DefaultErrorHandler());
 
         return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, ScheduleVideoMessageDto> scheduleVideoConfigConsumerFactory() {
+        Map<String, Object> configProps = getCommonConfigProps();
+        configProps.put(JsonDeserializer.VALUE_DEFAULT_TYPE, ScheduleVideoMessageDto.class.getName());
+
+        return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(),
+                new JsonDeserializer<>(ScheduleVideoMessageDto.class));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ScheduleVideoMessageDto> scheduleVideoKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, ScheduleVideoMessageDto> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(scheduleVideoConfigConsumerFactory());
+
+        factory.setCommonErrorHandler(new org.springframework.kafka.listener.DefaultErrorHandler());
+
+        return factory;
+    }
+
+    private Map<String, Object> getCommonConfigProps() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServers);
+        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, consumerGroupName + "_" + getNodeInstanceName());
+        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        return configProps;
     }
 
     private String getNodeInstanceName() {

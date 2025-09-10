@@ -12,7 +12,7 @@ import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
 import com.betfair.video.api.domain.dto.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.Geolocation;
-import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemMapping;
 import com.betfair.video.api.domain.dto.valueobject.StreamDetails;
 import com.betfair.video.api.domain.dto.valueobject.StreamParams;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
@@ -91,10 +91,10 @@ class StreamServiceTest {
 
         ScheduleItem scheduleItem = mock(ScheduleItem.class);
 
-        ScheduleItemMapper mapper = mock(ScheduleItemMapper.class);
+        ScheduleItemMapping mapper = mock(ScheduleItemMapping.class);
         when(mapper.scheduleItemMappingKey()).thenReturn(new ScheduleItemMappingKey("videoItemId", new ProviderEventKey(1, "12345", "EVENT:12345")));
 
-        Set<ScheduleItemMapper> mappings = Set.of(mapper);
+        Set<ScheduleItemMapping> mappings = Set.of(mapper);
         when(scheduleItem.mappings()).thenReturn(mappings);
 
         when(scheduleItemService.getScheduleItemByStreamKey(any(VideoStreamInfoSearchKeyWrapper.class), eq(context)))

@@ -19,7 +19,7 @@ import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
 import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
-import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemMapping;
 import com.betfair.video.api.domain.exception.InsufficientAccessException;
 import com.betfair.video.api.domain.exception.InvalidInputException;
 import com.betfair.video.api.domain.exception.StreamNotFoundException;
@@ -241,7 +241,7 @@ public class StreamService {
         String exchangeRaceId = null;
 
         if (item.mappings() != null && !item.mappings().isEmpty()) {
-            ScheduleItemMapper mapping = filterMappingsByExternalId(item, searchKey, context);
+            ScheduleItemMapping mapping = filterMappingsByExternalId(item, searchKey, context);
 
             if (mapping != null && mapping.scheduleItemMappingKey() != null && mapping.scheduleItemMappingKey().providerEventKey() != null) {
                 eventId = mapping.scheduleItemMappingKey().providerEventKey().primaryId();
@@ -289,8 +289,8 @@ public class StreamService {
         }
     }
 
-    private ScheduleItemMapper filterMappingsByExternalId(ScheduleItem item, VRAStreamSearchKey searchKey, RequestContext context) {
-        Set<ScheduleItemMapper> filteredMappings = new HashSet<>();
+    private ScheduleItemMapping filterMappingsByExternalId(ScheduleItem item, VRAStreamSearchKey searchKey, RequestContext context) {
+        Set<ScheduleItemMapping> filteredMappings = new HashSet<>();
 
         if (!(searchKey instanceof VideoStreamInfoByExternalIdSearchKey)) {
             return null;
@@ -303,7 +303,7 @@ public class StreamService {
             return null;
         }
 
-        for (ScheduleItemMapper mapping : item.mappings()) {
+        for (ScheduleItemMapping mapping : item.mappings()) {
             boolean isRequestedMapping = isRequestedMapping(mapping, externalId);
 
             if (isRequestedMapping) {
@@ -319,7 +319,7 @@ public class StreamService {
             return filteredMappings.iterator().next();
         }
 
-        ScheduleItemMapper pickedMapping = filteredMappings.iterator().next();
+        ScheduleItemMapping pickedMapping = filteredMappings.iterator().next();
 
         logger.error("[{}]: has >1 mappings for schedule item, will pick 1st available one to " +
                         "extract event id. This is not critical but should not happen. Search key: {}. Filtered mappings: {}",
@@ -328,7 +328,7 @@ public class StreamService {
         return pickedMapping;
     }
 
-    private boolean isRequestedMapping(ScheduleItemMapper mapping, String externalId) {
+    private boolean isRequestedMapping(ScheduleItemMapping mapping, String externalId) {
         return externalId.equals(mapping.scheduleItemMappingKey().providerEventKey().primaryId());
     }
 

@@ -21,4 +21,18 @@ public enum TypeStream {
         return id;
     }
 
+    public static TypeStream fromValue(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        for (TypeStream typeStream : TypeStream.values()) {
+            if (typeStream.name().equalsIgnoreCase(value)) {
+                return typeStream;
+            }
+        }
+
+        return null;
+    }
+
 }

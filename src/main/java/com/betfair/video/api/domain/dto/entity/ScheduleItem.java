@@ -1,8 +1,8 @@
 package com.betfair.video.api.domain.dto.entity;
 
 import com.betfair.video.api.domain.dto.valueobject.ImportStatus;
-import com.betfair.video.api.domain.dto.valueobject.ScheduleItemMapper;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -10,7 +10,7 @@ public record ScheduleItem(
         Long videoItemId,
         Integer providerId,
         String providerEventId,
-        Integer providerSportsType,
+        String providerSportsType,
         String providerLanguage,
         Boolean providerChargeableFlag,
         String providerStreamingUrl,
@@ -30,8 +30,8 @@ public record ScheduleItem(
         Integer brandId,
         ScheduleItemData providerData,
         ScheduleItemData overriddenData,
-        Set<ScheduleItemMapper> mappings
-) {
+        Set<ScheduleItemMapping> mappings
+) implements Serializable {
     public ScheduleItemData getActualProviderData() {
         if (this.providerData == null) {
             return null;

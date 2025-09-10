@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class ConfigurationItemsAdapter implements ConfigurationItemsPort, RefreshCache<ConfigurationSearchKey, ConfigurationItem> {
+public class ConfigurationItemsAdapter implements ConfigurationItemsPort, RefreshMapCache<ConfigurationSearchKey, ConfigurationItem> {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationItemsAdapter.class);
 

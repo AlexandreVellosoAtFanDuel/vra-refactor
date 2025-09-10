@@ -1,11 +1,14 @@
 package com.betfair.video.api.config.beans;
 
 import com.betfair.video.api.domain.dto.entity.ConfigurationItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
 import com.betfair.video.api.domain.dto.valueobject.DomainReferenceType;
 import com.betfair.video.api.domain.dto.search.ConfigurationSearchKey;
 import com.betfair.video.api.domain.dto.search.ReferenceTypeInfoByIdSearchKey;
 import com.betfair.video.api.infra.output.dto.betradarv2.AudioVisualEventDto;
+import com.hazelcast.collection.IList;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.ListConfig;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
@@ -30,6 +33,7 @@ public class SpringHazelcastConfiguration {
         config.addMapConfig(buildConfigForBetRadarV2AudioVisualEvents());
         config.addMapConfig(buildConfigForConfigurationItems());
         config.addMapConfig(buildConfigForReferenceTypes());
+        config.addListConfig(buildConfigForScheduleItems());
 
         return Hazelcast.newHazelcastInstance(config);
     }
@@ -47,6 +51,11 @@ public class SpringHazelcastConfiguration {
     @Bean
     public IMap<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypesMap(HazelcastInstance instance) {
         return instance.getMap("referenceTypesMap");
+    }
+
+    @Bean
+    public IList<ScheduleItem> scheduleItemCache(HazelcastInstance instance) {
+        return instance.getList("scheduleItemCache");
     }
 
     private MapConfig buildConfigForBetRadarV2AudioVisualEvents() {
@@ -67,6 +76,11 @@ public class SpringHazelcastConfiguration {
         return new MapConfig("referenceTypesMap")
                 .setTimeToLiveSeconds(600)
                 .setMaxIdleSeconds(600)
+                .setBackupCount(2);
+    }
+
+    private ListConfig buildConfigForScheduleItems() {
+        return new ListConfig("scheduleItemCache")
                 .setBackupCount(2);
     }
 

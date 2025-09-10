@@ -1,8 +1,9 @@
 package com.betfair.video.api.domain.dto.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class ScheduleItemData {
+public class ScheduleItemData implements Serializable {
 
     private String eventName;
     private String venue;
