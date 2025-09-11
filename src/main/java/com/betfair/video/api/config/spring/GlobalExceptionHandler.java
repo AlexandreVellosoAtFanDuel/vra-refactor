@@ -1,14 +1,11 @@
 package com.betfair.video.api.config.spring;
 
 import com.betfair.video.api.domain.exception.BBVNoStakesException;
-import com.betfair.video.api.domain.exception.VideoException;
-import com.betfair.video.api.infra.input.rest.dto.VideoExceptionDto;
 import com.betfair.video.api.domain.exception.StreamNotStartedException;
+import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.infra.input.rest.dto.ErrorResponseDetailDto;
+import com.betfair.video.api.infra.input.rest.dto.VideoExceptionDto;
 import jakarta.servlet.http.HttpServletRequest;
-
-import java.util.Arrays;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

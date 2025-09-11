@@ -14,7 +14,10 @@ public class ExternalIdMapper {
 
     private static final String PRIMARY_SECONDARY_IDS_SEPARATOR = "@";
 
-    public ExternalId map(ExternalIdSource externalIdSource, Set<String> externalIds) {
+    private ExternalIdMapper() {
+    }
+
+    public static ExternalId map(ExternalIdSource externalIdSource, Set<String> externalIds) {
         Map<String, List<String>> ids = new HashMap<>();
 
         for (String externalId : externalIds) {

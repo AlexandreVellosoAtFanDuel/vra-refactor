@@ -2,9 +2,9 @@ package com.betfair.video.api.config.beans;
 
 import com.betfair.video.api.domain.dto.entity.ConfigurationItem;
 import com.betfair.video.api.domain.dto.entity.ScheduleItem;
-import com.betfair.video.api.domain.dto.valueobject.DomainReferenceType;
 import com.betfair.video.api.domain.dto.search.ConfigurationSearchKey;
 import com.betfair.video.api.domain.dto.search.ReferenceTypeInfoByIdSearchKey;
+import com.betfair.video.api.domain.dto.valueobject.DomainReferenceType;
 import com.betfair.video.api.infra.output.dto.betradarv2.AudioVisualEventDto;
 import com.hazelcast.collection.IList;
 import com.hazelcast.config.Config;

@@ -5,7 +5,10 @@ import com.betfair.video.api.domain.dto.valueobject.ContentType;
 
 public class TypeStreamMapper {
 
-    public Integer convertContentTypeToStreamTypeId(ContentType contentType) {
+    private TypeStreamMapper() {
+    }
+
+    public static Integer convertContentTypeToStreamTypeId(ContentType contentType) {
         return switch (contentType) {
             case VID -> TypeStream.VID.getId();
             case VIZ -> TypeStream.VIZ.getId();

@@ -4,14 +4,14 @@ import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.TypeChannel;
 import com.betfair.video.api.domain.dto.entity.TypeMobileDevice;
 import com.betfair.video.api.domain.dto.entity.TypeStream;
+import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
+import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.ExternalId;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
-import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.exception.InsufficientAccessException;
 import com.betfair.video.api.domain.exception.InvalidInputException;
 import com.betfair.video.api.domain.exception.StreamNotFoundException;
@@ -33,16 +33,10 @@ public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
 
     private final Integer streamingBrandId;
 
-    private final ExternalIdMapper externalIdMapper;
-
-    private final TypeStreamMapper typeStreamMapper;
-
     private final StreamService streamService;
 
-    public EventService(Integer streamingBrandId, ExternalIdMapper externalIdMapper, TypeStreamMapper typeStreamMapper, StreamService streamService) {
+    public EventService(Integer streamingBrandId, StreamService streamService) {
         this.streamingBrandId = streamingBrandId;
-        this.externalIdMapper = externalIdMapper;
-        this.typeStreamMapper = typeStreamMapper;
         this.streamService = streamService;
     }
 
@@ -60,7 +54,7 @@ public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
 
         ExternalIdSource source = ExternalIdSource.fromExternalIdSource(externalIdSource);
 
-        ExternalId parsedExternalIds = externalIdMapper.map(source, Set.of(externalId));
+        ExternalId parsedExternalIds = ExternalIdMapper.map(source, Set.of(externalId));
 
         String primaryId = null;
         String secondaryId = null;
@@ -70,7 +64,7 @@ public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
             secondaryId = !entry.getValue().isEmpty() ? entry.getValue().getFirst() : null;
         }
 
-        Integer requestedStreamTypeId = typeStreamMapper.convertContentTypeToStreamTypeId(contentType);
+        Integer requestedStreamTypeId = TypeStreamMapper.convertContentTypeToStreamTypeId(contentType);
 
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
                 .externalIdSource(parsedExternalIds.externalIdSource())

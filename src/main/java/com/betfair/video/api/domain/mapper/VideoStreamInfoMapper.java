@@ -27,7 +27,10 @@ import java.util.TreeSet;
 
 public class VideoStreamInfoMapper {
 
-    public VideoStreamInfo map(
+    private VideoStreamInfoMapper() {
+    }
+
+    public static VideoStreamInfo map(
             final ScheduleItem scheduleItem,
             final StreamDetails streamDetails,
             final Set<VideoQuality> availableVideoQualityValues,
@@ -122,7 +125,7 @@ public class VideoStreamInfoMapper {
         );
     }
 
-    private String mapBlockedCountries(ScheduleItem scheduleItem, @Context GeoRestrictionsUseCase geoRestrictionsUseCase) {
+    private static String mapBlockedCountries(ScheduleItem scheduleItem, @Context GeoRestrictionsUseCase geoRestrictionsUseCase) {
         String defaultBlockedCountries = geoRestrictionsUseCase != null
                 ? geoRestrictionsUseCase.getProviderBlockedCountries(scheduleItem) : null;
         String providerBlockedCountries = scheduleItem.providerData() != null
@@ -133,7 +136,7 @@ public class VideoStreamInfoMapper {
         return createAggregatedBlockedCountries(defaultBlockedCountries, providerBlockedCountries, overrideBlockedCountries);
     }
 
-    private List<VideoQuality> mapVideoQualityList(Set<VideoQuality> availableVideoQualityValues) {
+    private static List<VideoQuality> mapVideoQualityList(Set<VideoQuality> availableVideoQualityValues) {
         if (availableVideoQualityValues == null) {
             return null;
         }
@@ -141,7 +144,7 @@ public class VideoStreamInfoMapper {
         return new ArrayList<>(availableVideoQualityValues);
     }
 
-    private VideoStreamEndpoint mapVideoStreamEndpoint(StreamDetails streamDetails) {
+    private static VideoStreamEndpoint mapVideoStreamEndpoint(StreamDetails streamDetails) {
 
         String videoQuality = null;
         String videoEndpoint = null;
@@ -161,7 +164,7 @@ public class VideoStreamInfoMapper {
         );
     }
 
-    private SizeRestrictions mapSizeRestrictions(Map<ConfigurationType, String> sizeRestrictions) {
+    private static SizeRestrictions mapSizeRestrictions(Map<ConfigurationType, String> sizeRestrictions) {
         if (sizeRestrictions == null || sizeRestrictions.isEmpty()) {
             return null;
         }
@@ -181,40 +184,40 @@ public class VideoStreamInfoMapper {
         );
     }
 
-    private Long mapAccountId(User user) {
+    private static Long mapAccountId(User user) {
         return user != null ? Long.valueOf(user.accountId()) : null;
     }
 
-    private String mapSportId(ScheduleItem scheduleItem) {
+    private static String mapSportId(ScheduleItem scheduleItem) {
         return scheduleItem.betfairSportsType() != null ? String.valueOf(scheduleItem.betfairSportsType()) : null;
     }
 
-    private String mapProviderEventId(ScheduleItem scheduleItem) {
+    private static String mapProviderEventId(ScheduleItem scheduleItem) {
         return StringUtils.isNotEmpty(scheduleItem.providerEventId()) ? scheduleItem.providerEventId() : null;
     }
 
-    private String mapProviderEventName(ScheduleItem scheduleItem) {
+    private static String mapProviderEventName(ScheduleItem scheduleItem) {
         ScheduleItemData scheduleItemData = scheduleItem.getActualProviderData();
         return scheduleItemData != null && StringUtils.isNotEmpty(scheduleItemData.getEventName())
                 ? scheduleItemData.getEventName() : null;
     }
 
-    private String mapCompetition(ScheduleItem scheduleItem) {
+    private static String mapCompetition(ScheduleItem scheduleItem) {
         ScheduleItemData scheduleItemData = scheduleItem.getActualProviderData();
         return scheduleItemData != null && StringUtils.isNotEmpty(scheduleItemData.getCompetition())
                 ? scheduleItemData.getCompetition() : null;
     }
 
-    private Date mapStartDateTime(ScheduleItem scheduleItem) {
+    private static Date mapStartDateTime(ScheduleItem scheduleItem) {
         ScheduleItemData scheduleItemData = scheduleItem.getActualProviderData();
         return scheduleItemData != null ? scheduleItemData.getStart() : null;
     }
 
-    private String mapSportName(TypeSport typeSport) {
+    private static String mapSportName(TypeSport typeSport) {
         return typeSport != null ? typeSport.getDescription() : null;
     }
 
-    private Integer parseInteger(String value) {
+    private static Integer parseInteger(String value) {
         if (!NumberUtils.isCreatable(value)) {
             return null;
         }
@@ -222,7 +225,7 @@ public class VideoStreamInfoMapper {
         return NumberUtils.createNumber(value).intValue();
     }
 
-    private String createAggregatedBlockedCountries(String... blockedCountries) {
+    private static String createAggregatedBlockedCountries(String... blockedCountries) {
         Set<String> aggregatedBlockedCountries = new TreeSet<>();
 
         for (String countryList : blockedCountries) {

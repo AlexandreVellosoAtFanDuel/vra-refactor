@@ -3,9 +3,14 @@ package com.betfair.video.api.domain.service;
 import com.betfair.video.api.domain.dto.entity.ConfigurationItem;
 import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemMapping;
 import com.betfair.video.api.domain.dto.entity.TypeSport;
 import com.betfair.video.api.domain.dto.entity.TypeStream;
 import com.betfair.video.api.domain.dto.entity.User;
+import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
+import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
+import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
+import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
 import com.betfair.video.api.domain.dto.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.ReferenceTypeEnum;
@@ -15,11 +20,6 @@ import com.betfair.video.api.domain.dto.valueobject.StreamParams;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamState;
-import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
-import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
-import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
-import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
-import com.betfair.video.api.domain.dto.entity.ScheduleItemMapping;
 import com.betfair.video.api.domain.exception.InsufficientAccessException;
 import com.betfair.video.api.domain.exception.InvalidInputException;
 import com.betfair.video.api.domain.exception.StreamNotFoundException;
@@ -47,10 +47,6 @@ public class StreamService {
 
     private static final Logger logger = LoggerFactory.getLogger(StreamService.class);
 
-    public static final Pattern LINEBREAKS_PATTERN = Pattern.compile("(\r)|(\n)");
-
-    public static final Pattern COMMA_PATTERN = Pattern.compile(",");
-
     private final ConfigurationItemsPort configurationItemsPort;
 
     private final ScheduleItemService scheduleItemService;
@@ -67,15 +63,13 @@ public class StreamService {
 
     private final GeoRestrictionsService geoRestrictionsService;
 
-    private final VideoStreamInfoMapper videoStreamInfoMapper;
-
     private final ReferenceTypePort referenceTypePort;
 
     public StreamService(ConfigurationItemsPort configurationItemsPort,
                          ScheduleItemService scheduleItemService, ProviderFactoryPort providerFactoryPort,
                          PermissionService permissionService, BetsCheckService betsCheckService,
                          DirectStreamConfigPort directStreamConfigPort, InlineStreamConfigPort inlineStreamConfigPort,
-                         GeoRestrictionsService geoRestrictionsService, VideoStreamInfoMapper videoStreamInfoMapper,
+                         GeoRestrictionsService geoRestrictionsService,
                          ReferenceTypePort referenceTypePort) {
         this.configurationItemsPort = configurationItemsPort;
         this.scheduleItemService = scheduleItemService;
@@ -85,7 +79,6 @@ public class StreamService {
         this.directStreamConfigPort = directStreamConfigPort;
         this.inlineStreamConfigPort = inlineStreamConfigPort;
         this.geoRestrictionsService = geoRestrictionsService;
-        this.videoStreamInfoMapper = videoStreamInfoMapper;
         this.referenceTypePort = referenceTypePort;
     }
 
@@ -250,7 +243,7 @@ public class StreamService {
             }
         }
 
-        return videoStreamInfoMapper.map(
+        return VideoStreamInfoMapper.map(
                 item,
                 streamDetails,
                 provider.getAvailableVideoQualityValues(),
@@ -272,8 +265,10 @@ public class StreamService {
     }
 
     private String removeCommas(String string) {
+        final Pattern commaPattern = Pattern.compile(",");
+
         if (string != null) {
-            Matcher m = COMMA_PATTERN.matcher(string);
+            Matcher m = commaPattern.matcher(string);
             return m.replaceAll("");
         } else {
             return null;
@@ -281,8 +276,10 @@ public class StreamService {
     }
 
     private String removeLineBrakes(String string) {
+        final Pattern lineBreaksPattern = Pattern.compile("(\r)|(\n)");
+
         if (string != null) {
-            Matcher m = LINEBREAKS_PATTERN.matcher(string);
+            Matcher m = lineBreaksPattern.matcher(string);
             return m.replaceAll("");
         } else {
             return null;
