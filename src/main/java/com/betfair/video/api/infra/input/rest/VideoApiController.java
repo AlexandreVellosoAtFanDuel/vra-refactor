@@ -1,20 +1,21 @@
 package com.betfair.video.api.infra.input.rest;
 
 import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.valueobject.ContentType;
+import com.betfair.video.api.domain.dto.valueobject.Geolocation;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.api.domain.exception.StreamNotStartedException;
-import com.betfair.video.api.domain.exception.VideoException;
+import com.betfair.video.api.domain.port.input.CreateUserUseCase;
+import com.betfair.video.api.domain.port.input.GetUserGeolocationUseCase;
 import com.betfair.video.api.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
 import com.betfair.video.api.domain.service.EventService;
 import com.betfair.video.api.infra.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.infra.input.rest.dto.UserGeolocationDto;
 import com.betfair.video.api.infra.input.rest.dto.VideoQualityDto;
 import com.betfair.video.api.infra.input.rest.dto.VideoStreamInfoDto;
-import com.betfair.video.api.infra.input.rest.mapper.UserGeolocationDtoMapper;
+import com.betfair.video.api.infra.input.rest.mapper.UserGeolocationMapper;
 import com.betfair.video.api.infra.input.rest.mapper.VideoStreamInfoDtoMapper;
-import com.betfair.video.api.infra.input.rest.util.UserContextBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,21 +29,26 @@ import java.util.List;
 @RequestMapping("/VideoAPI/v1.0")
 public class VideoApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(VideoApiController.class);
+    private static final String UUID_HEADER = "X-UUID";
+    private static final String X_IP = "X-IP";
+    private static final String ACCOUNT_ID = "accountId";
+    private static final String USER_ID = "userId";
 
-    private final UserContextBuilder userContextBuilder;
+    private static final Logger logger = LoggerFactory.getLogger(VideoApiController.class);
 
     private final RetrieveStreamInfoByExternalIdUseCase retrieveStreamInfoByExternalIdUseCase;
 
     private final VideoStreamInfoDtoMapper videoStreamInfoDtoMapper;
 
-    private final UserGeolocationDtoMapper userGeolocationDtoMapper;
+    private final CreateUserUseCase createUserUseCase;
 
-    public VideoApiController(UserContextBuilder userContextBuilder, EventService retrieveStreamInfoByExternalIdUseCase, VideoStreamInfoDtoMapper videoStreamInfoDtoMapper, UserGeolocationDtoMapper userGeolocationDtoMapper) {
-        this.userContextBuilder = userContextBuilder;
+    private final GetUserGeolocationUseCase getUserGeolocationUseCase;
+
+    public VideoApiController(EventService retrieveStreamInfoByExternalIdUseCase, VideoStreamInfoDtoMapper videoStreamInfoDtoMapper, CreateUserUseCase createUserUseCase, GetUserGeolocationUseCase getUserGeolocationUseCase) {
         this.retrieveStreamInfoByExternalIdUseCase = retrieveStreamInfoByExternalIdUseCase;
         this.videoStreamInfoDtoMapper = videoStreamInfoDtoMapper;
-        this.userGeolocationDtoMapper = userGeolocationDtoMapper;
+        this.createUserUseCase = createUserUseCase;
+        this.getUserGeolocationUseCase = getUserGeolocationUseCase;
     }
 
     @RequestMapping("/retrieveStreamInfoByExternalId")
@@ -62,7 +68,14 @@ public class VideoApiController {
             @RequestParam(value = "providerId", required = false) Integer providerId,
             @RequestParam(value = "providerParams", required = false) String providerParams
     ) {
-        RequestContext context = userContextBuilder.createContextFromRequest(request);
+        final String uuid = request.getHeader(UUID_HEADER);
+        final String accountId = (String) request.getAttribute(ACCOUNT_ID);
+        final String userId = (String) request.getAttribute(USER_ID);
+        final String ip = request.getHeader(X_IP);
+
+        User user = this.createUserUseCase.createUser(uuid, ip, accountId, userId);
+
+        RequestContext context = new RequestContext(uuid, ip, user);
 
         logger.info("[{}]: Enter retrieveStreamInfoByExternalId, source: {}, id: {}, channelTypeId: {}, mobileDeviceId: {}", context.uuid(), externalIdSource, externalId, channelTypeId, mobileDeviceId);
 
@@ -90,11 +103,14 @@ public class VideoApiController {
 
     @RequestMapping("/retrieveUserGeolocation")
     public UserGeolocationDto retrieveUserGeolocation(HttpServletRequest request) {
-        RequestContext context = userContextBuilder.createContextFromRequest(request);
+        final String uuid = request.getHeader(UUID_HEADER);
+        final String userIp = request.getHeader(X_IP);
 
-        logger.info("[{}] Enter retrieveUserGeolocation", context.uuid());
+        Geolocation userGeolocation = this.getUserGeolocationUseCase.getUserGeolocation(uuid, userIp);
 
-        return userGeolocationDtoMapper.mapToDto(context.user());
+        logger.info("[{}] Enter retrieveUserGeolocation", uuid);
+
+        return UserGeolocationMapper.mapToDto(userGeolocation);
     }
 
 }

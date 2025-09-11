@@ -1,11 +1,11 @@
 package com.betfair.video.api.domain.service;
 
-import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.valueobject.Geolocation;
 import com.betfair.video.api.domain.dto.valueobject.UserPermissions;
+import com.betfair.video.api.domain.port.input.CreateUserUseCase;
 
-public class UserService {
+public class UserService implements CreateUserUseCase {
 
     private final UserGeolocationService userGeolocationService;
 
@@ -16,17 +16,17 @@ public class UserService {
         this.permissionService = permissionService;
     }
 
-    public User createUserFromContext(RequestContext context, String accountId, String userId) {
-        Geolocation geolocation = userGeolocationService.getUserGeolocation(context);
+    @Override
+    public User createUser(String uuid, String ip, String accountId, String userId) {
+        Geolocation geolocation = userGeolocationService.getUserGeolocation(uuid, ip);
         UserPermissions permissions = permissionService.createUserPermissions();
 
         return new User(
                 accountId,
                 userId,
-                context.resolvedIps().getFirst(),
+                ip,
                 geolocation,
                 permissions
         );
     }
-
 }

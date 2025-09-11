@@ -1,6 +1,5 @@
 package com.betfair.video.api.infra.output.adapter;
 
-import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.valueobject.CountryAndSubdivisions;
 import com.betfair.video.api.domain.dto.valueobject.Geolocation;
 import com.betfair.video.api.domain.port.output.GeolocationPort;
@@ -14,19 +13,16 @@ import com.maxmind.geoip2.record.Location;
 import com.maxmind.geoip2.record.Subdivision;
 import com.maxmind.geoip2.record.Traits;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Component
 public class GeolocationAdapter implements GeolocationPort {
@@ -43,21 +39,22 @@ public class GeolocationAdapter implements GeolocationPort {
     }
 
     @Override
-    public Geolocation getUserGeolocation(RequestContext userContext) {
-        String clientIp = getUserIpAddress(userContext);
-
-        Integer metroCode = resolveDmaId(userContext)
+    public Geolocation getUserGeolocation(String uuid, String ip) {
+        Integer metroCode = resolveDmaId(uuid, ip)
                 .orElse(null);
 
         try {
-            Validate.isTrue(StringUtils.isNotBlank(clientIp));
-            InetAddress clientAddress = InetAddress.getByName(clientIp);
+            if (StringUtils.isBlank(ip)) {
+                throw new IllegalArgumentException("IP address is empty");
+            }
+
+            InetAddress clientAddress = InetAddress.getByName(ip);
             CountryAndSubdivisions car = this.getCountryAndSubdivisions(clientAddress, cityReader);
-            boolean isSuspect = suspectNetworkPort.isSuspectNetwork(clientIp);
+            boolean isSuspect = suspectNetworkPort.isSuspectNetwork(ip);
 
             return new Geolocation(car.countryCode(), car.getRegionCode(), metroCode, isSuspect);
         } catch (GeoIp2Exception | IllegalArgumentException | IOException ex) {
-            logger.warn("Failed querying MaxMind GeoIp 2 database for ip {}. Falling back to default - unknown geo details", clientIp, ex);
+            logger.warn("[{}] Failed querying MaxMind GeoIp 2 database for ip {}. Falling back to default - unknown geo details", uuid, ip, ex);
             return new Geolocation("--", null, metroCode, false);
         }
     }
@@ -91,31 +88,21 @@ public class GeolocationAdapter implements GeolocationPort {
         );
     }
 
-    private Optional<Integer> resolveDmaId(RequestContext userContext) {
-        String clientIp = getUserIpAddress(userContext);
-
+    private Optional<Integer> resolveDmaId(String uuid, String ip) {
         Optional<Integer> dmaId = Optional.empty();
         try {
-            InetAddress inetAddress = InetAddress.getByName(clientIp);
+            InetAddress inetAddress = InetAddress.getByName(ip);
             dmaId = cityReader.tryCity(inetAddress)
                     .map(AbstractCityResponse::getLocation)
                     .map(Location::getMetroCode);
 
         } catch (IOException e) {
-            logger.error("[{}]: Exception occurred when handling user address {}, {}}", userContext.uuid(), clientIp, e.getMessage());
+            logger.error("[{}]: Exception occurred when handling user address {}, {}}", uuid, ip, e.getMessage());
         } catch (GeoIp2Exception e) {
-            logger.error("[{}]: Exception occurred while retrieving geolocation data for user address {}, {}", userContext.uuid(), clientIp, e.getMessage());
+            logger.error("[{}]: Exception occurred while retrieving geolocation data for user address {}, {}", uuid, ip, e.getMessage());
         }
 
         return dmaId;
-    }
-
-    private String getUserIpAddress(RequestContext user) {
-        return Optional.ofNullable(user.resolvedIps())
-                .map(Collection::stream)
-                .map(Stream::findFirst)
-                .flatMap(firstIp -> firstIp)
-                .orElse(null);
     }
 
     private Map<String, String> extractMetaAttributes(Traits traits) {

@@ -1,6 +1,5 @@
 package com.betfair.video.api.infra.adapter;
 
-import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.valueobject.Geolocation;
 import com.betfair.video.api.infra.output.adapter.GeolocationAdapter;
 import com.betfair.video.api.infra.output.adapter.SuspectNetworkAdapter;
@@ -46,8 +45,6 @@ class GeolocationAdapterTest {
     @DisplayName("Should return default geolocation for valid IP address")
     void shouldReturnDefaultGeolocationForValidIPAddress() throws IOException, GeoIp2Exception {
         // Given
-        RequestContext requestContext = new RequestContext("uuid", List.of(VALID_IP));
-
         CityResponse mockCityResponse = mock(CityResponse.class);
         Country mockCountry = mock(Country.class);
         Subdivision mockSubdivision = mock(Subdivision.class);
@@ -68,7 +65,7 @@ class GeolocationAdapterTest {
         when(suspectNetworkAdapter.isSuspectNetwork(VALID_IP)).thenReturn(false);
 
         // When
-        Geolocation geolocation = geolocationAdapter.getUserGeolocation(requestContext);
+        Geolocation geolocation = geolocationAdapter.getUserGeolocation("uuid", VALID_IP);
 
         // Then
         assertThat(geolocation).isNotNull();
