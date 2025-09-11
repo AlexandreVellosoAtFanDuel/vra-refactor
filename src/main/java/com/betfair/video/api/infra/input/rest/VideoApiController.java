@@ -97,9 +97,4 @@ public class VideoApiController {
         return userGeolocationDtoMapper.mapToDto(context.user());
     }
 
-    @RequestMapping("/testError")
-    public void testError() {
-        throw new StreamNotStartedException(null);
-    }
-
 }
