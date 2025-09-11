@@ -1,5 +1,6 @@
 package com.betfair.video.api.config.beans;
 
+import com.betfair.video.api.domain.mapper.VideoStreamInfoMapper;
 import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.output.DirectStreamConfigPort;
 import com.betfair.video.api.domain.port.output.GeolocationPort;
@@ -68,11 +69,10 @@ public class ServiceBeans {
                                        ScheduleItemService scheduleItemService, ProviderFactoryPort providerFactoryPort,
                                        PermissionService permissionService, BetsCheckService betsCheckService,
                                        DirectStreamConfigPort directStreamConfigPort, InlineStreamConfigPort inlineStreamConfigPort,
-                                       GeoRestrictionsService geoRestrictionsService,
-                                       ReferenceTypePort referenceTypePort) {
+                                       ReferenceTypePort referenceTypePort, VideoStreamInfoMapper videoStreamInfoMapper) {
         return new StreamService(configurationItemsPort, scheduleItemService, providerFactoryPort,
                 permissionService, betsCheckService, directStreamConfigPort, inlineStreamConfigPort,
-                geoRestrictionsService, referenceTypePort);
+                referenceTypePort, videoStreamInfoMapper);
     }
 
     @Bean

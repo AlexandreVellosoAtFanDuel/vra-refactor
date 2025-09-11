@@ -61,16 +61,15 @@ public class StreamService {
 
     private final InlineStreamConfigPort inlineStreamConfigPort;
 
-    private final GeoRestrictionsService geoRestrictionsService;
-
     private final ReferenceTypePort referenceTypePort;
+
+    private final VideoStreamInfoMapper videoStreamInfoMapper;
 
     public StreamService(ConfigurationItemsPort configurationItemsPort,
                          ScheduleItemService scheduleItemService, ProviderFactoryPort providerFactoryPort,
                          PermissionService permissionService, BetsCheckService betsCheckService,
                          DirectStreamConfigPort directStreamConfigPort, InlineStreamConfigPort inlineStreamConfigPort,
-                         GeoRestrictionsService geoRestrictionsService,
-                         ReferenceTypePort referenceTypePort) {
+                         ReferenceTypePort referenceTypePort, VideoStreamInfoMapper videoStreamInfoMapper) {
         this.configurationItemsPort = configurationItemsPort;
         this.scheduleItemService = scheduleItemService;
         this.providerFactoryPort = providerFactoryPort;
@@ -78,8 +77,8 @@ public class StreamService {
         this.betsCheckService = betsCheckService;
         this.directStreamConfigPort = directStreamConfigPort;
         this.inlineStreamConfigPort = inlineStreamConfigPort;
-        this.geoRestrictionsService = geoRestrictionsService;
         this.referenceTypePort = referenceTypePort;
+        this.videoStreamInfoMapper = videoStreamInfoMapper;
     }
 
     public VideoStreamInfo getStreamInfoByExternalId(final VideoStreamInfoByExternalIdSearchKey searchKey, final RequestContext context, final boolean includeMetadata) {
@@ -243,7 +242,7 @@ public class StreamService {
             }
         }
 
-        return VideoStreamInfoMapper.map(
+        return this.videoStreamInfoMapper.map(
                 item,
                 streamDetails,
                 provider.getAvailableVideoQualityValues(),
@@ -257,7 +256,6 @@ public class StreamService {
                 context.user(),
                 includeMetadata,
                 getVideoPlayerConfig(item, streamDetails),
-                geoRestrictionsService,
                 eventId,
                 eventName,
                 exchangeRaceId

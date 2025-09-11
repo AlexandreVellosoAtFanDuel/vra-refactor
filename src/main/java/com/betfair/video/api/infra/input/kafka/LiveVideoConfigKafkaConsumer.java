@@ -35,18 +35,10 @@ public class LiveVideoConfigKafkaConsumer {
 
     private final RefreshMapCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache;
 
-    private final ConfigurationItemMapper configurationItemMapper;
-
-    private final ConfigurationSearchKeyMapper configurationSearchKeyMapper;
-
     public LiveVideoConfigKafkaConsumer(RefreshMapCache<ConfigurationSearchKey, ConfigurationItem> configurationItemsRefreshCache,
-                                        RefreshMapCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache,
-                                        ConfigurationItemMapper configurationItemMapper,
-                                        ConfigurationSearchKeyMapper configurationSearchKeyMapper) {
+                                        RefreshMapCache<ReferenceTypeInfoByIdSearchKey, List<DomainReferenceType>> referenceTypeRefreshCache) {
         this.configurationItemsRefreshCache = configurationItemsRefreshCache;
         this.referenceTypeRefreshCache = referenceTypeRefreshCache;
-        this.configurationItemMapper = configurationItemMapper;
-        this.configurationSearchKeyMapper = configurationSearchKeyMapper;
     }
 
     @KafkaListener(topics = "${kafka.topic.livevideo-config}",
@@ -77,8 +69,8 @@ public class LiveVideoConfigKafkaConsumer {
         Map<ConfigurationSearchKey, ConfigurationItem> items = new HashMap<>();
 
         dbConfigs.forEach(dbConfigDto -> {
-            ConfigurationSearchKey key = configurationSearchKeyMapper.map(dbConfigDto);
-            ConfigurationItem value = configurationItemMapper.map(dbConfigDto);
+            ConfigurationSearchKey key = ConfigurationSearchKeyMapper.map(dbConfigDto);
+            ConfigurationItem value = ConfigurationItemMapper.map(dbConfigDto);
 
             items.put(key, value);
         });
