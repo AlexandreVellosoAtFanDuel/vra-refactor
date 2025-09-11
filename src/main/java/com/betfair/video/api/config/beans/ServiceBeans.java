@@ -1,6 +1,7 @@
 package com.betfair.video.api.config.beans;
 
 import com.betfair.video.api.domain.mapper.VideoStreamInfoMapper;
+import com.betfair.video.api.domain.port.output.AuthenticationPort;
 import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
 import com.betfair.video.api.domain.port.output.DirectStreamConfigPort;
 import com.betfair.video.api.domain.port.output.GeolocationPort;
@@ -9,6 +10,7 @@ import com.betfair.video.api.domain.port.output.ProviderFactoryPort;
 import com.betfair.video.api.domain.port.output.ReferenceTypePort;
 import com.betfair.video.api.domain.port.output.VideoStreamInfoPort;
 import com.betfair.video.api.domain.service.AtrScheduleService;
+import com.betfair.video.api.domain.service.AuthenticationService;
 import com.betfair.video.api.domain.service.BetsCheckService;
 import com.betfair.video.api.domain.service.EventService;
 import com.betfair.video.api.domain.service.GeoRestrictionsService;
@@ -83,6 +85,11 @@ public class ServiceBeans {
     @Bean
     public UserService userService(UserGeolocationService userGeolocationService, PermissionService permissionService) {
         return new UserService(userGeolocationService, permissionService);
+    }
+
+    @Bean
+    public AuthenticationService authenticationService(AuthenticationPort authenticationPort) {
+        return new AuthenticationService(authenticationPort);
     }
 
 }

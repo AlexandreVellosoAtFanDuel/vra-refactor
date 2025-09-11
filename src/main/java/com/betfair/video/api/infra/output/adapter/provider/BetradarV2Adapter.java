@@ -23,14 +23,12 @@ import com.betfair.video.api.infra.output.dto.betradarv2.ContentDto;
 import com.betfair.video.api.infra.output.dto.betradarv2.StreamDto;
 import com.betfair.video.api.infra.output.dto.betradarv2.StreamUrlDto;
 import com.hazelcast.map.IMap;
-import feign.FeignException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -137,10 +135,10 @@ public class BetradarV2Adapter implements StreamingProviderPort {
             try {
                 cachedEvents = betRadarV2Client.getAudioVisualEvents(recommendedStreamStatusIds, recommendedStreamProductIds);
                 this.audioVisualEvents.put("audioVisualEvents", cachedEvents);
-            } catch (FeignException fe) {
-                logger.error("[{}]: Feign error trying to fetch audio visual events from provider for httpStatus = {}, recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
-                        context.uuid(), fe.status(), recommendedStreamStatusIds, recommendedStreamProductIds, fe.getMessage(), fe);
-                throw new ErrorInDependentServiceException("General error trying to fetch audio visual events from provider", null);
+            } catch (VideoException ex) {
+                logger.error("[{}]: Error when trying to fetch audio visual events from provider for recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
+                        context.uuid(), recommendedStreamStatusIds, recommendedStreamProductIds, ex.getMessage(), ex);
+                throw ex;
             } catch (Exception ex) {
                 logger.error("[{}] General error trying to fetch audio visual events from provider for recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
                         context.uuid(), recommendedStreamStatusIds, recommendedStreamProductIds, ex.getMessage(), ex);
@@ -154,12 +152,8 @@ public class BetradarV2Adapter implements StreamingProviderPort {
     private StreamUrlDto getStreamLink(RequestContext context, String streamId, String streamType, String userIP) {
         try {
             return betRadarV2Client.getStreamLink(streamId, streamType, userIP);
-        } catch (FeignException fe) {
-            if (HttpStatus.NOT_FOUND.value() == fe.status()) {
-                throw new StreamNotFoundException("Straem link not found", null);
-            }
-
-            logger.error("[{}]: Feign error trying to fetch stream link for httpStatus = {}, streamId {} and streamType {}. Exception: {}", context.uuid(), fe.status(), streamId, streamType, fe.getMessage(), fe);
+        } catch (VideoException ex) {
+            logger.error("[{}]: Error when trying to fetch stream link for streamId {} and streamType {}. Exception: {}", context.uuid(), streamId, streamType, ex.getMessage(), ex);
         } catch (Exception ex) {
             logger.error("[{}] General error trying to fetch stream link for streamId {} and streamType {}. Exception: {}", context.uuid(), streamId, streamType, ex.getMessage(), ex);
         }

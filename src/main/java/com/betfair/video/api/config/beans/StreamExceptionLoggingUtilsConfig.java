@@ -1,4 +1,4 @@
-package com.betfair.video.api.config.beans.utils;
+package com.betfair.video.api.config.beans;
 
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
 import org.springframework.beans.factory.annotation.Value;

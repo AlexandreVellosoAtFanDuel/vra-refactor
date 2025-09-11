@@ -11,7 +11,7 @@ import com.betfair.video.api.domain.dto.valueobject.StreamDetails;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamEndpoint;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.api.domain.service.GeoRestrictionsService;
+import com.betfair.video.api.domain.port.input.GeoRestrictionsUseCase;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -26,10 +26,10 @@ import java.util.TreeSet;
 
 public class VideoStreamInfoMapper {
 
-    private final GeoRestrictionsService geoRestrictionsService;
+    private final GeoRestrictionsUseCase geoRestrictionsUseCase;
 
-    public VideoStreamInfoMapper(GeoRestrictionsService geoRestrictionsService) {
-        this.geoRestrictionsService = geoRestrictionsService;
+    public VideoStreamInfoMapper(GeoRestrictionsUseCase geoRestrictionsUseCase) {
+        this.geoRestrictionsUseCase = geoRestrictionsUseCase;
     }
 
     public VideoStreamInfo map(
@@ -127,7 +127,7 @@ public class VideoStreamInfoMapper {
     }
 
     private String mapBlockedCountries(ScheduleItem scheduleItem) {
-        String defaultBlockedCountries = this.geoRestrictionsService.getProviderBlockedCountries(scheduleItem);
+        String defaultBlockedCountries = this.geoRestrictionsUseCase.getProviderBlockedCountries(scheduleItem);
         String providerBlockedCountries = scheduleItem.providerData() != null
                 ? scheduleItem.providerData().getBlockedCountries() : null;
         String overrideBlockedCountries = scheduleItem.overriddenData() != null

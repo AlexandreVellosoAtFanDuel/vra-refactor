@@ -3,12 +3,9 @@ package com.betfair.video.api.domain.service;
 import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.TypeChannel;
 import com.betfair.video.api.domain.dto.entity.TypeMobileDevice;
-import com.betfair.video.api.domain.dto.entity.TypeStream;
 import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.dto.valueobject.ContentType;
-import com.betfair.video.api.domain.dto.valueobject.ExternalId;
-import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
 import com.betfair.video.api.domain.dto.valueobject.UserPermissions;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
@@ -25,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.INSUFFICIENT_ACCESS;
@@ -73,13 +69,6 @@ class EventServiceTest {
         when(context.uuid()).thenReturn("test-uuid");
         when(context.user()).thenReturn(user);
 
-        ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
-        when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
-                .thenReturn(externalId);
-
-        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentType.VID))
-                .thenReturn(TypeStream.VID.getId());
-
         VideoStreamInfo videoStreamInfoMock = mock(VideoStreamInfo.class);
         when(streamService.getStreamInfoByExternalId(any(VideoStreamInfoByExternalIdSearchKey.class), eq(context), anyBoolean()))
                 .thenReturn(videoStreamInfoMock);
@@ -126,13 +115,6 @@ class EventServiceTest {
         when(context.uuid()).thenReturn("test-uuid");
         when(context.user()).thenReturn(user);
 
-        ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
-        when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
-                .thenReturn(externalId);
-
-        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentType.VID))
-                .thenReturn(TypeStream.VID.getId());
-
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
                 context, "1", "12345", TypeChannel.NULL.getId(), null, null, null, null, null, null, null, ContentType.VID, null, null))
@@ -156,13 +138,6 @@ class EventServiceTest {
         when(context.uuid()).thenReturn("test-uuid");
         when(context.user()).thenReturn(user);
 
-        ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
-        when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
-                .thenReturn(externalId);
-
-        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentType.VID))
-                .thenReturn(TypeStream.VID.getId());
-
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
                 context, "1", "12345", TypeChannel.WEB.getId(), null, TypeMobileDevice.ANDROID_PHONE.getId(), null, null, null, null, null, ContentType.VID, null, null))
@@ -185,13 +160,6 @@ class EventServiceTest {
         RequestContext context = mock(RequestContext.class);
         when(context.uuid()).thenReturn("test-uuid");
         when(context.user()).thenReturn(user);
-
-        ExternalId externalId = new ExternalId(ExternalIdSource.BETFAIR_EVENT, Map.of("12345", Collections.emptyList()));
-        when(externalIdMapper.map(eq(ExternalIdSource.BETFAIR_EVENT), any()))
-                .thenReturn(externalId);
-
-        when(typeStreamMapper.convertContentTypeToStreamTypeId(ContentType.VID))
-                .thenReturn(TypeStream.VID.getId());
 
         // When & Then
         assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(

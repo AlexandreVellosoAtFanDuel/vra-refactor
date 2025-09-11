@@ -4,6 +4,7 @@ import com.betfair.video.api.domain.dto.entity.ProviderEventKey;
 import com.betfair.video.api.domain.dto.entity.ReferenceType;
 import com.betfair.video.api.domain.dto.entity.RequestContext;
 import com.betfair.video.api.domain.dto.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemMapping;
 import com.betfair.video.api.domain.dto.entity.ScheduleItemMappingKey;
 import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.search.VideoRequestIdentifier;
@@ -12,7 +13,6 @@ import com.betfair.video.api.domain.dto.search.VideoStreamInfoSearchKeyWrapper;
 import com.betfair.video.api.domain.dto.valueobject.BetsCheckerStatusEnum;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.Geolocation;
-import com.betfair.video.api.domain.dto.entity.ScheduleItemMapping;
 import com.betfair.video.api.domain.dto.valueobject.StreamDetails;
 import com.betfair.video.api.domain.dto.valueobject.StreamParams;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
@@ -127,7 +127,7 @@ class StreamServiceTest {
         when(betsCheckService.getBBVStatus(any(VideoRequestIdentifier.class), any(ScheduleItem.class), eq(context)))
                 .thenReturn(BetsCheckerStatusEnum.BBV_NOT_REQUIRED_CONFIG);
 
-        when(videoStreamInfoMapper.map(any(ScheduleItem.class), any(StreamDetails.class), any(), any(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), anyBoolean(), any(), any(), any(), any(), any()))
+        when(videoStreamInfoMapper.map(any(ScheduleItem.class), any(StreamDetails.class), any(), any(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), anyBoolean(), any(), any(), any(), any()))
                 .thenReturn(mock(VideoStreamInfo.class));
 
         when(referenceTypePort.findReferenceTypeById(any(), any()))

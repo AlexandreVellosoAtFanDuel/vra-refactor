@@ -1,18 +1,18 @@
 package com.betfair.video.api.infra.adapter;
 
+import com.betfair.video.api.domain.exception.ErrorInDependentServiceException;
+import com.betfair.video.api.domain.exception.InsufficientAccessException;
 import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.infra.input.rest.dto.cro.RequestVerifySession;
-import com.betfair.video.api.infra.output.dto.ResponseVerifySession;
-import com.betfair.video.api.infra.output.client.CROClient;
 import com.betfair.video.api.infra.output.adapter.AuthenticationAdapter;
-import feign.FeignException;
+import com.betfair.video.api.infra.output.client.CROClient;
+import com.betfair.video.api.infra.output.dto.ResponseVerifySession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 
 import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE;
 import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.INSUFFICIENT_ACCESS;
@@ -52,9 +52,7 @@ class AuthenticationAdapterTest {
     @DisplayName("Should throw unauthorized response for invalid session")
     void shouldHandleExceptionsGracefullyWhenVerifyingSessionToken() {
         // Given
-        FeignException unauthorizedException = mock(FeignException.class);
-        when(unauthorizedException.status()).thenReturn(HttpStatus.UNAUTHORIZED.value());
-        when(croClient.verifySession(any(RequestVerifySession.class))).thenThrow(unauthorizedException);
+        when(croClient.verifySession(any(RequestVerifySession.class))).thenThrow(new InsufficientAccessException());
 
         // When & Then
         assertThatThrownBy(() -> authenticationAdapter.verifySession(INVALID_SESSION_TOKEN))
@@ -70,9 +68,7 @@ class AuthenticationAdapterTest {
     @DisplayName("Should throw unauthorized response for error when validating session")
     void shouldThrowUnauthorizedResponseForErrorWhenValidatingSession() {
         // Given
-        FeignException unauthorizedException = mock(FeignException.class);
-        when(unauthorizedException.status()).thenReturn(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        when(croClient.verifySession(any(RequestVerifySession.class))).thenThrow(unauthorizedException);
+        when(croClient.verifySession(any(RequestVerifySession.class))).thenThrow(new ErrorInDependentServiceException());
 
         // When & Then
         assertThatThrownBy(() -> authenticationAdapter.verifySession(INVALID_SESSION_TOKEN))

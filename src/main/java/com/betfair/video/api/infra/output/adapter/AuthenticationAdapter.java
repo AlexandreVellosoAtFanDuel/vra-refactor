@@ -8,10 +8,8 @@ import com.betfair.video.api.infra.input.rest.dto.cro.RequestVerifySession;
 import com.betfair.video.api.infra.input.rest.dto.cro.SessionToken;
 import com.betfair.video.api.infra.output.client.CROClient;
 import com.betfair.video.api.infra.output.dto.ResponseVerifySession;
-import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,16 +30,14 @@ public class AuthenticationAdapter implements AuthenticationPort {
         try {
             ResponseVerifySession session = this.croClient.verifySession(request);
             return new UserSessionDto(session.accountId(), session.userId());
-        } catch (FeignException fe) {
-            if (HttpStatus.UNAUTHORIZED.value() == fe.status()) {
-                logger.warn("Session verification failed with status: {}", fe.status());
-                throw new InsufficientAccessException();
-            }
-
-            logger.warn("Error when verifying session: {}", fe.getMessage());
-            throw new ErrorInDependentServiceException();
+        } catch (InsufficientAccessException ex) {
+            logger.info("Session verification failed", ex);
+            throw ex;
+        }catch (ErrorInDependentServiceException ex) {
+            logger.info("Error in CRO service during session verification", ex);
+            throw ex;
         } catch (Exception e) {
-            logger.error("Error verifying session", e);
+            logger.error("General error verifying session", e);
             throw new ErrorInDependentServiceException();
         }
     }
