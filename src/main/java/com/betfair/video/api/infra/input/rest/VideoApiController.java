@@ -15,7 +15,7 @@ import com.betfair.video.api.infra.input.rest.dto.UserGeolocationDto;
 import com.betfair.video.api.infra.input.rest.dto.VideoQualityDto;
 import com.betfair.video.api.infra.input.rest.dto.VideoStreamInfoDto;
 import com.betfair.video.api.infra.input.rest.mapper.UserGeolocationMapper;
-import com.betfair.video.api.infra.input.rest.mapper.VideoStreamInfoDtoMapper;
+import com.betfair.video.api.infra.input.rest.mapper.VideoStreamInfoMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,15 +38,12 @@ public class VideoApiController {
 
     private final RetrieveStreamInfoByExternalIdUseCase retrieveStreamInfoByExternalIdUseCase;
 
-    private final VideoStreamInfoDtoMapper videoStreamInfoDtoMapper;
-
     private final CreateUserUseCase createUserUseCase;
 
     private final GetUserGeolocationUseCase getUserGeolocationUseCase;
 
-    public VideoApiController(EventService retrieveStreamInfoByExternalIdUseCase, VideoStreamInfoDtoMapper videoStreamInfoDtoMapper, CreateUserUseCase createUserUseCase, GetUserGeolocationUseCase getUserGeolocationUseCase) {
+    public VideoApiController(EventService retrieveStreamInfoByExternalIdUseCase, CreateUserUseCase createUserUseCase, GetUserGeolocationUseCase getUserGeolocationUseCase) {
         this.retrieveStreamInfoByExternalIdUseCase = retrieveStreamInfoByExternalIdUseCase;
-        this.videoStreamInfoDtoMapper = videoStreamInfoDtoMapper;
         this.createUserUseCase = createUserUseCase;
         this.getUserGeolocationUseCase = getUserGeolocationUseCase;
     }
@@ -98,7 +95,7 @@ public class VideoApiController {
                 providerParams
         );
 
-        return videoStreamInfoDtoMapper.mapToDto(item);
+        return VideoStreamInfoMapper.mapToDto(item);
     }
 
     @RequestMapping("/retrieveUserGeolocation")

@@ -17,4 +17,14 @@ public enum VideoQualityDto {
     public String getValue() {
         return value;
     }
+
+    public static VideoQualityDto fromValue(String value) {
+        for (VideoQualityDto quality : VideoQualityDto.values()) {
+            if (quality.value != null && quality.value.equals(value)) {
+                return quality;
+            }
+        }
+
+        return UNRECOGNIZED_VALUE;
+    }
 }
