@@ -1,1 +1,6 @@
 rootProject.name = 'video-retrieval-api'
+include 'input'
+include 'domain'
+include 'application'
+include 'output'
+
