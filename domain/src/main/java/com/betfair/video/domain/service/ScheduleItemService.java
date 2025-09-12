@@ -109,7 +109,7 @@ public class ScheduleItemService {
     }
 
     public boolean isItemWatchAndBetSupported(ScheduleItem scheduleItem) {
-        //612164 Perform provider became watch&bet(no bbv check required for user) for horseracing, but only UK racecources are free, Irish venues we need to check using bbv services.
+        //612164 Perform adapter.provider became watch&bet(no bbv check required for user) for horseracing, but only UK racecources are free, Irish venues we need to check using bbv services.
         // Remove this when Irish races are watch&bet
         String watchAndBetVenues = configurationItemsPort.findProviderWatchAndBetVenues(
                 scheduleItem.providerId(), scheduleItem.videoChannelType(), scheduleItem.betfairSportsType(),

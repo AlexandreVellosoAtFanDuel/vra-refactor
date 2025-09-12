@@ -89,7 +89,7 @@ public class VideoException extends RuntimeException {
         STREAM_GENERIC_ERROR(30),
 
         /**
-         * HTTP 404 Not Found. The consumer has attempted to access a stream that the provider cannot find. This could be because the stream no longer exists or an invalid id has been provided
+         * HTTP 404 Not Found. The consumer has attempted to access a stream that the adapter.provider cannot find. This could be because the stream no longer exists or an invalid id has been provided
          */
         STREAM_NOT_FOUND(31),
 
@@ -104,7 +104,7 @@ public class VideoException extends RuntimeException {
         STREAM_HAS_ENDED(33),
 
         /**
-         * HTTP 403 Forbidden. The streaming provider is denying the customer access to the video event. Reasons vary from provider to provider
+         * HTTP 403 Forbidden. The streaming adapter.provider is denying the customer access to the video event. Reasons vary from adapter.provider to adapter.provider
          */
         STREAM_ACCESS_DENIED(34),
 
@@ -124,7 +124,7 @@ public class VideoException extends RuntimeException {
         CANNOT_UNIQUELY_RESOLVE_STREAM(51),
 
         /**
-         * HTTP 500 Internal Server Error. The streaming provider has returned an error.
+         * HTTP 500 Internal Server Error. The streaming adapter.provider has returned an error.
          */
         PROVIDER_CONNECTION_ERROR(52),
 
@@ -134,12 +134,12 @@ public class VideoException extends RuntimeException {
         NOT_IN_ARCHIVE_YET(53),
 
         /**
-         * HTTP 403 Forbidden. The consumer has attempted to access a stream of provider that is not available on site (app) request comes from
+         * HTTP 403 Forbidden. The consumer has attempted to access a stream of adapter.provider that is not available on site (app) request comes from
          */
         PROVIDER_NOT_AVAILABLE_ON_SITE(54),
 
         /**
-         * HTTP 403 Forbidden. The consumer has attempted to access a stream of provider's venue that is not available on site (app) request comes from
+         * HTTP 403 Forbidden. The consumer has attempted to access a stream of adapter.provider's venue that is not available on site (app) request comes from
          */
         VENUE_NOT_AVAILABLE_ON_SITE(55),
 

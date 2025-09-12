@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class GeoRestrictionsService implements GeoRestrictionsServicePort {
 
     public String getProviderBlockedCountries(ScheduleItem scheduleItem) {
-        // TODO: Fetch provider blocked countries
+        // TODO: Fetch adapter.provider blocked countries
         return "ZA";
     }
 

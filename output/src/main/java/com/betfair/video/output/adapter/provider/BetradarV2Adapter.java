@@ -89,7 +89,7 @@ public class BetradarV2Adapter implements StreamingProviderPort {
         StreamingFormat streamFormat = configurationItemsRepository.findPreferredStreamingFormat(Provider.BETRADAR_V2,
                 item.videoChannelType(), item.betfairSportsType(), item.streamTypeId(), item.brandId());
         if (streamFormat == null) {
-            logger.info("There is no default stream format for provider {}, channel {}, stream type {}. Using 'rtmp' as default stream format.", Provider.BETRADAR_V2, item.videoChannelType(), item.streamTypeId());
+            logger.info("There is no default stream format for adapter.provider {}, channel {}, stream type {}. Using 'rtmp' as default stream format.", Provider.BETRADAR_V2, item.videoChannelType(), item.streamTypeId());
             streamFormat = StreamingFormat.RTMP;
         }
 
@@ -136,13 +136,13 @@ public class BetradarV2Adapter implements StreamingProviderPort {
                 cachedEvents = betRadarV2Client.getAudioVisualEvents(recommendedStreamStatusIds, recommendedStreamProductIds);
                 this.audioVisualEvents.put("audioVisualEvents", cachedEvents);
             } catch (VideoException ex) {
-                logger.error("[{}]: Error when trying to fetch audio visual events from provider for recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
+                logger.error("[{}]: Error when trying to fetch audio visual events from adapter.provider for recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
                         context.uuid(), recommendedStreamStatusIds, recommendedStreamProductIds, ex.getMessage(), ex);
                 throw ex;
             } catch (Exception ex) {
-                logger.error("[{}] General error trying to fetch audio visual events from provider for recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
+                logger.error("[{}] General error trying to fetch audio visual events from adapter.provider for recommendedStreamStatusIds {} and recommendedStreamProductIds {}. Exception: {}",
                         context.uuid(), recommendedStreamStatusIds, recommendedStreamProductIds, ex.getMessage(), ex);
-                throw new ErrorInDependentServiceException("General error trying to fetch audio visual events from provider", null);
+                throw new ErrorInDependentServiceException("General error trying to fetch audio visual events from adapter.provider", null);
             }
         }
 

@@ -85,10 +85,10 @@ public class StreamService {
     public VideoStreamInfo getStreamInfoByExternalId(final VideoStreamInfoByExternalIdSearchKey searchKey, final RequestContext context, final boolean includeMetadata) {
 
         if (searchKey.getProviderId() != null && referenceTypePort.findReferenceTypeById(searchKey.getProviderId(), ReferenceTypeEnum.VIDEO_PROVIDER) == null) {
-            logger.error("[{}]: No provider was found for the given provider ID ({}). User country: {},{}.",
+            logger.error("[{}]: No adapter.provider was found for the given adapter.provider ID ({}). User country: {},{}.",
                     context.uuid(), searchKey.getProviderId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
 
-            final String message = String.format("No provider was found for the given provider ID (%s). User country: %s,%s.",
+            final String message = String.format("No adapter.provider was found for the given adapter.provider ID (%s). User country: %s,%s.",
                     searchKey.getProviderId(), context.user().geolocation().countryCode(), context.user().geolocation().subDivisionCode());
             throw new InvalidInputException(message, null);
         }
@@ -168,7 +168,7 @@ public class StreamService {
         StreamingProviderPort provider = providerFactoryPort.getStreamingProviderByIdAndVideoChannelId(item.providerId());
 
         if (provider == null) {
-            logger.error("[{}]: No provider was found for the given provider ID ({}).",
+            logger.error("[{}]: No adapter.provider was found for the given adapter.provider ID ({}).",
                     context.uuid(), item.providerId());
             throw new InvalidInputException();
         }

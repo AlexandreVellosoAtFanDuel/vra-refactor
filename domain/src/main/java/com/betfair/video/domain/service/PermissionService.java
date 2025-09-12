@@ -209,13 +209,13 @@ public class PermissionService {
         } else {
             // A search by external IDs resulted in multiple video streams.
             // Returning stream with Exact mapping or the one with the highest inexact total score if requested by eventId.
-            // Otherwise - returning one with the highest provider event id and logging issue
+            // Otherwise - returning one with the highest adapter.provider event id and logging issue
             if (searchKey.getExternalIdSource() == ExternalIdSource.BETFAIR_EVENT) {
                 logger.info("[{}]: Cannot uniquely resolve stream! Returning item with Exact mapping or highest inexact score. Search key: {}. Resolved items: {}",
                         context.uuid(), searchKey, ScheduleItemUtils.getItemsForLog(items));
                 pickedScheduleItem = ScheduleItemUtils.pickMaxScoredStream(searchKey.getPrimaryId(), items);
             } else {
-                logger.info("[{}]: Cannot uniquely resolve stream! Returning item with higher provider event id. Video id: {}. Search key: {}. Resolved items: {}",
+                logger.info("[{}]: Cannot uniquely resolve stream! Returning item with higher adapter.provider event id. Video id: {}. Search key: {}. Resolved items: {}",
                         context.uuid(), items.getFirst().videoItemId(), searchKey, ScheduleItemUtils.getItemsForLog(items));
 
                 pickedScheduleItem = getItemWithHighestProviderEventId(items);
