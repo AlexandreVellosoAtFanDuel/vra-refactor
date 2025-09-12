@@ -1,16 +1,16 @@
 package service;
 
-import com.betfair.video.domain.dto.entity.RequestContext;
-import com.betfair.video.domain.dto.entity.ScheduleItem;
-import com.betfair.video.domain.dto.entity.ScheduleItemData;
-import com.betfair.video.domain.dto.valueobject.VideoStreamState;
-import com.betfair.video.domain.exception.VideoException;
-import com.betfair.video.domain.port.output.ConfigurationItemsPort;
-import com.betfair.video.domain.port.output.VideoStreamInfoPort;
-import com.betfair.video.domain.service.PermissionService;
-import com.betfair.video.domain.service.ScheduleItemService;
-import com.betfair.video.domain.utils.DateUtils;
-import com.betfair.video.domain.utils.StreamExceptionLoggingUtils;
+import com.betfair.video.api.domain.dto.entity.RequestContext;
+import com.betfair.video.api.domain.dto.entity.ScheduleItem;
+import com.betfair.video.api.domain.dto.entity.ScheduleItemData;
+import com.betfair.video.api.domain.dto.valueobject.VideoStreamState;
+import com.betfair.video.api.domain.exception.VideoException;
+import com.betfair.video.api.domain.port.output.ConfigurationItemsPort;
+import com.betfair.video.api.domain.port.output.VideoStreamInfoPort;
+import com.betfair.video.api.domain.service.PermissionService;
+import com.betfair.video.api.domain.service.ScheduleItemService;
+import com.betfair.video.api.domain.utils.DateUtils;
+import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,8 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Date;
 
-import static com.betfair.video.domain.exception.VideoException.ErrorCodeEnum.STREAM_HAS_ENDED;
-import static com.betfair.video.domain.exception.VideoException.ErrorCodeEnum.STREAM_NOT_STARTED;
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.STREAM_HAS_ENDED;
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.STREAM_NOT_STARTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

@@ -1,6 +1,6 @@
 package adapter;
 
-import com.betfair.video.output.adapter.SuspectNetworkAdapter;
+import com.betfair.video.api.output.adapter.SuspectNetworkAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

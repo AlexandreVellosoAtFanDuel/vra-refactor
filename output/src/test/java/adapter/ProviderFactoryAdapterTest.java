@@ -1,8 +1,8 @@
 package adapter;
 
-import com.betfair.video.output.adapter.ProviderFactoryAdapter;
-import com.betfair.video.output.adapter.provider.BetradarV2Adapter;
-import com.betfair.video.output.adapter.provider.IMGProviderAdapter;
+import com.betfair.video.api.output.adapter.ProviderFactoryAdapter;
+import com.betfair.video.api.output.adapter.provider.BetradarV2Adapter;
+import com.betfair.video.api.output.adapter.provider.IMGProviderAdapter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

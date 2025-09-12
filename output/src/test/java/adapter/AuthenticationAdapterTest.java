@@ -1,12 +1,12 @@
 package adapter;
 
-import com.betfair.video.domain.exception.ErrorInDependentServiceException;
-import com.betfair.video.domain.exception.InsufficientAccessException;
-import com.betfair.video.domain.exception.VideoException;
-import com.betfair.video.output.adapter.AuthenticationAdapter;
-import com.betfair.video.output.client.CROClient;
-import com.betfair.video.output.dto.ResponseVerifySession;
-import com.betfair.video.output.dto.cro.RequestVerifySession;
+import com.betfair.video.api.domain.exception.ErrorInDependentServiceException;
+import com.betfair.video.api.domain.exception.InsufficientAccessException;
+import com.betfair.video.api.domain.exception.VideoException;
+import com.betfair.video.api.output.adapter.AuthenticationAdapter;
+import com.betfair.video.api.output.client.CROClient;
+import com.betfair.video.api.output.dto.ResponseVerifySession;
+import com.betfair.video.api.output.dto.cro.RequestVerifySession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static com.betfair.video.domain.exception.VideoException.ErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE;
-import static com.betfair.video.domain.exception.VideoException.ErrorCodeEnum.INSUFFICIENT_ACCESS;
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.ERROR_IN_DEPENDENT_SERVICE;
+import static com.betfair.video.api.domain.exception.VideoException.ErrorCodeEnum.INSUFFICIENT_ACCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

@@ -1,8 +1,8 @@
 package adapter;
 
-import com.betfair.video.domain.dto.valueobject.Geolocation;
-import com.betfair.video.output.adapter.GeolocationAdapter;
-import com.betfair.video.output.adapter.SuspectNetworkAdapter;
+import com.betfair.video.api.domain.dto.valueobject.Geolocation;
+import com.betfair.video.api.output.adapter.GeolocationAdapter;
+import com.betfair.video.api.output.adapter.SuspectNetworkAdapter;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;

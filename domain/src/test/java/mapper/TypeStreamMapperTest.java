@@ -1,8 +1,8 @@
 package mapper;
 
-import com.betfair.video.domain.dto.entity.TypeStream;
-import com.betfair.video.domain.dto.valueobject.ContentType;
-import com.betfair.video.domain.mapper.TypeStreamMapper;
+import com.betfair.video.api.domain.dto.entity.TypeStream;
+import com.betfair.video.api.domain.dto.valueobject.ContentType;
+import com.betfair.video.api.domain.mapper.TypeStreamMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

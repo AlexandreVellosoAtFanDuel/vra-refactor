@@ -1,0 +1,16 @@
+package com.betfair.video.api.output.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.concurrent.Executors;
+
+@Configuration
+public class ExecutorServiceConfig {
+
+    @Bean
+    public java.util.concurrent.ExecutorService executorService() {
+        return Executors.newFixedThreadPool(1);
+    }
+
+}

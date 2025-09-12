@@ -22,7 +22,7 @@ class ArchitectureTest {
     static void setUp() {
         importedClasses = new ClassFileImporter()
                 .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
-                .importPackages("com.betfair.video");
+                .importPackages("com.betfair.video.api");
     }
 
     @ParameterizedTest
