@@ -7,7 +7,7 @@ import com.betfair.video.domain.dto.valueobject.VideoStreamInfo;
 
 import java.util.List;
 
-public interface RetrieveStreamInfoByExternalIdUseCase {
+public interface EventServicePort {
 
     VideoStreamInfo retrieveScheduleByExternalId(RequestContext context, String externalIdSource, String externalId,
                                                  Integer channelTypeId, List<Integer> channelSubTypeIds, Integer mobileDeviceId,

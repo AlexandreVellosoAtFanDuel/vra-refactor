@@ -4,11 +4,11 @@ package com.betfair.video.domain.service;
 import com.betfair.video.domain.dto.entity.User;
 import com.betfair.video.domain.dto.valueobject.Geolocation;
 import com.betfair.video.domain.dto.valueobject.UserPermissions;
-import com.betfair.video.domain.port.input.CreateUserUseCase;
+import com.betfair.video.domain.port.input.UserServicePort;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService implements CreateUserUseCase {
+public class UserService implements UserServicePort {
 
     private final UserGeolocationService userGeolocationService;
 

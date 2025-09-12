@@ -18,7 +18,7 @@ import com.betfair.video.domain.exception.StreamNotFoundException;
 import com.betfair.video.domain.exception.VideoException;
 import com.betfair.video.domain.mapper.ExternalIdMapper;
 import com.betfair.video.domain.mapper.TypeStreamMapper;
-import com.betfair.video.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
+import com.betfair.video.domain.port.input.EventServicePort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class EventService implements RetrieveStreamInfoByExternalIdUseCase {
+public class EventService implements EventServicePort {
 
     private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 

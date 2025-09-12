@@ -6,9 +6,9 @@ import com.betfair.video.domain.dto.valueobject.ContentType;
 import com.betfair.video.domain.dto.valueobject.Geolocation;
 import com.betfair.video.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.domain.port.input.CreateUserUseCase;
-import com.betfair.video.domain.port.input.GetUserGeolocationUseCase;
-import com.betfair.video.domain.port.input.RetrieveStreamInfoByExternalIdUseCase;
+import com.betfair.video.domain.port.input.UserServicePort;
+import com.betfair.video.domain.port.input.UserGeolocationServicePort;
+import com.betfair.video.domain.port.input.EventServicePort;
 import com.betfair.video.input.rest.dto.VideoQualityDto;
 import com.betfair.video.input.rest.dto.VideoStreamInfoDto;
 import com.betfair.video.input.rest.dto.ContentTypeDto;
@@ -35,13 +35,13 @@ public class VideoApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(VideoApiController.class);
 
-    private final RetrieveStreamInfoByExternalIdUseCase retrieveStreamInfoByExternalIdUseCase;
+    private final EventServicePort retrieveStreamInfoByExternalIdUseCase;
 
-    private final CreateUserUseCase createUserUseCase;
+    private final UserServicePort createUserUseCase;
 
-    private final GetUserGeolocationUseCase getUserGeolocationUseCase;
+    private final UserGeolocationServicePort getUserGeolocationUseCase;
 
-    public VideoApiController(RetrieveStreamInfoByExternalIdUseCase retrieveStreamInfoByExternalIdUseCase, CreateUserUseCase createUserUseCase, GetUserGeolocationUseCase getUserGeolocationUseCase) {
+    public VideoApiController(EventServicePort retrieveStreamInfoByExternalIdUseCase, UserServicePort createUserUseCase, UserGeolocationServicePort getUserGeolocationUseCase) {
         this.retrieveStreamInfoByExternalIdUseCase = retrieveStreamInfoByExternalIdUseCase;
         this.createUserUseCase = createUserUseCase;
         this.getUserGeolocationUseCase = getUserGeolocationUseCase;

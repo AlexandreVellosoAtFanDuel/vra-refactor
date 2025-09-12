@@ -2,12 +2,12 @@ package com.betfair.video.domain.service;
 
 
 import com.betfair.video.domain.dto.valueobject.Geolocation;
-import com.betfair.video.domain.port.input.GetUserGeolocationUseCase;
+import com.betfair.video.domain.port.input.UserGeolocationServicePort;
 import com.betfair.video.domain.port.output.GeolocationPort;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserGeolocationService implements GetUserGeolocationUseCase {
+public class UserGeolocationService implements UserGeolocationServicePort {
 
     private final GeolocationPort geolocationPort;
 

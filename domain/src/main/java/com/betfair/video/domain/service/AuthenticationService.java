@@ -1,12 +1,12 @@
 package com.betfair.video.domain.service;
 
 import com.betfair.video.domain.dto.valueobject.UserSessionDto;
-import com.betfair.video.domain.port.input.VerifySessionUseCase;
+import com.betfair.video.domain.port.input.AuthenticationServicePort;
 import com.betfair.video.domain.port.output.AuthenticationPort;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthenticationService implements VerifySessionUseCase {
+public class AuthenticationService implements AuthenticationServicePort {
 
     private final AuthenticationPort authentication;
 

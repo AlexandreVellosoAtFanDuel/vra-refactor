@@ -11,7 +11,7 @@ import com.betfair.video.domain.dto.valueobject.StreamDetails;
 import com.betfair.video.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.domain.dto.valueobject.VideoStreamEndpoint;
 import com.betfair.video.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.domain.port.input.GeoRestrictionsUseCase;
+import com.betfair.video.domain.port.input.GeoRestrictionsServicePort;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -28,9 +28,9 @@ import java.util.TreeSet;
 @Component
 public class VideoStreamInfoMapper {
 
-    private final GeoRestrictionsUseCase geoRestrictionsUseCase;
+    private final GeoRestrictionsServicePort geoRestrictionsUseCase;
 
-    public VideoStreamInfoMapper(GeoRestrictionsUseCase geoRestrictionsUseCase) {
+    public VideoStreamInfoMapper(GeoRestrictionsServicePort geoRestrictionsUseCase) {
         this.geoRestrictionsUseCase = geoRestrictionsUseCase;
     }
 
