@@ -6,6 +6,7 @@ import com.betfair.video.api.domain.dto.entity.TypeMobileDevice;
 import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
 import com.betfair.video.api.domain.dto.valueobject.ContentType;
+import com.betfair.video.api.domain.dto.valueobject.RetrieveScheduleByExternalIdParams;
 import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
 import com.betfair.video.api.domain.dto.valueobject.UserPermissions;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
@@ -76,8 +77,8 @@ class EventServiceTest {
                 .thenReturn(videoStreamInfoMock);
 
         // When
-        VideoStreamInfo result = eventService.retrieveScheduleByExternalId(
-                context, "1", "12345", null, null, null, null, null, null, null, null, ContentType.VID, null, null);
+        var params = new RetrieveScheduleByExternalIdParams(context, "1", "12345", null, null, null, null, null, null, null, null, ContentType.VID, null, null);
+        VideoStreamInfo result = eventService.retrieveScheduleByExternalId(params);
 
         // Then
         assertThat(result).isNotNull();
@@ -96,7 +97,8 @@ class EventServiceTest {
         when(context.user()).thenReturn(user);
 
         // When & Then
-        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(context, null, null, null, null, null, null, null, null, null, null, null, null, null))
+        var params = new RetrieveScheduleByExternalIdParams(context, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(params))
                 .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
                     VideoException videoException = (VideoException) exception;
@@ -118,8 +120,8 @@ class EventServiceTest {
         when(context.user()).thenReturn(user);
 
         // When & Then
-        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, "1", "12345", TypeChannel.NULL.getId(), null, null, null, null, null, null, null, ContentType.VID, null, null))
+        var params = new RetrieveScheduleByExternalIdParams(context, "1", "12345", TypeChannel.NULL.getId(), null, null, null, null, null, null, null, ContentType.VID, null, null);
+        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(params))
                 .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
                     VideoException videoException = (VideoException) exception;
@@ -141,8 +143,8 @@ class EventServiceTest {
         when(context.user()).thenReturn(user);
 
         // When & Then
-        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, "1", "12345", TypeChannel.WEB.getId(), null, TypeMobileDevice.ANDROID_PHONE.getId(), null, null, null, null, null, ContentType.VID, null, null))
+        var params = new RetrieveScheduleByExternalIdParams(context, "1", "12345", TypeChannel.WEB.getId(), null, TypeMobileDevice.ANDROID_PHONE.getId(), null, null, null, null, null, ContentType.VID, null, null);
+        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(params))
                 .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
                     VideoException videoException = (VideoException) exception;
@@ -164,8 +166,8 @@ class EventServiceTest {
         when(context.user()).thenReturn(user);
 
         // When & Then
-        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(
-                context, "1", "12345", TypeChannel.MOBILE.getId(), null, TypeMobileDevice.NULL.getId(), null, null, null, null, null, ContentType.VID, null, null))
+        var params = new RetrieveScheduleByExternalIdParams(context, "1", "12345", TypeChannel.MOBILE.getId(), null, TypeMobileDevice.NULL.getId(), null, null, null, null, null, ContentType.VID, null, null);
+        assertThatThrownBy(() -> eventService.retrieveScheduleByExternalId(params))
                 .isInstanceOf(VideoException.class)
                 .satisfies(exception -> {
                     VideoException videoException = (VideoException) exception;

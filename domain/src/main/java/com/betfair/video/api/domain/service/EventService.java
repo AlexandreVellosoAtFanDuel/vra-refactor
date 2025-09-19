@@ -6,11 +6,10 @@ import com.betfair.video.api.domain.dto.entity.TypeMobileDevice;
 import com.betfair.video.api.domain.dto.entity.TypeStream;
 import com.betfair.video.api.domain.dto.search.VRAStreamSearchKey;
 import com.betfair.video.api.domain.dto.search.VideoStreamInfoByExternalIdSearchKey;
-import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.ExternalId;
 import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
+import com.betfair.video.api.domain.dto.valueobject.RetrieveScheduleByExternalIdParams;
 import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
-import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
 import com.betfair.video.api.domain.exception.InsufficientAccessException;
 import com.betfair.video.api.domain.exception.InvalidInputException;
@@ -44,20 +43,17 @@ public class EventService implements EventServicePort {
     }
 
     @Override
-    public VideoStreamInfo retrieveScheduleByExternalId(RequestContext context, String externalIdSource, String externalId,
-                                                        Integer channelTypeId, List<Integer> channelSubTypeIds, Integer mobileDeviceId,
-                                                        String mobileOsVersion, Integer mobileScreenDensityDpi, VideoQuality videoQuality,
-                                                        String commentaryLanguage, Integer providerId, ContentType contentType,
-                                                        Boolean includeMetadata, String providerParams) {
+    public VideoStreamInfo retrieveScheduleByExternalId(RetrieveScheduleByExternalIdParams params) {
+        RequestContext context = params.context();
 
         if (!context.user().permissions().hasPermission(ServicePermission.VIDEO)) {
             logger.error("[{}]: Access permissions are insufficient for the requested operation or data for user (...)", context.uuid());
             throw new InsufficientAccessException();
         }
 
-        ExternalIdSource source = ExternalIdSource.fromExternalIdSource(externalIdSource);
+        ExternalIdSource source = ExternalIdSource.fromExternalIdSource(params.externalIdSource());
 
-        ExternalId parsedExternalIds = ExternalIdMapper.map(source, Set.of(externalId));
+        ExternalId parsedExternalIds = ExternalIdMapper.map(source, Set.of(params.externalId()));
 
         String primaryId = null;
         String secondaryId = null;
@@ -67,29 +63,29 @@ public class EventService implements EventServicePort {
             secondaryId = !entry.getValue().isEmpty() ? entry.getValue().getFirst() : null;
         }
 
-        Integer requestedStreamTypeId = TypeStreamMapper.convertContentTypeToStreamTypeId(contentType);
+        Integer requestedStreamTypeId = TypeStreamMapper.convertContentTypeToStreamTypeId(params.contentType());
 
         VideoStreamInfoByExternalIdSearchKey searchKey = new VideoStreamInfoByExternalIdSearchKey.Builder()
                 .externalIdSource(parsedExternalIds.externalIdSource())
                 .primaryId(primaryId)
                 .secondaryId(secondaryId)
-                .channelTypeId(channelTypeId)
-                .channelSubTypeIds(channelSubTypeIds)
-                .mobileDeviceId(mobileDeviceId)
-                .mobileOsVersion(mobileOsVersion)
-                .mobileScreenDensityDpi(mobileScreenDensityDpi)
-                .videoQuality(videoQuality)
-                .commentaryLanguage(commentaryLanguage)
-                .providerId(providerId)
-                .contentType(contentType)
+                .channelTypeId(params.channelTypeId())
+                .channelSubTypeIds(params.channelSubTypeIds())
+                .mobileDeviceId(params.mobileDeviceId())
+                .mobileOsVersion(params.mobileOsVersion())
+                .mobileScreenDensityDpi(params.mobileScreenDensityDpi())
+                .videoQuality(params.videoQuality())
+                .commentaryLanguage(params.commentaryLanguage())
+                .providerId(params.providerId())
+                .contentType(params.contentType())
                 .streamTypeIds(requestedStreamTypeId != null ? Collections.singleton(requestedStreamTypeId) : TypeStream.REGULAR_STREAM_TYPES)
                 .brandIds(Collections.singleton(streamingBrandId))
-                .providerParams(providerParams)
+                .providerParams(params.providerParams())
                 .build();
 
         validateChannelParams(context.uuid(), searchKey);
 
-        return streamService.getStreamInfoByExternalId(searchKey, context, Boolean.TRUE.equals(includeMetadata));
+        return streamService.getStreamInfoByExternalId(searchKey, context, Boolean.TRUE.equals(params.includeMetadata()));
     }
 
     private void validateChannelParams(final String uuid, final VRAStreamSearchKey searchKey) throws VideoException {
