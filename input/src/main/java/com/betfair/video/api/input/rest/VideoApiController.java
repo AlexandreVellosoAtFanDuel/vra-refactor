@@ -1,14 +1,12 @@
 package com.betfair.video.api.input.rest;
 
 import com.betfair.video.api.domain.dto.entity.RequestContext;
-import com.betfair.video.api.domain.dto.entity.User;
 import com.betfair.video.api.domain.dto.valueobject.ContentType;
 import com.betfair.video.api.domain.dto.valueobject.Geolocation;
 import com.betfair.video.api.domain.dto.valueobject.VideoQuality;
 import com.betfair.video.api.domain.dto.valueobject.VideoStreamInfo;
-import com.betfair.video.api.domain.port.input.UserServicePort;
-import com.betfair.video.api.domain.port.input.UserGeolocationServicePort;
 import com.betfair.video.api.domain.port.input.EventServicePort;
+import com.betfair.video.api.domain.port.input.UserGeolocationServicePort;
 import com.betfair.video.api.input.rest.dto.ContentTypeDto;
 import com.betfair.video.api.input.rest.dto.UserGeolocationDto;
 import com.betfair.video.api.input.rest.dto.VideoQualityDto;
@@ -28,22 +26,14 @@ import java.util.List;
 @RequestMapping("/VideoAPI/v1.0")
 public class VideoApiController {
 
-    private static final String UUID_HEADER = "X-UUID";
-    private static final String X_IP = "X-IP";
-    private static final String ACCOUNT_ID = "accountId";
-    private static final String USER_ID = "userId";
-
     private static final Logger logger = LoggerFactory.getLogger(VideoApiController.class);
 
     private final EventServicePort retrieveStreamInfoByExternalIdUseCase;
 
-    private final UserServicePort createUserUseCase;
-
     private final UserGeolocationServicePort getUserGeolocationUseCase;
 
-    public VideoApiController(EventServicePort retrieveStreamInfoByExternalIdUseCase, UserServicePort createUserUseCase, UserGeolocationServicePort getUserGeolocationUseCase) {
+    public VideoApiController(EventServicePort retrieveStreamInfoByExternalIdUseCase, UserGeolocationServicePort getUserGeolocationUseCase) {
         this.retrieveStreamInfoByExternalIdUseCase = retrieveStreamInfoByExternalIdUseCase;
-        this.createUserUseCase = createUserUseCase;
         this.getUserGeolocationUseCase = getUserGeolocationUseCase;
     }
 
@@ -64,14 +54,7 @@ public class VideoApiController {
             @RequestParam(value = "providerId", required = false) Integer providerId,
             @RequestParam(value = "providerParams", required = false) String providerParams
     ) {
-        final String uuid = request.getHeader(UUID_HEADER);
-        final String accountId = (String) request.getAttribute(ACCOUNT_ID);
-        final String userId = (String) request.getAttribute(USER_ID);
-        final String ip = request.getHeader(X_IP);
-
-        User user = this.createUserUseCase.createUser(uuid, ip, accountId, userId);
-
-        RequestContext context = new RequestContext(uuid, ip, user);
+        RequestContext context = (RequestContext) request.getAttribute("context");
 
         logger.info("[{}]: Enter retrieveStreamInfoByExternalId, source: {}, id: {}, channelTypeId: {}, mobileDeviceId: {}", context.uuid(), externalIdSource, externalId, channelTypeId, mobileDeviceId);
 
@@ -99,12 +82,11 @@ public class VideoApiController {
 
     @RequestMapping("/retrieveUserGeolocation")
     public UserGeolocationDto retrieveUserGeolocation(HttpServletRequest request) {
-        final String uuid = request.getHeader(UUID_HEADER);
-        final String userIp = request.getHeader(X_IP);
+        RequestContext context = (RequestContext) request.getAttribute("context");
 
-        Geolocation userGeolocation = this.getUserGeolocationUseCase.getUserGeolocation(uuid, userIp);
+        Geolocation userGeolocation = this.getUserGeolocationUseCase.getUserGeolocation(context.uuid(), context.ip());
 
-        logger.info("[{}] Enter retrieveUserGeolocation", uuid);
+        logger.info("[{}] Enter retrieveUserGeolocation", context.uuid());
 
         return UserGeolocationMapper.mapToDto(userGeolocation);
     }
