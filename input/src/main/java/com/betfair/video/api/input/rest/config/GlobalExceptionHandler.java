@@ -1,6 +1,7 @@
 package com.betfair.video.api.input.rest.config;
 
 import com.betfair.video.api.domain.exception.BBVNoStakesException;
+import com.betfair.video.api.domain.exception.NoSessionException;
 import com.betfair.video.api.domain.exception.StreamNotStartedException;
 import com.betfair.video.api.domain.exception.VideoException;
 import com.betfair.video.api.input.rest.dto.VideoExceptionDto;
@@ -107,6 +108,17 @@ public class GlobalExceptionHandler {
         logger.warn("[{}]: Missing parameter: {}", uuid, ex.getParameterName());
 
         return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler({NoSessionException.class})
+    public Map<String, Object> handleNoSessionException(VideoException ex, HttpServletRequest request) {
+
+        final String uuid = request.getHeader(X_UUID);
+
+        logError(uuid, ex);
+
+        return createErrorResponse(ex, FaultCode.CLIENT);
     }
 
 //    private HttpStatus mapErrorCodeToHttpStatus(VideoAPIExceptionErrorCodeEnum errorCode) {

@@ -30,11 +30,7 @@ public class ContextInterceptor implements HandlerInterceptor {
         final String userId = (String) request.getAttribute(USER_ID);
         final String ip = request.getHeader(X_IP);
 
-        User user = null;
-
-        if (accountId != null && userId != null) {
-            user = this.createUserUseCase.createUser(uuid, ip, accountId, userId);
-        }
+        User user = this.createUserUseCase.createUser(uuid, ip, accountId, userId);
 
         RequestContext context = new RequestContext(uuid, ip, user);
 

@@ -31,10 +31,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
         logger.info("[{}]: Enter AuthenticationInterceptor", uuid);
 
-        UserSessionDto session = verifySessionUseCase.verifySession(xAuthentication);
+        if (xAuthentication != null && !xAuthentication.isEmpty()) {
+            UserSessionDto session = verifySessionUseCase.verifySession(xAuthentication);
 
-        request.setAttribute("accountId", session.accountId());
-        request.setAttribute("userId", session.userId());
+            request.setAttribute("accountId", session.accountId());
+            request.setAttribute("userId", session.userId());
+        }
 
         return true;
     }

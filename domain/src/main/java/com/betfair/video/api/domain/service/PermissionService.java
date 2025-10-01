@@ -9,7 +9,9 @@ import com.betfair.video.api.domain.dto.valueobject.ExternalIdSource;
 import com.betfair.video.api.domain.dto.valueobject.ServicePermission;
 import com.betfair.video.api.domain.dto.valueobject.UserPermissions;
 import com.betfair.video.api.domain.exception.CannotUniquelyResolveStreamException;
+import com.betfair.video.api.domain.exception.NoSessionException;
 import com.betfair.video.api.domain.exception.StreamNotFoundException;
+import com.betfair.video.api.domain.port.output.AuthenticationIgnoredPort;
 import com.betfair.video.api.domain.utils.ScheduleItemUtils;
 import com.betfair.video.api.domain.utils.StreamExceptionLoggingUtils;
 import org.slf4j.Logger;
@@ -36,8 +38,11 @@ public class PermissionService {
 
     private final StreamExceptionLoggingUtils streamExceptionLoggingUtils;
 
-    public PermissionService(StreamExceptionLoggingUtils streamExceptionLoggingUtils) {
+    private final AuthenticationIgnoredPort authenticationIgnoredPort;
+
+    public PermissionService(StreamExceptionLoggingUtils streamExceptionLoggingUtils, AuthenticationIgnoredPort authenticationIgnoredPort) {
         this.streamExceptionLoggingUtils = streamExceptionLoggingUtils;
+        this.authenticationIgnoredPort = authenticationIgnoredPort;
     }
 
     public UserPermissions createUserPermissions() {
@@ -69,19 +74,19 @@ public class PermissionService {
     }
 
     private Set<Character> getUserValidMappingStatuses() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     private Set<Character> getUserValidMappingApprovalStatuses() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     private Set<Character> getUserValidImportStatuses() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     private Set<Character> getUserValidImportApprovalStatuses() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     public boolean checkUserPermissionsAgainstItem(ScheduleItem item, User user) {
@@ -100,7 +105,7 @@ public class PermissionService {
         }
 
         checkUserPermissionsAgainstExternalIdProvider(context.user(), searchKey, eventIdentifier);
-        checkUserSession(context.user(), items, eventIdentifier);
+        checkUserSession(context, items, eventIdentifier);
         additionalInfo = checkUserPermissionsAgainstItemStatus(items, searchKey, context.user());
 
         if (items.size() > 1) {
@@ -130,8 +135,23 @@ public class PermissionService {
         // TODO: implement this method
     }
 
-    private void checkUserSession(User user, List<ScheduleItem> items, VideoRequestIdentifier eventIdentifier) {
-        // TODO: Implement this method
+    private void checkUserSession(RequestContext context, List<ScheduleItem> items, VideoRequestIdentifier eventIdentifier) {
+        final User user = context.user();
+
+        // No session
+        if (user.userId() == null) {
+            items = items.stream()
+                    .filter(item -> authenticationIgnoredPort.isProviderInList(item.providerId(), item.videoChannelType()))
+                    .toList();
+        }
+
+        if (items.isEmpty()) {
+            String additionalInfo = String.format("{User has no valid session. AccountId: %s, Request identifier: %s}", user.accountId(), eventIdentifier);
+
+            NoSessionException exception = new NoSessionException(additionalInfo, null);
+            streamExceptionLoggingUtils.logException(logger, eventIdentifier, Level.ERROR, context, exception, items, additionalInfo);
+            throw exception;
+        }
     }
 
     private String checkUserPermissionsAgainstItemStatus(List<ScheduleItem> items, VideoStreamInfoByExternalIdSearchKey searchKey, User user) {

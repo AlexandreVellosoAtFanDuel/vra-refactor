@@ -46,7 +46,7 @@ public class EventService implements EventServicePort {
     public VideoStreamInfo retrieveScheduleByExternalId(RetrieveScheduleByExternalIdParams params) {
         RequestContext context = params.context();
 
-        if (!context.user().permissions().hasPermission(ServicePermission.VIDEO)) {
+        if (context.user() == null || !context.user().permissions().hasPermission(ServicePermission.VIDEO)) {
             logger.error("[{}]: Access permissions are insufficient for the requested operation or data for user (...)", context.uuid());
             throw new InsufficientAccessException();
         }
