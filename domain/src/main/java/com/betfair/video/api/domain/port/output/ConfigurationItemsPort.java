@@ -24,4 +24,5 @@ public interface ConfigurationItemsPort {
 
     StreamingFormat findPreferredStreamingFormat(Provider provider, Integer integer, Integer integer1, Integer integer2, Integer integer3);
 
+    String findProviderBlockedCountries(Integer providerId, Integer videoChannelType, Integer betfairSportsType, Integer streamTypeId, Integer brandId);
 }

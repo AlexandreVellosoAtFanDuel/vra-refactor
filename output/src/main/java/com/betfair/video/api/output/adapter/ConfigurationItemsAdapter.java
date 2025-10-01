@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.EnumMap;
 import java.util.Map;
 
 @Component
@@ -34,54 +35,56 @@ public class ConfigurationItemsAdapter implements ConfigurationItemsPort, Refres
     }
 
     @Override
-    public Map<ConfigurationType, String> getSizeRestrictions(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
-        // TODO: Fetch from configuration
-        return Map.of(
-                ConfigurationType.SIZE_RESTRICTION_FULLSCREEN_ALLOWED, "false",
-                ConfigurationType.SIZE_RESTRICTION_ASPECT_RATIO, "0.5625",
-                ConfigurationType.SIZE_RESTRICTION_MAX_WIDTH, "1080",
-                ConfigurationType.SIZE_RESTRICTION_DEAFULT_WIDTH, "480"
-        );
+    public Map<ConfigurationType, String> getSizeRestrictions(Integer providerId, Integer channelType, Integer sportType, Integer streamTypeId, Integer brandId) {
+        return this.getConfigItems(new ConfigurationType[]{ConfigurationType.SIZE_RESTRICTION_WIDTH_CENTIMETER, ConfigurationType.SIZE_RESTRICTION_WIDTH_PIXEL, ConfigurationType.SIZE_RESTRICTION_WIDTH_PERCENTAGE, ConfigurationType.SIZE_RESTRICTION_HEIGHT_CENTIMETER, ConfigurationType.SIZE_RESTRICTION_HEIGHT_PIXEL, ConfigurationType.SIZE_RESTRICTION_HEIGHT_PERCENTAGE, ConfigurationType.SIZE_RESTRICTION_FULLSCREEN_ALLOWED, ConfigurationType.SIZE_RESTRICTION_AIRPLAY_ALLOWED, ConfigurationType.SIZE_RESTRICTION_ASPECT_RATIO, ConfigurationType.SIZE_RESTRICTION_MAX_WIDTH, ConfigurationType.SIZE_RESTRICTION_DEAFULT_WIDTH}, providerId, channelType, sportType, streamTypeId, brandId);
     }
 
     @Override
-    public ConfigurationItem findVideoPlayerConfig(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
-        // TODO: Fetch from configuration
-        return new ConfigurationItem(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                "hls::{'maxBufferLength':30,'maxBufferSize':60000000,'maxMaxBufferLength':600,'liveSyncDurationCount':2,'liveMaxLatencyDurationCount':'3','abrEwmaFastLive':3.0,'abrEwmaSlowLive':9.0}--rtmp::{'maxBufferLength':1,'maxBufferSize':1,'maxMaxBufferLength':1,'liveSyncDurationCount':1,'liveMaxLatencyDurationCount':1,'abrEwmaFastLive':1,'abrEwmaSlowLive':1}",
-                null,
-                null
-        );
+    public ConfigurationItem findVideoPlayerConfig(Integer providerId, Integer channelType, Integer sportType, Integer streamTypeId, Integer brandId) {
+        return this.find(ConfigurationType.VIDEO_PLAYER_CONFIG, providerId, channelType, sportType != null ? sportType : TypeSport.NULL.getSportId(), -1, streamTypeId, brandId);
     }
 
     @Override
-    public String getDefaultBufferingInterval(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
-        // TODO: Fetch from configuration
-        return "1";
+    public String getDefaultBufferingInterval(Integer providerId, Integer channelType, Integer sportType, Integer streamTypeId, Integer brandId) {
+        ConfigurationItem item = this.find(ConfigurationType.DEFAULT_BUFFERING_INTERVAL, providerId, channelType, sportType, -1, streamTypeId, brandId);
+        return item != null ? item.configValue() : "";
     }
 
     @Override
-    public String getDefaultVideoQuality(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
-        // TODO: Fetch from configuration
-        return "MEDIUM";
+    public String getDefaultVideoQuality(Integer providerId, Integer channelType, Integer sportType, Integer streamTypeId, Integer brandId) {
+        ConfigurationItem item = this.find(ConfigurationType.DEFAULT_VIDEO_QUALITY, providerId, channelType, sportType, -1, streamTypeId, brandId);
+        return item != null ? item.configValue() : "";
     }
 
     @Override
-    public String findProviderWatchAndBetVenues(Integer integer, Integer integer1, Integer integer2, Integer integer3, Integer integer4) {
-        // TODO: Fetch from configuration
-        return null;
+    public String findProviderWatchAndBetVenues(Integer providerId, Integer channelType, Integer sportType, Integer streamTypeId, Integer brandId) {
+        ConfigurationItem value = this.find(ConfigurationType.PROVIDER_WATCH_AND_BET_VENUES, providerId, channelType, sportType, -1, streamTypeId, brandId);
+        return value != null ? value.configValue() : null;
     }
 
     @Override
-    public StreamingFormat findPreferredStreamingFormat(Provider provider, Integer integer, Integer integer1, Integer integer2, Integer integer3) {
-        // TODO: Fetch from configuration
-        return StreamingFormat.HLS;
+    public StreamingFormat findPreferredStreamingFormat(Provider provider, Integer channelType, Integer sportType, Integer streamTypeId, Integer brandId) {
+        ConfigurationItem value = this.find(ConfigurationType.PREFERRED_STREAMING_FORMAT, provider.getId(), channelType, sportType, -1, streamTypeId, brandId);
+        return value != null && value.configValue() != null ? StreamingFormat.fromValue(value.configValue().trim()) : null;
+    }
+
+    @Override
+    public String findProviderBlockedCountries(Integer providerId, Integer videoChannelType, Integer sportType, Integer streamTypeId, Integer brandId) {
+        ConfigurationItem value = this.find(ConfigurationType.GEO_BLOCKING, providerId, videoChannelType, sportType, -1, streamTypeId, brandId);
+        return value != null ? value.configValue() : null;
+    }
+
+    private Map<ConfigurationType, String> getConfigItems(ConfigurationType[] types, Integer providerId, Integer channelTypeId, Integer sportType, Integer streamTypeId, Integer brandId) {
+        Map<ConfigurationType, String> result = new EnumMap<>(ConfigurationType.class);
+
+        for (ConfigurationType configurationType : types) {
+            ConfigurationItem item = this.find(configurationType, providerId, channelTypeId, sportType, -1, streamTypeId, brandId);
+            if (item != null) {
+                result.put(configurationType, item.configValue());
+            }
+        }
+
+        return result;
     }
 
     private ConfigurationItem find(ConfigurationType configType, Integer providerId, Integer channelType, Integer sportType, Integer mappingProviderId, Integer streamType, Integer brandId) {
