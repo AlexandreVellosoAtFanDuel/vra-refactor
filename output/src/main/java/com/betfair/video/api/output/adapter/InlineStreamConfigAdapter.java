@@ -8,11 +8,13 @@ public class InlineStreamConfigAdapter implements InlineStreamConfigPort {
 
     @Override
     public boolean isArchivedProviderInList(Integer integer, boolean b) {
+        // TODO: fetch from configuration
         return false;
     }
 
     @Override
     public boolean isProviderInList(Integer integer, Integer integer1) {
+        // TODO: fetch from configuration
         return false;
     }
 
