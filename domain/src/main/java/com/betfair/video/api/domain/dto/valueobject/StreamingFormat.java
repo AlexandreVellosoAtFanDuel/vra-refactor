@@ -8,7 +8,8 @@ public enum StreamingFormat {
     CMAF_DASH("cmaf-dash"),
     MP4("mp4"),
     WS("webrtc"),
-    IFRAME("iframe");
+    IFRAME("iframe"),
+    LL_HLS("ll-hls");
 
     private final String value;
 

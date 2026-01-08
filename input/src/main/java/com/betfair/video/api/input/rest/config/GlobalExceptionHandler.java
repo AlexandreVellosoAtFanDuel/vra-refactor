@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
             CannotUniquelyResolveStreamException.class,
             StreamHasEndedException.class
     })
-    public Map<String, Object> handleNotFoundException(StreamNotStartedException ex, HttpServletRequest request) {
+    public Map<String, Object> handleNotFoundException(VideoException ex, HttpServletRequest request) {
 
         final String uuid = request.getHeader(X_UUID);
 

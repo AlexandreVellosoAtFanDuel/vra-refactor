@@ -35,7 +35,6 @@ public class VideoException extends RuntimeException {
         return sportType;
     }
 
-    // TODO: Verify a better place for this enum
     public enum ErrorCodeEnum {
 
         /**

@@ -99,6 +99,7 @@ public class BetradarV2Adapter implements StreamingProviderPort {
             case CMAF_DASH -> "cmaf-manifest";
             case MPEG_DASH -> "dash-manifest";
             case HLS -> "hls-manifest";
+            case LL_HLS -> "ll-hls-manifest";
             default -> streamFormat.getValue();
         };
 
@@ -165,6 +166,10 @@ public class BetradarV2Adapter implements StreamingProviderPort {
         StreamingFormat streamFormat = StreamingFormat.fromValue(requestParams.get(RequestParams.STREAM_FORMAT.name()));
 
         Map<String, String> params = new HashMap<>();
+
+        if (StreamingFormat.LL_HLS.equals(streamFormat)) {
+            streamFormat = StreamingFormat.HLS;
+        }
 
         params.put("streamFormat", streamFormat.getValue());
 

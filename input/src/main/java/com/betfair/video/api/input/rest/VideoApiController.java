@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/VideoAPI/v1.0")
+@RequestMapping("/VideoAPI/v2.0")
 public class VideoApiController {
 
     private static final Logger logger = LoggerFactory.getLogger(VideoApiController.class);

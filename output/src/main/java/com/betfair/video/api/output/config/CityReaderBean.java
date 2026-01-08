@@ -39,7 +39,7 @@ public class CityReaderBean {
             FileInputStream fileInputStream = new FileInputStream(dbFile);
 
             logger.info("GeoIP2-City database file loaded successfully from: {} (configured path: {})",
-                       dbFile.getAbsolutePath(), geoipDatabaseFilePath);
+                    dbFile.getAbsolutePath(), geoipDatabaseFilePath);
 
             return loadDbReader(fileInputStream);
 
